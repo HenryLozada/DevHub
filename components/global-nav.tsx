@@ -7,6 +7,7 @@ interface GlobalNavProps {
   onTabChange: (tab: "calendar" | "budgeted" | "chores" | "devhub") => void
   theme: "light" | "dark"
   onToggleTheme: () => void
+  rightSlot?: React.ReactNode
 }
 
 const TABS = [
@@ -16,7 +17,7 @@ const TABS = [
   { id: "devhub" as const, label: "DevHub", icon: Terminal },
 ]
 
-export function GlobalNav({ activeTab, onTabChange, theme, onToggleTheme }: GlobalNavProps) {
+export function GlobalNav({ activeTab, onTabChange, theme, onToggleTheme, rightSlot }: GlobalNavProps) {
   return (
     <nav className="sticky top-0 z-50 bg-black border-b border-zinc-800">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -54,6 +55,7 @@ export function GlobalNav({ activeTab, onTabChange, theme, onToggleTheme }: Glob
 
           {/* Right */}
           <div className="flex items-center gap-3">
+            {rightSlot}
             <button
               onClick={onToggleTheme}
               className="p-2 rounded-sm bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 hover:border-zinc-700 text-zinc-500 hover:text-zinc-300 transition-all cursor-pointer"

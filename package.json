@@ -13,6 +13,7 @@
     "@astrojs/check": "^0.9.9",
     "@astrojs/react": "^4.0.0",
     "@base-ui/react": "^1.5.0",
+    "@supabase/supabase-js": "^2.110.3",
     "astro": "^5.0.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
