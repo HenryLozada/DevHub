@@ -16,7 +16,6 @@ import {
 import {
   type PersonalEvent,
   type EventOccurrence,
-  INITIAL_PERSONAL_EVENTS,
   projectPersonalMonth,
 } from "@/lib/events"
 import { MonthGrid } from "@/components/month-grid"
@@ -27,21 +26,14 @@ import { EventDialog } from "@/components/event-dialog"
 import { sileo } from "sileo"
 import { cn } from "@/lib/utils"
 
-const SEED_RULES: CashflowRule[] = [
-  { id: "r1", concepto: "Renta", monto: 4000, tipo: "egreso", recurrencia: "mensual", diaDelMes: 8 },
-  { id: "r2", concepto: "Internet", monto: 600, tipo: "egreso", recurrencia: "mensual", diaDelMes: 10 },
-  { id: "r3", concepto: "Nómina Semanal", monto: 2000, tipo: "ingreso", recurrencia: "semanal", diaSemana: 5 },
-]
-
 export function CashflowCalendar() {
   const today = new Date()
   const [viewYear, setViewYear] = useState(today.getFullYear())
   const [viewMonth, setViewMonth] = useState(today.getMonth())
   const [selectedDate, setSelectedDate] = useState(today)
   const [activeTab, setActiveTab] = useState<"finanzas" | "eventos">("eventos")
-  // Estado inicial: mismos datos que SSR para evitar mismatch de hidratación.
-  const [rules, setRules] = useState<CashflowRule[]>(SEED_RULES)
-  const [events, setEvents] = useState<PersonalEvent[]>(INITIAL_PERSONAL_EVENTS)
+  const [rules, setRules] = useState<CashflowRule[]>([])
+  const [events, setEvents] = useState<PersonalEvent[]>([])
 
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editingRule, setEditingRule] = useState<CashflowRule | null>(null)
