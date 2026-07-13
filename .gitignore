@@ -1,0 +1,23 @@
+# Environment variables
+.env
+.env*.local
+
+# Build output
+dist/
+.astro/
+
+# Dependencies
+node_modules/
+
+# OS files
+.DS_Store
+
+# Standalone project archives
+*.zip
+budgeted---shared-expense-tracker/
+done-&-dusted/
+weather-dashboard-agent/
+
+# Misc
+.vercel/
+.snowflake/
