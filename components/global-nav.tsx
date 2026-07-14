@@ -32,20 +32,20 @@ export function GlobalNav({ activeTab, onTabChange, theme, onToggleTheme, rightS
           </div>
 
           {/* Tabs */}
-          <div className="flex items-center h-full">
+          <div className="flex items-center h-full overflow-x-auto no-scrollbar gap-0.5">
             {TABS.map(({ id, label, icon: Icon }) => (
               <button
                 key={id}
                 onClick={() => onTabChange(id)}
                 className={cn(
-                  "relative flex items-center gap-2 h-full px-4 text-xs font-mono font-bold uppercase tracking-wider transition-colors cursor-pointer select-none",
+                  "relative flex items-center gap-1.5 h-full px-2.5 md:px-4 text-[10px] md:text-xs font-mono font-bold uppercase tracking-wider transition-colors cursor-pointer select-none shrink-0",
                   activeTab === id
                     ? "text-[#76b900]"
                     : "text-zinc-500 hover:text-zinc-300"
                 )}
               >
-                <Icon className="size-3.5" />
-                {label}
+                <Icon className="size-3 md:size-3.5" />
+                <span className="hidden md:inline">{label}</span>
                 {activeTab === id && (
                   <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#76b900]" />
                 )}

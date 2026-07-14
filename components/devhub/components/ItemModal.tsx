@@ -124,7 +124,7 @@ export function ItemModal({ item, onClose, onSaved }: ItemModalProps) {
         <div className="corner-square" />
 
         {/* Black Header */}
-        <div className="bg-black text-white px-6 py-4 flex items-center justify-between border-b border-zinc-800 select-none">
+        <div className="bg-black text-white px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between border-b border-zinc-800 select-none">
           <h3 className="text-sm font-mono font-bold tracking-wider uppercase text-zinc-100 flex items-center gap-2">
             <span className="text-[#76b900]">//</span> {item ? "Editar Elemento" : "Nuevo Elemento"}
           </h3>
@@ -137,7 +137,7 @@ export function ItemModal({ item, onClose, onSaved }: ItemModalProps) {
         </div>
 
         {/* Form Body */}
-        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
           {/* Title */}
           <div>
             <label className="block text-[10px] font-mono font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-widest mb-1.5">

@@ -44,23 +44,23 @@ export function Dashboard({ expenses, onRefresh }: DashboardProps) {
   const categories = [...new Set(expenses.map(e => e.category))]
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8">
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h2 className="text-3xl font-bold text-zinc-950 dark:text-white font-sans uppercase tracking-tight">Mis Gastos</h2>
-          <p className="text-zinc-500 text-xs mt-1 font-mono uppercase tracking-wider">
+    <div className="max-w-4xl mx-auto px-3 md:px-4 py-4 md:py-8">
+      <div className="flex items-center justify-between mb-4 md:mb-8">
+        <div className="min-w-0">
+          <h2 className="text-xl md:text-3xl font-bold text-zinc-950 dark:text-white font-sans uppercase tracking-tight truncate">Mis Gastos</h2>
+          <p className="text-zinc-500 text-[10px] md:text-xs mt-0.5 md:mt-1 font-mono uppercase tracking-wider truncate">
             {expenses.length} registros · ${fmt(unpaidTotal)} pendiente
           </p>
         </div>
         <button onClick={() => { setEditing(null); setShowAdd(true) }}
-          className="flex items-center gap-1.5 px-4 py-2 bg-[#76b900] text-black rounded-none text-xs font-mono font-bold uppercase tracking-wider hover:bg-[#86cb00] transition-colors border border-[#76b900]">
-          <Plus className="w-4 h-4" /> Gasto
+          className="flex items-center gap-1.5 px-3 md:px-4 py-1.5 md:py-2 bg-[#76b900] text-black rounded-none text-[10px] md:text-xs font-mono font-bold uppercase tracking-wider hover:bg-[#86cb00] transition-colors border border-[#76b900] shrink-0">
+          <Plus className="w-3.5 h-3.5 md:w-4 md:h-4" /> Gasto
         </button>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-4 mb-8">
-        <div className="bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 p-5 rounded-none shadow-xs relative overflow-hidden">
+      <div className="grid grid-cols-3 gap-2 md:gap-4 mb-4 md:mb-8">
+        <div className="bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 p-3 md:p-5 rounded-none shadow-xs relative overflow-hidden">
           <div className="corner-square" />
           <p className="font-mono text-[9px] uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-1">Total</p>
           <p className="text-2xl font-mono font-bold text-[#76b900]">${fmt(total)}</p>
@@ -149,10 +149,10 @@ export function Dashboard({ expenses, onRefresh }: DashboardProps) {
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               className="absolute inset-0 bg-black/40 backdrop-blur-xs" onClick={() => setConfirmDelete(null)} />
             <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}
-              className="relative w-full max-w-sm bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-none p-8 text-center shadow-xs overflow-hidden">
+              className="relative w-full max-w-sm bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-none p-4 sm:p-8 text-center shadow-xs overflow-hidden">
               <div className="corner-square" />
-              <div className="w-14 h-14 bg-red-500/10 border border-red-500/20 rounded-none flex items-center justify-center mx-auto mb-5 text-red-600"><TrendingDown className="w-7 h-7" /></div>
-              <h3 className="text-md font-bold text-zinc-900 dark:text-white font-mono uppercase tracking-wider mb-2">¿Eliminar gasto?</h3>
+              <div className="w-12 h-12 sm:w-14 sm:h-14 bg-red-500/10 border border-red-500/20 rounded-none flex items-center justify-center mx-auto mb-4 sm:mb-5 text-red-600"><TrendingDown className="w-6 h-6 sm:w-7 sm:h-7" /></div>
+              <h3 className="text-sm sm:text-md font-bold text-zinc-900 dark:text-white font-mono uppercase tracking-wider mb-2">¿Eliminar gasto?</h3>
               <p className="text-zinc-400 dark:text-zinc-500 text-xs font-mono uppercase tracking-wider mb-6">Esta acción no se puede deshacer.</p>
               <div className="flex gap-3">
                 <button onClick={() => setConfirmDelete(null)} className="flex-1 py-2.5 bg-zinc-100 dark:bg-zinc-900 text-zinc-900 dark:text-white border border-zinc-200 dark:border-zinc-800 rounded-none font-mono text-xs uppercase tracking-wider font-bold hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-colors">Cancelar</button>

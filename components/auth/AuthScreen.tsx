@@ -42,7 +42,7 @@ export function AuthScreen() {
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
-        className={cn(GLASS, "w-full max-w-sm rounded-sm p-8 shadow-sm")}
+        className={cn(GLASS, "w-full max-w-sm rounded-sm p-4 sm:p-8 shadow-sm")}
       >
         {/* Logo */}
         <div className="flex items-center gap-2.5 mb-6 justify-center">

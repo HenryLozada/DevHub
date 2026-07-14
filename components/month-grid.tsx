@@ -34,14 +34,14 @@ export function MonthGrid({
         {WEEKDAYS.map((day) => (
           <div
             key={day}
-            className="py-2 text-center text-[10px] font-mono font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 select-none"
+            className="py-1.5 sm:py-2 text-center text-[8px] sm:text-[10px] font-mono font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 select-none"
           >
             {day}
           </div>
         ))}
       </div>
 
-      <div className="grid grid-cols-7 auto-rows-[minmax(80px,auto)]">
+      <div className="grid grid-cols-7 auto-rows-[minmax(40px,auto)] sm:auto-rows-[minmax(80px,auto)]">
         {days.map((date) => {
           const key = toDateKey(date)
           const inMonth = date.getMonth() === month
@@ -69,7 +69,7 @@ export function MonthGrid({
               onClick={() => onSelectDate(date)}
               aria-pressed={isSelected}
               className={cn(
-                "group relative flex min-h-[80px] sm:min-h-[100px] flex-col gap-1 border-b border-r border-white/30 dark:border-white/10 p-1.5 text-left transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#76b900] focus-visible:ring-inset last:border-r-0",
+                "group relative flex min-h-[40px] sm:min-h-[80px] lg:min-h-[100px] flex-col gap-0.5 sm:gap-1 border-b border-r border-white/30 dark:border-white/10 p-1 sm:p-1.5 text-left transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#76b900] focus-visible:ring-inset last:border-r-0",
                 "hover:bg-white/95 dark:hover:bg-zinc-900/60 hover:shadow-[0_0_30px_-4px_rgba(118,185,0,0.3)] dark:hover:shadow-[0_0_35px_-4px_rgba(118,185,0,0.35)]",
                 !inMonth && "bg-zinc-50/30 dark:bg-zinc-900/10 text-zinc-300 dark:text-zinc-700",
                 inMonth && "text-zinc-900 dark:text-zinc-100",
@@ -79,7 +79,7 @@ export function MonthGrid({
               <div className="flex items-center justify-between w-full">
                 <span
                   className={cn(
-                    "flex size-7 items-center justify-center rounded-sm text-[13px] font-bold",
+                    "flex size-5 sm:size-7 items-center justify-center rounded-sm text-[10px] sm:text-[13px] font-bold",
                     isToday && "bg-[#76b900] text-black",
                     !isToday && !inMonth && "text-zinc-400 dark:text-zinc-600",
                     !isToday && inMonth && "text-zinc-900 dark:text-zinc-100",
@@ -87,24 +87,24 @@ export function MonthGrid({
                 >
                   {date.getDate()}
                 </span>
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-0.5 sm:gap-1">
                   {hasIngreso && (
-                    <span className="size-2 rounded-none bg-emerald-500" aria-label="Ingreso" />
+                    <span className="size-1.5 sm:size-2 rounded-none bg-emerald-500" aria-label="Ingreso" />
                   )}
                   {hasEgreso && (
-                    <span className="size-2 rounded-none bg-red-500" aria-label="Egreso" />
+                    <span className="size-1.5 sm:size-2 rounded-none bg-red-500" aria-label="Egreso" />
                   )}
                 </div>
               </div>
 
-              <div className="hidden min-h-0 flex-1 flex-col gap-1 overflow-hidden sm:flex w-full">
+              <div className="hidden min-h-0 flex-1 flex-col gap-0.5 sm:gap-1 overflow-hidden sm:flex w-full">
                 {displayedItems.map((item) => {
                   if (item.type === "finance") {
                     return (
                       <div
                         key={item.key}
                         className={cn(
-                          "flex items-center gap-1 truncate rounded-sm px-1.5 py-0.5 text-[10px] leading-tight font-mono font-bold",
+                          "flex items-center gap-1 truncate rounded-sm px-1 sm:px-1.5 py-0.5 text-[8px] sm:text-[10px] leading-tight font-mono font-bold",
                           item.tipo === "ingreso"
                             ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/20 dark:text-emerald-400"
                             : "bg-red-50 text-red-600 dark:bg-red-950/20 dark:text-red-400",
@@ -119,7 +119,7 @@ export function MonthGrid({
                       <div
                         key={item.key}
                         className={cn(
-                          "flex items-center gap-1 truncate rounded-sm px-1.5 py-0.5 text-[10px] leading-tight font-mono font-bold",
+                          "flex items-center gap-1 truncate rounded-sm px-1 sm:px-1.5 py-0.5 text-[8px] sm:text-[10px] leading-tight font-mono font-bold",
                           meta.bgLight,
                           meta.textColor,
                           "dark:bg-zinc-800 dark:text-zinc-200"
@@ -132,7 +132,7 @@ export function MonthGrid({
                 })}
 
                 {remainingCount > 0 && (
-                  <span className="px-1 text-[9px] font-mono text-zinc-400 dark:text-zinc-500">
+                  <span className="px-1 text-[8px] sm:text-[9px] font-mono text-zinc-400 dark:text-zinc-500">
                     +{remainingCount} más
                   </span>
                 )}

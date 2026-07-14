@@ -161,7 +161,7 @@ export function ChatPanel({ isOpen, onClose }: ChatPanelProps) {
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 20, scale: 0.97 }}
           transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-          className={cn("fixed bottom-24 right-6 w-[22rem] md:w-[26rem] flex flex-col z-50 rounded-sm overflow-hidden", GLASS)}
+          className={cn("fixed bottom-24 right-3 md:right-6 left-3 md:left-auto w-auto md:w-[26rem] flex flex-col z-50 rounded-sm overflow-hidden", GLASS)}
           style={{ height: "520px", maxHeight: "80vh" }}
         >
           <div className="flex items-center justify-between px-4 py-3 border-b border-white/30 dark:border-white/10 shrink-0">

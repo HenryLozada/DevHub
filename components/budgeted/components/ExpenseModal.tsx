@@ -46,7 +46,7 @@ export function ExpenseModal({ expense, onClose, onSaved }: ExpenseModalProps) {
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
         className="absolute inset-0 bg-black/40 backdrop-blur-xs" onClick={onClose} />
       <motion.div initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }}
-        className="relative w-full max-w-md bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-none shadow-sm p-8 overflow-hidden">
+        className="relative w-full max-w-md bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-none shadow-sm p-4 sm:p-8 overflow-hidden">
         <div className="corner-square" />
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-lg font-bold text-zinc-900 dark:text-white font-mono uppercase tracking-wider">{expense ? "EDITAR GASTO" : "NUEVO GASTO"}</h3>

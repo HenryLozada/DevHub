@@ -167,7 +167,7 @@ export function Dashboard({ chores, onRefresh }: DashboardProps) {
       </div>
 
       {/* Kanban columns */}
-      <div className="flex-1 grid grid-cols-3 gap-3 min-h-0 relative z-10">
+      <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-3 min-h-0 relative z-10">
         {columns.map(col => {
           const meta = URGENCY_COLORS[col.key]
           const isCollapsed = collapsed[col.key]
@@ -245,9 +245,9 @@ export function Dashboard({ chores, onRefresh }: DashboardProps) {
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setConfirmDelete(null)} />
             <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}
-              className={cn("relative w-full max-w-sm rounded-sm p-8 text-center overflow-hidden", GLASS)}>
-              <div className="w-14 h-14 bg-red-500/10 border border-red-500/20 rounded-sm flex items-center justify-center mx-auto mb-5 text-red-500 backdrop-blur-sm"><Trash2 className="w-7 h-7" /></div>
-              <h3 className="text-md font-bold text-zinc-900 dark:text-white font-mono uppercase tracking-wider mb-2">¿Eliminar tarea?</h3>
+              className={cn("relative w-full max-w-sm rounded-sm p-4 sm:p-8 text-center overflow-hidden", GLASS)}>
+              <div className="w-12 h-12 sm:w-14 sm:h-14 bg-red-500/10 border border-red-500/20 rounded-sm flex items-center justify-center mx-auto mb-4 sm:mb-5 text-red-500 backdrop-blur-sm"><Trash2 className="w-6 h-6 sm:w-7 sm:h-7" /></div>
+              <h3 className="text-sm sm:text-md font-bold text-zinc-900 dark:text-white font-mono uppercase tracking-wider mb-2">¿Eliminar tarea?</h3>
               <p className="text-zinc-400 dark:text-zinc-500 text-xs font-mono uppercase tracking-wider mb-6">Esta acción no se puede deshacer.</p>
               <div className="flex gap-3">
                 <button onClick={() => setConfirmDelete(null)} className="flex-1 py-2.5 bg-zinc-100/80 dark:bg-zinc-900/80 backdrop-blur-sm text-zinc-900 dark:text-white border border-zinc-200/50 dark:border-zinc-800/50 rounded-sm font-mono text-xs uppercase tracking-wider font-bold hover:bg-zinc-200/80 dark:hover:bg-zinc-800/80 transition-colors cursor-pointer">Cancelar</button>

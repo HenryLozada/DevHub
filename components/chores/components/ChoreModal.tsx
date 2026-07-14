@@ -59,9 +59,9 @@ export function ChoreModal({ chore, onClose, onSaved }: ChoreModalProps) {
       <motion.div initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }}
         className="relative w-full max-w-lg bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-none shadow-sm overflow-hidden overflow-y-auto max-h-[90vh]">
         <div className="corner-square" />
-        <div className="p-8">
+        <div className="p-4 sm:p-8">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-bold text-zinc-900 dark:text-white font-mono uppercase tracking-wider">{chore ? "EDITAR TAREA" : "NUEVA TAREA"}</h3>
+            <h3 className="text-base sm:text-lg font-bold text-zinc-900 dark:text-white font-mono uppercase tracking-wider">{chore ? "EDITAR TAREA" : "NUEVA TAREA"}</h3>
             <button onClick={onClose} className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-900 rounded-none text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 transition-colors border border-transparent hover:border-zinc-200 dark:hover:border-zinc-800"><X className="w-5 h-5" /></button>
           </div>
           <form onSubmit={submit} className="space-y-4">
