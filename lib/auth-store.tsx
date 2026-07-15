@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, type ReactNode } from "react"
+import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from "react"
 import { supabase } from "./supabase"
 import { setUserId, uploadToCloud, downloadFromCloud } from "./local-store"
 import type { User } from "@supabase/supabase-js"
@@ -12,9 +12,12 @@ const KEYS = [
   "ph_devbot_history",
 ]
 
+const POLL_INTERVAL = 30_000 // 30 segundos
+
 interface AuthContextType {
   user: User | null
   loading: boolean
+  syncVersion: number   // sube cada vez que hay sync exitoso — úsalo como key para forzar re-render
   signUp: (email: string, password: string) => Promise<string | null>
   signIn: (email: string, password: string) => Promise<string | null>
   signInWithGoogle: () => Promise<void>
@@ -24,48 +27,60 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType>({
   user: null,
   loading: true,
+  syncVersion: 0,
   signUp: async () => null,
   signIn: async () => null,
   signInWithGoogle: async () => {},
   signOut: async () => {},
 })
 
-function onUserChanged(user: User | null) {
-  setUserId(user?.id || null)
-  if (!user) return
-
-  // On login: download each dataset from cloud to localStorage
-  KEYS.forEach(async (key) => {
-    const ok = await downloadFromCloud(key)
-    if (!ok) {
-      // Nothing in cloud yet — push local data up
-      await uploadToCloud(key)
-    }
-  })
-}
-
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
+  const [syncVersion, setSyncVersion] = useState(0)
+
+  // Descarga todos los datos de Supabase al localStorage y bump syncVersion
+  const syncDown = useCallback(async (u: User | null) => {
+    if (!u) return
+    let anyUpdated = false
+    await Promise.all(
+      KEYS.map(async (key) => {
+        const ok = await downloadFromCloud(key)
+        if (ok) anyUpdated = true
+        else await uploadToCloud(key) // primera vez: sube el local
+      })
+    )
+    if (anyUpdated) setSyncVersion(v => v + 1)
+  }, [])
 
   useEffect(() => {
     if (!supabase) { setLoading(false); return }
 
+    // Al iniciar: restaurar sesión y descargar datos
     supabase.auth.getSession().then(({ data: { session } }) => {
       const u = session?.user ?? null
       setUser(u)
-      onUserChanged(u)
-      setLoading(false)
+      setUserId(u?.id || null)
+      syncDown(u).finally(() => setLoading(false))
     })
 
+    // Cambios de sesión (login / logout)
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       const u = session?.user ?? null
       setUser(u)
-      onUserChanged(u)
+      setUserId(u?.id || null)
+      syncDown(u)
     })
 
     return () => subscription.unsubscribe()
-  }, [])
+  }, [syncDown])
+
+  // Polling cada 30s — mantiene los datos sincronizados entre dispositivos
+  useEffect(() => {
+    if (!user) return
+    const id = setInterval(() => syncDown(user), POLL_INTERVAL)
+    return () => clearInterval(id)
+  }, [user, syncDown])
 
   async function signUp(email: string, password: string): Promise<string | null> {
     if (!supabase) return "Supabase no configurado"
@@ -91,7 +106,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, loading, signUp, signIn, signInWithGoogle, signOut }}>
+    <AuthContext.Provider value={{ user, loading, syncVersion, signUp, signIn, signInWithGoogle, signOut }}>
       {children}
     </AuthContext.Provider>
   )
