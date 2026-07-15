@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button"
-import { IoAdd, IoTrendingUp, IoTrendingDown, IoPencil } from "react-icons/io5"
+import { Plus as IoAdd, TrendingUp as IoTrendingUp, TrendingDown as IoTrendingDown, Pencil as IoPencil } from "lucide-react"
 import {
   type CashflowRule,
   type MonthSummary,

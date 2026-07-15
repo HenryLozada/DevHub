@@ -11,7 +11,7 @@ import {
   FileText,
   Terminal,
 } from "lucide-react";
-import { FaGithub, FaYoutube } from "react-icons/fa6";
+import { FaGithub, FaYoutube } from "@/components/icons";
 import { DevItem } from "../types";
 import { sileo } from "sileo";
 

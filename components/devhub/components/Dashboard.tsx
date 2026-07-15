@@ -12,7 +12,7 @@ import {
   Layers,
   Key,
 } from "lucide-react";
-import { FaGithub } from "react-icons/fa6";
+import { FaGithub } from "@/components/icons";
 import { sileo } from "sileo";
 
 export function Dashboard() {

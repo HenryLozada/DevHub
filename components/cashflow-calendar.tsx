@@ -1,11 +1,11 @@
 import { useMemo, useState, useEffect } from "react"
 import { ModuleNav } from "@/components/module-nav"
 import {
-  IoArrowBack,
-  IoArrowForward,
-  IoCalendar,
-  IoStatsChart,
-} from "react-icons/io5"
+  ArrowLeft as IoArrowBack,
+  ArrowRight as IoArrowForward,
+  Calendar as IoCalendar,
+  TrendingUp as IoStatsChart,
+} from "lucide-react"
 import {
   type CashflowRule,
   MONTHS,

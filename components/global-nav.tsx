@@ -1,5 +1,4 @@
-import { IoCalendarOutline } from "react-icons/io5"
-import { Wallet, CheckCircle2, Terminal, Sun, Moon } from "lucide-react"
+import { Calendar as IoCalendarOutline, Wallet, CheckCircle2, Terminal, Sun, Moon } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 interface GlobalNavProps {

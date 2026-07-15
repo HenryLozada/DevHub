@@ -43,8 +43,11 @@ async function syncToCloud(key: string, value: unknown) {
   const table = TABLE_MAP[key]
   if (!table) return
 
+  const timestamp = new Date().toISOString()
+  localStorage.setItem(`${key}_ts`, timestamp)
+
   await supabase.from(table).upsert(
-    { user_id: userId, data: JSON.parse(JSON.stringify(value)) },
+    { user_id: userId, data: JSON.parse(JSON.stringify(value)), updated_at: timestamp },
     { onConflict: "user_id" }
   )
 }
@@ -61,19 +64,26 @@ export async function downloadFromCloud(key: string): Promise<boolean> {
 
   const { data } = await supabase
     .from(table)
-    .select("data")
+    .select("data, updated_at")
     .eq("user_id", userId)
     .single()
 
   if (data?.data) {
+    const localTs = localStorage.getItem(`${key}_ts`) || ""
+    const cloudTs = data.updated_at || ""
     const existing = localStorage.getItem(key)
     const newStr = JSON.stringify(data.data)
-    if (existing !== newStr) {
-      localStorage.setItem(key, newStr)
-      if (typeof window !== "undefined") {
-        window.dispatchEvent(new Event("ph:update"))
+
+    // Si la nube es más reciente o si no hay timestamp local pero los datos cambiaron
+    if (!localTs || !cloudTs || cloudTs >= localTs) {
+      if (existing !== newStr) {
+        localStorage.setItem(key, newStr)
+        if (cloudTs) localStorage.setItem(`${key}_ts`, cloudTs)
+        if (typeof window !== "undefined") {
+          window.dispatchEvent(new Event("ph:update"))
+        }
+        return true
       }
-      return true
     }
   }
   return false
@@ -92,8 +102,11 @@ export async function uploadToCloud(key: string): Promise<boolean> {
   const local = readStore<any>(key, null)
   if (!local) return false
 
+  const timestamp = new Date().toISOString()
+  localStorage.setItem(`${key}_ts`, timestamp)
+
   await supabase.from(table).upsert(
-    { user_id: userId, data: local },
+    { user_id: userId, data: local, updated_at: timestamp },
     { onConflict: "user_id" }
   )
   return true

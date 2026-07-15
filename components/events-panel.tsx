@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button"
-import { IoAdd, IoDownload, IoPencil } from "react-icons/io5"
+import { Plus as IoAdd, Download as IoDownload, Pencil as IoPencil } from "lucide-react"
 import {
   type PersonalEvent,
   type EventOccurrence,
