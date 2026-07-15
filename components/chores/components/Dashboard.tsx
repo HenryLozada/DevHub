@@ -47,6 +47,41 @@ type Urgency = keyof typeof URGENCY_COLORS
 const GLASS = "backdrop-blur-xl bg-white/40 dark:bg-zinc-950/40 border border-white/30 dark:border-white/10 shadow-sm shadow-black/5"
 const GLASS_CARD = "backdrop-blur-md bg-white/60 dark:bg-zinc-950/60 border border-white/40 dark:border-white/[0.08] shadow-sm shadow-black/5"
 
+function KanbanCard({
+  c,
+  onToggle,
+  onEdit,
+  onDelete,
+}: {
+  c: Chore
+  onToggle: (c: Chore) => void
+  onEdit: (c: Chore) => void
+  onDelete: (c: Chore) => void
+}) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 4 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, scale: 0.95 }}
+      className={cn("group flex items-center gap-2.5 p-2.5", GLASS_CARD, "hover:border-white/70 dark:hover:border-white/20 hover:shadow-md transition-all duration-200")}
+    >
+      <button onClick={() => onToggle(c)} className="shrink-0 transition-all active:scale-90 cursor-pointer group/toggle">
+        <Circle className="w-[15px] h-[15px] text-zinc-300 dark:text-zinc-600 group-hover/toggle:text-[#76b900] transition-colors" />
+      </button>
+      <div className="flex-1 min-w-0">
+        <p className="text-xs font-semibold text-zinc-800 dark:text-zinc-200 truncate leading-tight">{c.title}</p>
+        {c.dueDate && (
+          <p className="text-[9px] font-mono text-zinc-400 dark:text-zinc-500 truncate mt-0.5">{c.dueDate}</p>
+        )}
+      </div>
+      <div className="flex gap-0.5 opacity-0 group-hover:opacity-100 transition-all duration-200 shrink-0">
+        <button onClick={() => onEdit(c)} className="p-1 hover:bg-white/80 dark:hover:bg-zinc-800/60 text-zinc-400 hover:text-[#76b900] rounded-sm transition-colors cursor-pointer"><Pencil className="w-3 h-3" /></button>
+        <button onClick={() => onDelete(c)} className="p-1 hover:bg-red-500/10 text-zinc-400 hover:text-red-500 rounded-sm transition-colors cursor-pointer"><Trash2 className="w-3 h-3" /></button>
+      </div>
+    </motion.div>
+  )
+}
+
 function getUrgency(c: Chore): Urgency | null {
   if (c.status === "done") return null
   if (!c.dueDate) return "later"
@@ -113,31 +148,6 @@ export function Dashboard({ chores, onRefresh }: DashboardProps) {
     { key: "later", chores: grouped.later },
   ]
 
-  function KanbanCard({ c }: { c: Chore }) {
-    return (
-      <motion.div layout
-        initial={{ opacity: 0, y: 4 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.95 }}
-        className={cn("group flex items-center gap-2.5 p-2.5", GLASS_CARD, "hover:border-white/70 dark:hover:border-white/20 hover:shadow-md transition-all duration-200")}
-      >
-        <button onClick={() => handleToggle(c)} className="shrink-0 transition-all active:scale-90 cursor-pointer group/toggle">
-          <Circle className="w-[15px] h-[15px] text-zinc-300 dark:text-zinc-600 group-hover/toggle:text-[#76b900] transition-colors" />
-        </button>
-        <div className="flex-1 min-w-0">
-          <p className="text-xs font-semibold text-zinc-800 dark:text-zinc-200 truncate leading-tight">{c.title}</p>
-          {c.dueDate && (
-            <p className="text-[9px] font-mono text-zinc-400 dark:text-zinc-500 truncate mt-0.5">{c.dueDate}</p>
-          )}
-        </div>
-        <div className="flex gap-0.5 opacity-0 group-hover:opacity-100 transition-all duration-200 shrink-0">
-          <button onClick={() => { setEditingChore(c); setShowChoreModal(true) }} className="p-1 hover:bg-white/80 dark:hover:bg-zinc-800/60 text-zinc-400 hover:text-[#76b900] rounded-sm transition-colors cursor-pointer"><Pencil className="w-3 h-3" /></button>
-          <button onClick={() => setConfirmDelete(c)} className="p-1 hover:bg-red-500/10 text-zinc-400 hover:text-red-500 rounded-sm transition-colors cursor-pointer"><Trash2 className="w-3 h-3" /></button>
-        </div>
-      </motion.div>
-    )
-  }
-
   return (
     <div className="h-[calc(100vh-7.5rem)] flex flex-col px-4 py-4 max-w-6xl mx-auto relative">
       {/* Subtle background decoration */}
@@ -195,7 +205,13 @@ export function Dashboard({ chores, onRefresh }: DashboardProps) {
               <div className="flex-1 overflow-y-auto min-h-0 space-y-1.5 pr-0.5 scrollbar-thin">
                 <AnimatePresence mode="popLayout">
                   {(isCollapsed ? col.chores.slice(0, 3) : col.chores).map(c => (
-                    <KanbanCard key={c.id} c={c} />
+                    <KanbanCard
+                      key={c.id}
+                      c={c}
+                      onToggle={handleToggle}
+                      onEdit={(item) => { setEditingChore(item); setShowChoreModal(true) }}
+                      onDelete={(item) => setConfirmDelete(item)}
+                    />
                   ))}
                   {isCollapsed && col.chores.length > 3 && (
                     <button onClick={() => toggleCollapse(col.key)}

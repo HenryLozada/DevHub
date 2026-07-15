@@ -66,8 +66,15 @@ export async function downloadFromCloud(key: string): Promise<boolean> {
     .single()
 
   if (data?.data) {
-    localStorage.setItem(key, JSON.stringify(data.data))
-    return true
+    const existing = localStorage.getItem(key)
+    const newStr = JSON.stringify(data.data)
+    if (existing !== newStr) {
+      localStorage.setItem(key, newStr)
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new Event("ph:update"))
+      }
+      return true
+    }
   }
   return false
 }

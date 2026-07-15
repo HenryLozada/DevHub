@@ -102,7 +102,7 @@ export function Dashboard({ expenses, onRefresh }: DashboardProps) {
             {filtered.map(exp => {
               const st = STATUS_META[exp.paidStatus || "unpaid"]
               return (
-                <motion.div key={exp.id} layout
+                <motion.div key={exp.id}
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.95 }}

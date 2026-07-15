@@ -24,6 +24,48 @@ function formatTime(d: Date) {
   return d.toLocaleTimeString("es-MX", { hour: "2-digit", minute: "2-digit" })
 }
 
+function BotMessage({ msg, isFirst }: { msg: Message; isFirst: boolean }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 8, scale: 0.98 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ duration: 0.25, ease: "easeOut" }}
+      className="flex items-start gap-2.5 max-w-[85%]"
+    >
+      <div className="shrink-0 w-7 h-7 rounded-sm bg-[#76b900]/10 border border-[#76b900]/20 flex items-center justify-center mt-0.5">
+        <Bot className="w-3.5 h-3.5 text-[#76b900]" />
+      </div>
+      <div>
+        <div className={cn("px-3.5 py-2.5 text-xs leading-relaxed text-zinc-700 dark:text-zinc-300", GLASS_BOT, "rounded-sm")}>
+          <p>{msg.content}</p>
+        </div>
+        <p className="text-[9px] font-mono text-zinc-400 dark:text-zinc-600 mt-1 px-1">{formatTime(msg.timestamp)}</p>
+      </div>
+    </motion.div>
+  )
+}
+
+function UserMessage({ msg }: { msg: Message }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 8, scale: 0.98 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ duration: 0.2, ease: "easeOut" }}
+      className="flex items-start gap-2.5 max-w-[85%] ml-auto flex-row-reverse"
+    >
+      <div className="shrink-0 w-7 h-7 rounded-sm bg-zinc-200/60 dark:bg-zinc-800/60 border border-white/30 dark:border-white/10 flex items-center justify-center mt-0.5 backdrop-blur-sm">
+        <User className="w-3.5 h-3.5 text-zinc-500 dark:text-zinc-400" />
+      </div>
+      <div>
+        <div className="px-3.5 py-2.5 text-xs leading-relaxed text-zinc-800 dark:text-zinc-200 bg-black/5 dark:bg-white/5 backdrop-blur-md border border-white/40 dark:border-white/[0.08] rounded-sm shadow-sm">
+          <p>{msg.content}</p>
+        </div>
+        <p className="text-[9px] font-mono text-zinc-400 dark:text-zinc-600 mt-1 px-1 text-right">{formatTime(msg.timestamp)}</p>
+      </div>
+    </motion.div>
+  )
+}
+
 export function DevBotChat({ onItemAdded }: DevBotChatProps) {
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -192,48 +234,6 @@ export function DevBotChat({ onItemAdded }: DevBotChatProps) {
       e.preventDefault()
       parseAndSave(input)
     }
-  }
-
-  function BotMessage({ msg, isFirst }: { msg: Message; isFirst: boolean }) {
-    return (
-      <motion.div
-        initial={{ opacity: 0, y: 8, scale: 0.98 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{ duration: 0.25, ease: "easeOut" }}
-        className="flex items-start gap-2.5 max-w-[85%]"
-      >
-        <div className="shrink-0 w-7 h-7 rounded-sm bg-[#76b900]/10 border border-[#76b900]/20 flex items-center justify-center mt-0.5">
-          <Bot className="w-3.5 h-3.5 text-[#76b900]" />
-        </div>
-        <div>
-          <div className={cn("px-3.5 py-2.5 text-xs leading-relaxed text-zinc-700 dark:text-zinc-300", GLASS_BOT, "rounded-sm")}>
-            <p>{msg.content}</p>
-          </div>
-          <p className="text-[9px] font-mono text-zinc-400 dark:text-zinc-600 mt-1 px-1">{formatTime(msg.timestamp)}</p>
-        </div>
-      </motion.div>
-    )
-  }
-
-  function UserMessage({ msg }: { msg: Message }) {
-    return (
-      <motion.div
-        initial={{ opacity: 0, y: 8, scale: 0.98 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{ duration: 0.2, ease: "easeOut" }}
-        className="flex items-start gap-2.5 max-w-[85%] ml-auto flex-row-reverse"
-      >
-        <div className="shrink-0 w-7 h-7 rounded-sm bg-zinc-200/60 dark:bg-zinc-800/60 border border-white/30 dark:border-white/10 flex items-center justify-center mt-0.5 backdrop-blur-sm">
-          <User className="w-3.5 h-3.5 text-zinc-500 dark:text-zinc-400" />
-        </div>
-        <div>
-          <div className="px-3.5 py-2.5 text-xs leading-relaxed text-zinc-800 dark:text-zinc-200 bg-black/5 dark:bg-white/5 backdrop-blur-md border border-white/40 dark:border-white/[0.08] rounded-sm shadow-sm">
-            <p>{msg.content}</p>
-          </div>
-          <p className="text-[9px] font-mono text-zinc-400 dark:text-zinc-600 mt-1 px-1 text-right">{formatTime(msg.timestamp)}</p>
-        </div>
-      </motion.div>
-    )
   }
 
   return (
