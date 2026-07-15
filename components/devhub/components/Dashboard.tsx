@@ -100,70 +100,70 @@ export function Dashboard() {
       </div>
 
       {/* Stats Widgets */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
         {/* Total Items */}
-        <div className="relative border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-5 rounded-none overflow-hidden select-none">
+        <div className="relative border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-3 md:p-5 rounded-none overflow-hidden select-none">
           <div className="corner-square" />
           <div className="flex justify-between items-start">
-            <div>
-              <p className="text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-widest">
+            <div className="min-w-0">
+              <p className="text-[9px] md:text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-widest truncate">
                 Total Items
               </p>
-              <h3 className="text-3xl font-mono font-bold text-zinc-900 dark:text-white mt-2">
+              <h3 className="text-xl md:text-3xl font-mono font-bold text-zinc-900 dark:text-white mt-1 md:mt-2 tabular-nums">
                 {totalCount}
               </h3>
             </div>
-            <Layers className="w-5 h-5 text-zinc-400 dark:text-zinc-600" />
+            <Layers className="w-4 h-4 md:w-5 md:h-5 text-zinc-400 dark:text-zinc-600 shrink-0" />
           </div>
         </div>
 
         {/* Tools */}
-        <div className="relative border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-5 rounded-none overflow-hidden select-none">
+        <div className="relative border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-3 md:p-5 rounded-none overflow-hidden select-none">
           <div className="corner-square" />
           <div className="flex justify-between items-start">
-            <div>
-              <p className="text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-widest">
+            <div className="min-w-0">
+              <p className="text-[9px] md:text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-widest truncate">
                 Herramientas
               </p>
-              <h3 className="text-3xl font-mono font-bold text-[#76b900] mt-2">
+              <h3 className="text-xl md:text-3xl font-mono font-bold text-[#76b900] mt-1 md:mt-2 tabular-nums">
                 {toolsCount}
               </h3>
             </div>
-            <Terminal className="w-5 h-5 text-[#76b900]/70" />
+            <Terminal className="w-4 h-4 md:w-5 md:h-5 text-[#76b900]/70 shrink-0" />
           </div>
         </div>
 
         {/* Repositories */}
-        <div className="relative border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-5 rounded-none overflow-hidden select-none">
+        <div className="relative border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-3 md:p-5 rounded-none overflow-hidden select-none">
           <div className="corner-square" />
           <div className="flex justify-between items-start">
-            <div>
-              <p className="text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-widest">
+            <div className="min-w-0">
+              <p className="text-[9px] md:text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-widest truncate">
                 Repositorios
               </p>
-              <h3 className="text-3xl font-mono font-bold text-zinc-900 dark:text-white mt-2">
+              <h3 className="text-xl md:text-3xl font-mono font-bold text-zinc-900 dark:text-white mt-1 md:mt-2 tabular-nums">
                 {reposCount}
               </h3>
             </div>
-            <FaGithub className="w-5 h-5 text-zinc-500 dark:text-zinc-400" />
+            <FaGithub className="w-4 h-4 md:w-5 md:h-5 text-zinc-500 dark:text-zinc-400 shrink-0" />
           </div>
         </div>
 
         {/* Credentials / API Keys */}
-        <div className="relative border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-5 rounded-none overflow-hidden select-none">
+        <div className="relative border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-3 md:p-5 rounded-none overflow-hidden select-none">
           <div className="corner-square" />
           <div className="flex justify-between items-start">
-            <div>
-              <p className="text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-widest">
+            <div className="min-w-0">
+              <p className="text-[9px] md:text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-widest truncate">
                 Seguridad / API
               </p>
-              <h3 className="text-3xl font-mono font-bold text-zinc-900 dark:text-white mt-2">
+              <h3 className="text-xl md:text-3xl font-mono font-bold text-zinc-900 dark:text-white mt-1 md:mt-2 tabular-nums">
                 {secureCount}
               </h3>
             </div>
-            <div className="flex gap-1 text-zinc-500 dark:text-zinc-400">
-              <Lock className="w-4 h-4" />
-              <Key className="w-4 h-4" />
+            <div className="flex gap-1 text-zinc-500 dark:text-zinc-400 shrink-0">
+              <Lock className="w-3.5 h-3.5 md:w-4 md:h-4" />
+              <Key className="w-3.5 h-3.5 md:w-4 md:h-4" />
             </div>
           </div>
         </div>

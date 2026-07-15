@@ -62,18 +62,18 @@ export function Dashboard({ expenses, onRefresh }: DashboardProps) {
       <div className="grid grid-cols-3 gap-2 md:gap-4 mb-4 md:mb-8">
         <div className="bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 p-3 md:p-5 rounded-none shadow-xs relative overflow-hidden">
           <div className="corner-square" />
-          <p className="font-mono text-[9px] uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-1">Total</p>
-          <p className="text-2xl font-mono font-bold text-[#76b900]">${fmt(total)}</p>
+          <p className="font-mono text-[8px] md:text-[9px] uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-1 truncate">Total</p>
+          <p className="text-base md:text-2xl font-mono font-bold text-[#76b900] truncate">${fmt(total)}</p>
         </div>
-        <div className="bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 p-5 rounded-none shadow-xs relative overflow-hidden">
+        <div className="bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 p-3 md:p-5 rounded-none shadow-xs relative overflow-hidden">
           <div className="corner-square" />
-          <p className="font-mono text-[9px] uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-1">Pagado</p>
-          <p className="text-2xl font-mono font-bold text-emerald-500">${fmt(total - unpaidTotal)}</p>
+          <p className="font-mono text-[8px] md:text-[9px] uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-1 truncate">Pagado</p>
+          <p className="text-base md:text-2xl font-mono font-bold text-emerald-500 truncate">${fmt(total - unpaidTotal)}</p>
         </div>
-        <div className="bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 p-5 rounded-none shadow-xs relative overflow-hidden">
+        <div className="bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 p-3 md:p-5 rounded-none shadow-xs relative overflow-hidden">
           <div className="corner-square" />
-          <p className="font-mono text-[9px] uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-1">Pendiente</p>
-          <p className="text-2xl font-mono font-bold text-amber-500">${fmt(unpaidTotal)}</p>
+          <p className="font-mono text-[8px] md:text-[9px] uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-1 truncate">Pendiente</p>
+          <p className="text-base md:text-2xl font-mono font-bold text-amber-500 truncate">${fmt(unpaidTotal)}</p>
         </div>
       </div>
 
@@ -106,31 +106,31 @@ export function Dashboard({ expenses, onRefresh }: DashboardProps) {
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.95 }}
-                  className="flex items-center gap-4 p-4 hover:bg-zinc-50 dark:hover:bg-zinc-900/50 group transition-colors">
-                  <div className="w-10 h-10 bg-zinc-50 dark:bg-zinc-900 rounded-none flex items-center justify-center shrink-0 border border-zinc-200 dark:border-zinc-800">
-                    <Receipt className="w-5 h-5 text-[#76b900]" />
+                  className="flex items-center gap-2 md:gap-4 p-3 md:p-4 hover:bg-zinc-50 dark:hover:bg-zinc-900/50 group transition-colors">
+                  <div className="w-8 h-8 md:w-10 md:h-10 bg-zinc-50 dark:bg-zinc-900 rounded-none flex items-center justify-center shrink-0 border border-zinc-200 dark:border-zinc-800">
+                    <Receipt className="w-4 h-4 md:w-5 md:h-5 text-[#76b900]" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-bold text-zinc-900 dark:text-white truncate text-sm">{exp.description}</p>
-                    <div className="flex items-center gap-2 mt-1.5 flex-wrap">
-                      <span className="text-[9px] font-mono font-bold uppercase tracking-wider text-[#76b900] bg-[#76b900]/10 border border-[#76b900]/20 px-2 py-0.5 rounded-none">{exp.category}</span>
-                      <span className="text-[9px] text-zinc-400 dark:text-zinc-500 font-mono uppercase tracking-wider">{exp.date}</span>
+                    <p className="font-bold text-zinc-900 dark:text-white truncate text-xs md:text-sm">{exp.description}</p>
+                    <div className="flex items-center gap-1.5 mt-1 flex-wrap">
+                      <span className="text-[8px] md:text-[9px] font-mono font-bold uppercase tracking-wider text-[#76b900] bg-[#76b900]/10 border border-[#76b900]/20 px-1.5 py-0.5 rounded-none truncate max-w-[80px] md:max-w-none">{exp.category}</span>
+                      <span className="text-[8px] md:text-[9px] text-zinc-400 dark:text-zinc-500 font-mono uppercase tracking-wider">{exp.date}</span>
                     </div>
                   </div>
-                  <button onClick={() => handleToggleStatus(exp)}
-                    className={cn(
-                      "flex items-center gap-1.5 px-2.5 py-1.5 rounded-none text-[9px] font-mono font-bold uppercase tracking-wider transition-all border shrink-0",
-                      st.style,
-                      "hover:bg-zinc-100 dark:hover:bg-zinc-800"
-                    )}>
-                    {st.icon} {st.label}
-                  </button>
-                  <div className="text-right shrink-0">
-                    <p className="font-bold font-mono text-zinc-900 dark:text-white text-sm">${fmt(exp.amount)}</p>
+                  <div className="flex flex-col items-end gap-1 shrink-0">
+                    <p className="font-bold font-mono text-zinc-900 dark:text-white text-xs md:text-sm whitespace-nowrap">${fmt(exp.amount)}</p>
+                    <button onClick={() => handleToggleStatus(exp)}
+                      className={cn(
+                        "flex items-center gap-1 px-1.5 md:px-2.5 py-1 rounded-none text-[8px] md:text-[9px] font-mono font-bold uppercase tracking-wider transition-all border shrink-0 whitespace-nowrap",
+                        st.style,
+                        "hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                      )}>
+                      {st.icon} <span className="hidden md:inline">{st.label}</span>
+                    </button>
                   </div>
                   <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
-                    <button onClick={() => { setEditing(exp); setShowAdd(true) }} className="p-1.5 hover:bg-[#76b900]/10 text-zinc-400 hover:text-[#76b900] rounded-none border border-transparent hover:border-[#76b900]/20 transition-colors"><TrendingUp className="w-4 h-4" /></button>
-                    <button onClick={() => setConfirmDelete(exp)} className="p-1.5 hover:bg-red-500/10 text-zinc-400 hover:text-red-500 rounded-none border border-transparent hover:border-red-500/20 transition-colors"><TrendingDown className="w-4 h-4" /></button>
+                    <button onClick={() => { setEditing(exp); setShowAdd(true) }} className="p-1 md:p-1.5 hover:bg-[#76b900]/10 text-zinc-400 hover:text-[#76b900] rounded-none border border-transparent hover:border-[#76b900]/20 transition-colors"><TrendingUp className="w-3.5 h-3.5 md:w-4 md:h-4" /></button>
+                    <button onClick={() => setConfirmDelete(exp)} className="p-1 md:p-1.5 hover:bg-red-500/10 text-zinc-400 hover:text-red-500 rounded-none border border-transparent hover:border-red-500/20 transition-colors"><TrendingDown className="w-3.5 h-3.5 md:w-4 md:h-4" /></button>
                   </div>
                 </motion.div>
               )

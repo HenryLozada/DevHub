@@ -27,7 +27,7 @@ export function FinancePanel({
   onAddRule,
   onEditRule,
 }: FinancePanelProps) {
-  const card = "relative border border-white/30 dark:border-white/10 backdrop-blur-lg bg-white/40 dark:bg-zinc-950/40 p-5 rounded-sm shadow-sm shadow-black/5"
+  const card = "relative border border-white/30 dark:border-white/10 backdrop-blur-lg bg-white/40 dark:bg-zinc-950/40 p-3 sm:p-5 rounded-sm shadow-sm shadow-black/5"
   const chip = "flex items-center justify-between gap-2 rounded-sm border border-white/30 dark:border-white/10 backdrop-blur-md bg-white/30 dark:bg-zinc-900/40 p-2.5"
 
   return (
@@ -38,28 +38,28 @@ export function FinancePanel({
           Balance proyectado del mes
         </p>
         <p className={cn(
-          "mt-1.5 text-[34px] font-semibold leading-none tracking-tight tabular-nums",
+          "mt-1.5 text-2xl sm:text-[34px] font-semibold leading-none tracking-tight tabular-nums truncate",
           summary.balance >= 0 ? "text-emerald-600 dark:text-emerald-400" : "text-red-600 dark:text-red-400",
         )}>
           {formatCurrency(summary.balance)}
         </p>
 
-        <div className="mt-4 grid grid-cols-2 gap-2">
-          <div className="rounded-sm border border-emerald-200 dark:border-emerald-900 bg-emerald-50 dark:bg-emerald-950/40 p-3">
+        <div className="mt-3 md:mt-4 grid grid-cols-2 gap-2">
+          <div className="rounded-sm border border-emerald-200 dark:border-emerald-900 bg-emerald-50 dark:bg-emerald-950/40 p-2 sm:p-3">
             <div className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400">
-              <IoTrendingUp className="size-3.5" />
-              <span className="text-xs font-semibold">Ingresos</span>
+              <IoTrendingUp className="size-3 sm:size-3.5 shrink-0" />
+              <span className="text-[10px] sm:text-xs font-semibold truncate">Ingresos</span>
             </div>
-            <p className="mt-1 text-sm font-semibold tabular-nums text-emerald-600 dark:text-emerald-400">
+            <p className="mt-1 text-xs sm:text-sm font-semibold tabular-nums text-emerald-600 dark:text-emerald-400 truncate">
               {formatCurrency(summary.ingresos)}
             </p>
           </div>
-          <div className="rounded-sm border border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-950/40 p-3">
+          <div className="rounded-sm border border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-950/40 p-2 sm:p-3">
             <div className="flex items-center gap-1.5 text-red-600 dark:text-red-400">
-              <IoTrendingDown className="size-3.5" />
-              <span className="text-xs font-semibold">Egresos</span>
+              <IoTrendingDown className="size-3 sm:size-3.5 shrink-0" />
+              <span className="text-[10px] sm:text-xs font-semibold truncate">Egresos</span>
             </div>
-            <p className="mt-1 text-sm font-semibold tabular-nums text-red-600 dark:text-red-400">
+            <p className="mt-1 text-xs sm:text-sm font-semibold tabular-nums text-red-600 dark:text-red-400 truncate">
               {formatCurrency(summary.egresos)}
             </p>
           </div>
