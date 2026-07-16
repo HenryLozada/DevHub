@@ -1,4 +1,4 @@
-import React, { useState, useEffect, type FormEvent } from "react";
+import React, { useState, useEffect, useRef, type FormEvent } from "react";
 import { motion } from "motion/react";
 import { X } from "lucide-react";
 import { DevItem, DevItemType } from "../types";
@@ -23,6 +23,9 @@ export function ItemModal({ item, onClose, onSaved }: ItemModalProps) {
   const [apiKey, setApiKey] = useState(item?.apiKey ?? "");
   const [username, setUsername] = useState(item?.username ?? "");
   const [password, setPassword] = useState(item?.password ?? "");
+  const [metaLoading, setMetaLoading] = useState(false);
+  const userTouchedTitle = useRef(false);
+  const userTouchedDesc = useRef(false);
 
   // Keydown listener for Escape key to close the modal
   useEffect(() => {
@@ -32,6 +35,33 @@ export function ItemModal({ item, onClose, onSaved }: ItemModalProps) {
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [onClose]);
+
+  // Auto-fetch metadata from URL (for tool/repo types)
+  useEffect(() => {
+    if (!url.trim() || !["tool", "repo"].includes(type)) {
+      setMetaLoading(false);
+      return;
+    }
+    try { new URL(url.trim()) } catch { setMetaLoading(false); return }
+
+    const timer = setTimeout(async () => {
+      setMetaLoading(true);
+      try {
+        const targetUrl = url.trim();
+        const res = await fetch(`/api/metadata?url=${encodeURIComponent(targetUrl)}`)
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data.title && !userTouchedTitle.current) setTitle(data.title);
+        if (data.description && !userTouchedDesc.current) setDescription(data.description);
+      } catch {
+        // silently fail
+      } finally {
+        setMetaLoading(false);
+      }
+    }, 800);
+
+    return () => clearTimeout(timer);
+  }, [url, type]);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -148,7 +178,7 @@ export function ItemModal({ item, onClose, onSaved }: ItemModalProps) {
               type="text"
               required
               value={title}
-              onChange={(e) => setTitle(e.target.value)}
+              onChange={(e) => { setTitle(e.target.value); userTouchedTitle.current = true }}
               placeholder="ej. GitHub Copilot, Servidor de Producción..."
               className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-none text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:border-[#76b900] font-sans text-sm transition-colors"
             />
@@ -199,7 +229,7 @@ export function ItemModal({ item, onClose, onSaved }: ItemModalProps) {
             <textarea
               rows={2}
               value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              onChange={(e) => { setDescription(e.target.value); userTouchedDesc.current = true }}
               placeholder="Detalles sobre este recurso..."
               className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-none text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:border-[#76b900] text-sm resize-none transition-colors"
             />
@@ -219,6 +249,11 @@ export function ItemModal({ item, onClose, onSaved }: ItemModalProps) {
                 placeholder="https://..."
                 className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-none text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:border-[#76b900] font-sans text-sm transition-colors"
               />
+              {metaLoading && (
+                <span className="inline-block mt-1.5 text-[10px] font-mono text-zinc-400 animate-pulse">
+                  ↻ Obteniendo metadatos...
+                </span>
+              )}
             </div>
           )}
 
