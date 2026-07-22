@@ -22,9 +22,12 @@ export function LivePreview({ meta, values }: Props) {
 
   const children = (values.children as string) ?? ""
 
+  const BACKGROUND_IDS = ["flickering-grid", "animated-grid-pattern", "interactive-grid-pattern", "particles"]
+  const isBackground = BACKGROUND_IDS.includes(meta.id)
+
   return (
     <div className="relative flex items-center justify-center min-h-[200px] bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-none p-6 overflow-hidden">
-      {meta.id === "flickering-grid" || meta.id === "animated-grid-pattern" ? (
+      {isBackground ? (
         <div className="absolute inset-0">
           <meta.component {...(previewProps as any)} className="h-full w-full" />
         </div>
