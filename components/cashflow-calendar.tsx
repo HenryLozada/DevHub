@@ -27,6 +27,7 @@ import { sileo } from "sileo"
 import { cn } from "@/lib/utils"
 import { RippleButton } from "@/components/ui/ripple-button"
 import { InjectionSlot } from "@/components/playground/InjectionSlot"
+import { writeStore } from "@/lib/local-store"
 
 export function CashflowCalendar() {
   const today = new Date()
@@ -77,14 +78,14 @@ export function CashflowCalendar() {
     return () => window.removeEventListener("ph:update", handler);
   }, [])
 
-  // Save rules to localStorage
+  // Save rules to localStorage + cloud
   useEffect(() => {
-    localStorage.setItem("cashflow_rules", JSON.stringify(rules))
+    writeStore("cashflow_rules", rules)
   }, [rules])
 
-  // Save events to localStorage
+  // Save events to localStorage + cloud
   useEffect(() => {
-    localStorage.setItem("personal_events_v2", JSON.stringify(events))
+    writeStore("personal_events_v2", events)
   }, [events])
 
   // Proyección del mes activo: se recalcula solo al cambiar reglas o mes.
