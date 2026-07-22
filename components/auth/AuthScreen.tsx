@@ -3,6 +3,7 @@ import { motion } from "motion/react"
 import { Mail, Lock } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useAuth } from "@/lib/auth-store"
+import { RippleButton } from "@/components/ui/ripple-button"
 
 const GLASS = "backdrop-blur-xl bg-white/40 dark:bg-zinc-950/40 border border-white/30 dark:border-white/10"
 
@@ -85,13 +86,15 @@ export function AuthScreen() {
           {error && <p className="text-[10px] font-mono text-red-500">{error}</p>}
           {message && <p className="text-[10px] font-mono text-[#76b900]">{message}</p>}
 
-          <button
+          <RippleButton
             type="submit"
             disabled={busy}
-            className="w-full py-2.5 bg-[#76b900] text-black rounded-sm text-[10px] font-mono font-bold uppercase tracking-wider hover:bg-[#86cb00] transition-all border border-[#76b900] cursor-pointer disabled:opacity-50 shadow-sm shadow-[#76b900]/20"
+            rippleColor="#000000"
+            duration="600ms"
+            className="w-full py-2.5 bg-[#76b900] text-black rounded-sm text-[10px] font-mono font-bold uppercase tracking-wider hover:bg-[#86cb00] transition-all border border-[#76b900] cursor-pointer disabled:opacity-50 shadow-sm shadow-[#76b900]/20 overflow-hidden"
           >
             {busy ? "..." : mode === "signup" ? "Crear cuenta" : "Iniciar sesión"}
-          </button>
+          </RippleButton>
         </form>
 
         {/* Divider */}
@@ -102,12 +105,14 @@ export function AuthScreen() {
         </div>
 
         {/* Google */}
-        <button
+        <RippleButton
           onClick={signInWithGoogle}
-          className="w-full py-2.5 bg-white/50 dark:bg-zinc-900/50 border border-white/40 dark:border-white/10 rounded-sm text-[10px] font-mono font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300 hover:bg-white/80 dark:hover:bg-zinc-900/80 transition-all cursor-pointer flex items-center justify-center gap-2"
+          rippleColor="#ffffff"
+          duration="600ms"
+          className="w-full py-2.5 bg-white/50 dark:bg-zinc-900/50 border border-white/40 dark:border-white/10 rounded-sm text-[10px] font-mono font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300 hover:bg-white/80 dark:hover:bg-zinc-900/80 transition-all cursor-pointer flex items-center justify-center gap-2 overflow-hidden"
         >
           <span className="text-sm font-bold">G</span> Google
-        </button>
+        </RippleButton>
 
         {/* Toggle */}
         <p className="mt-5 text-[10px] font-mono text-zinc-400 dark:text-zinc-500 text-center">

@@ -3,6 +3,8 @@ import { AnimatePresence, motion } from "motion/react"
 import { CheckCircle2, Circle, Plus, Pencil, Trash2, ChevronRight, Sparkles } from "lucide-react"
 import { isBefore, startOfDay, endOfWeek, isSameDay } from "date-fns"
 import { cn } from "@/lib/utils"
+import { RippleButton } from "@/components/ui/ripple-button"
+import { InjectionSlot } from "@/components/playground/InjectionSlot"
 import { toggleChore, deleteChore } from "../store"
 import { Chore } from "../types"
 import { ChoreModal } from "./ChoreModal"
@@ -150,6 +152,7 @@ export function Dashboard({ chores, onRefresh }: DashboardProps) {
 
   return (
     <div className="h-[calc(100vh-7.5rem)] flex flex-col px-4 py-4 max-w-6xl mx-auto relative">
+      <InjectionSlot moduleId="chores" className="absolute inset-0 pointer-events-none" />
       {/* Subtle background decoration */}
       <div className="absolute -top-20 right-10 w-72 h-72 bg-[#76b900]/5 dark:bg-[#76b900]/[0.03] blur-3xl rounded-full pointer-events-none" />
       <div className="absolute -bottom-20 left-10 w-56 h-56 bg-violet-500/5 dark:bg-violet-500/[0.02] blur-3xl rounded-full pointer-events-none" />
@@ -170,10 +173,11 @@ export function Dashboard({ chores, onRefresh }: DashboardProps) {
             <span className="text-[10px] font-mono font-bold text-zinc-400 dark:text-zinc-500 tabular-nums">{doneCount}/{total}</span>
           </div>
         </div>
-        <button onClick={() => { setEditingChore(null); setShowChoreModal(true) }}
-          className="flex items-center gap-1.5 px-3 py-1.5 bg-[#76b900] text-black rounded-sm text-[10px] font-mono font-bold uppercase tracking-wider hover:bg-[#86cb00] transition-all duration-200 border border-[#76b900] cursor-pointer active:scale-[0.97] shadow-sm shadow-[#76b900]/20">
+        <RippleButton onClick={() => { setEditingChore(null); setShowChoreModal(true) }}
+          rippleColor="#000000" duration="600ms"
+          className="flex items-center gap-1.5 px-3 py-1.5 bg-[#76b900] text-black rounded-sm text-[10px] font-mono font-bold uppercase tracking-wider hover:bg-[#86cb00] transition-all duration-200 border border-[#76b900] cursor-pointer shadow-sm shadow-[#76b900]/20 overflow-hidden">
           <Plus className="w-3.5 h-3.5" /> Tarea
-        </button>
+        </RippleButton>
       </div>
 
       {/* Kanban columns */}
@@ -267,7 +271,7 @@ export function Dashboard({ chores, onRefresh }: DashboardProps) {
               <p className="text-zinc-400 dark:text-zinc-500 text-xs font-mono uppercase tracking-wider mb-6">Esta acción no se puede deshacer.</p>
               <div className="flex gap-3">
                 <button onClick={() => setConfirmDelete(null)} className="flex-1 py-2.5 bg-zinc-100/80 dark:bg-zinc-900/80 backdrop-blur-sm text-zinc-900 dark:text-white border border-zinc-200/50 dark:border-zinc-800/50 rounded-sm font-mono text-xs uppercase tracking-wider font-bold hover:bg-zinc-200/80 dark:hover:bg-zinc-800/80 transition-colors cursor-pointer">Cancelar</button>
-                <button onClick={() => handleDelete(confirmDelete)} className="flex-1 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-sm font-mono text-xs uppercase tracking-wider font-bold transition-colors border border-red-600 cursor-pointer shadow-sm shadow-red-600/20">Eliminar</button>
+                <RippleButton onClick={() => handleDelete(confirmDelete)} rippleColor="#ffffff" duration="600ms" className="flex-1 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-sm font-mono text-xs uppercase tracking-wider font-bold transition-colors border border-red-600 cursor-pointer shadow-sm shadow-red-600/20 overflow-hidden">Eliminar</RippleButton>
               </div>
             </motion.div>
           </div>

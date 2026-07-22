@@ -1,9 +1,9 @@
-import { Calendar as IoCalendarOutline, Wallet, CheckCircle2, Terminal, Sun, Moon } from "lucide-react"
+import { Calendar as IoCalendarOutline, Wallet, CheckCircle2, Terminal, Puzzle, Sun, Moon } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 interface GlobalNavProps {
-  activeTab: "calendar" | "budgeted" | "chores" | "devhub"
-  onTabChange: (tab: "calendar" | "budgeted" | "chores" | "devhub") => void
+  activeTab: "calendar" | "budgeted" | "chores" | "devhub" | "playground"
+  onTabChange: (tab: "calendar" | "budgeted" | "chores" | "devhub" | "playground") => void
   theme: "light" | "dark"
   onToggleTheme: () => void
   rightSlot?: React.ReactNode
@@ -14,6 +14,7 @@ const TABS = [
   { id: "budgeted" as const, label: "Gastos", icon: Wallet },
   { id: "chores" as const, label: "Tareas", icon: CheckCircle2 },
   { id: "devhub" as const, label: "DevHub", icon: Terminal },
+  { id: "playground" as const, label: "Playground", icon: Puzzle },
 ]
 
 export function GlobalNav({ activeTab, onTabChange, theme, onToggleTheme, rightSlot }: GlobalNavProps) {

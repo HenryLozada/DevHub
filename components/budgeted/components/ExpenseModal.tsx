@@ -2,6 +2,7 @@ import { useState, useEffect } from "react"
 import { motion } from "motion/react"
 import { X, Check, Circle, Minus } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { RippleButton } from "@/components/ui/ripple-button"
 import { updateExpense, saveExpense } from "../store"
 import { Expense, CATEGORIES, PaidStatus, fmt } from "../types"
 
@@ -121,9 +122,9 @@ export function ExpenseModal({ expense, onClose, onSaved }: ExpenseModalProps) {
               </div>
             </div>
           )}
-          <button type="submit" className="w-full py-3.5 bg-[#76b900] hover:bg-[#86cb00] text-black rounded-none font-mono text-xs uppercase tracking-wider font-bold transition-all border border-[#76b900]">
+          <RippleButton type="submit" rippleColor="#000000" duration="600ms" className="w-full py-3.5 bg-[#76b900] hover:bg-[#86cb00] text-black rounded-none font-mono text-xs uppercase tracking-wider font-bold transition-all border border-[#76b900] overflow-hidden">
             {expense ? "GUARDAR CAMBIOS" : "AGREGAR GASTO"}
-          </button>
+          </RippleButton>
         </form>
       </motion.div>
     </div>

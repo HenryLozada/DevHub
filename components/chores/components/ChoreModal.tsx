@@ -2,6 +2,7 @@ import { useState, useEffect, type FormEvent } from "react"
 import { motion } from "motion/react"
 import { X } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { RippleButton } from "@/components/ui/ripple-button"
 import { updateChore, saveChore } from "../store"
 import { Chore } from "../types"
 
@@ -96,9 +97,9 @@ export function ChoreModal({ chore, onClose, onSaved }: ChoreModalProps) {
                 </div>
               </div>
             </div>
-            <button type="submit" className="w-full py-3.5 bg-[#76b900] hover:bg-[#86cb00] text-black rounded-none font-mono text-xs uppercase tracking-wider font-bold transition-all">
+            <RippleButton type="submit" rippleColor="#000000" duration="600ms" className="w-full py-3.5 bg-[#76b900] hover:bg-[#86cb00] text-black rounded-none font-mono text-xs uppercase tracking-wider font-bold transition-all overflow-hidden">
               {chore ? "GUARDAR CAMBIOS" : "CREAR TAREA"}
-            </button>
+            </RippleButton>
           </form>
         </div>
       </motion.div>

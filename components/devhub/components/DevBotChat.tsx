@@ -110,38 +110,40 @@ export function DevBotChat({ onItemAdded }: DevBotChatProps) {
       url = trimmed
       const urlObj = new URL(trimmed)
 
+      // Fetch translated metadata from our API (title & description in Spanish)
+      let metaTitle: string | null = null
+      let metaDesc: string | null = null
+      try {
+        const metaRes = await fetch(`/api/metadata?url=${encodeURIComponent(trimmed)}`)
+        if (metaRes.ok) {
+          const metaData = await metaRes.json()
+          metaTitle = metaData.title || null
+          metaDesc = metaData.description || null
+        }
+      } catch (_) {}
+
       if (urlObj.hostname.includes("youtube.com") || urlObj.hostname.includes("youtu.be")) {
         type = "youtube"
         category = "Media"
         const videoId = urlObj.searchParams.get("v") || urlObj.pathname.split("/").pop()
-        title = `Video de YouTube (${videoId || "Link"})`
-        description = "Video guardado para ver más tarde."
-        try {
-          const res = await fetch(`https://noembed.com/embed?url=${encodeURIComponent(trimmed)}`)
-          if (res.ok) {
-            const data = await res.json()
-            if (data?.title) {
-              title = data.title
-              description = `Canal: ${data.author_name || "Desconocido"}. Video de YouTube guardado.`
-            }
-          }
-        } catch (_) {}
+        title = metaTitle || `Video de YouTube (${videoId || "Link"})`
+        description = metaDesc || "Video guardado para ver más tarde."
       } else if (urlObj.hostname.includes("github.com")) {
         type = "repo"
         category = "Repositorios"
         const paths = urlObj.pathname.split("/").filter(Boolean)
         if (paths.length >= 2) {
-          title = `${paths[0]}/${paths[1]}`
-          description = `Repositorio de GitHub por ${paths[0]}.`
+          title = metaTitle || `${paths[0]}/${paths[1]}`
+          description = metaDesc || `Repositorio de GitHub por ${paths[0]}.`
         } else {
-          title = "GitHub Repository"
-          description = "Repositorio guardado."
+          title = metaTitle || "Repositorio de GitHub"
+          description = metaDesc || "Repositorio guardado."
         }
       } else {
         type = "tool"
         category = "Herramientas"
-        title = urlObj.hostname.replace("www.", "")
-        description = "Herramienta web guardada."
+        title = metaTitle || urlObj.hostname.replace("www.", "")
+        description = metaDesc || "Herramienta web guardada."
       }
     } else if (trimmed.toLowerCase().startsWith("creds:") || trimmed.toLowerCase().startsWith("cred:")) {
       type = "credential"

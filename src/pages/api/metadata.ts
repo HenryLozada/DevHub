@@ -1,5 +1,39 @@
 import type { APIRoute } from "astro"
 
+export const prerender = false
+
+const GROQ_API_KEY = import.meta.env.GROQ_API_KEY
+
+async function translateToSpanish(text: string): Promise<string> {
+  if (!GROQ_API_KEY || !text || text.length > 1000) return text
+  // Skip if text is already clearly in Spanish
+  const spanishIndicators = /[áéíóúñ¿¡]/i
+  if (spanishIndicators.test(text)) return text
+  try {
+    const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${GROQ_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "llama-3.3-70b-versatile",
+        messages: [
+          { role: "system", content: "Traduce el siguiente texto a español mexicano. Responde UNICAMENTE con la traducción, sin explicaciones, sin comillas, sin notas adicionales. Si el texto ya está en español, repítelo tal cual." },
+          { role: "user", content: text },
+        ],
+        temperature: 0.1,
+        max_tokens: 200,
+      }),
+    })
+    if (!res.ok) return text
+    const data = await res.json()
+    return data?.choices?.[0]?.message?.content?.trim() || text
+  } catch {
+    return text
+  }
+}
+
 export const GET: APIRoute = async ({ url }) => {
   const target = url.searchParams.get("url")
   if (!target) {
@@ -16,14 +50,14 @@ export const GET: APIRoute = async ({ url }) => {
     })
     const html = await res.text()
 
-    const title = extractMeta(html, [
+    let title = extractMeta(html, [
       'property="og:title"',
       'name="twitter:title"',
       "property='og:title'",
       "name='twitter:title'",
     ]) || extractTag(html, "title")
 
-    const description = extractMeta(html, [
+    let description = extractMeta(html, [
       'property="og:description"',
       'name="description"',
       'name="twitter:description"',
@@ -31,6 +65,9 @@ export const GET: APIRoute = async ({ url }) => {
       "name='description'",
       "name='twitter:description'",
     ])
+
+    if (title) title = await translateToSpanish(title)
+    if (description) description = await translateToSpanish(description)
 
     const siteName = extractMeta(html, [
       'property="og:site_name"',

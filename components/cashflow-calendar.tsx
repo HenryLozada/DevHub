@@ -25,6 +25,8 @@ import { RuleDialog } from "@/components/rule-dialog"
 import { EventDialog } from "@/components/event-dialog"
 import { sileo } from "sileo"
 import { cn } from "@/lib/utils"
+import { RippleButton } from "@/components/ui/ripple-button"
+import { InjectionSlot } from "@/components/playground/InjectionSlot"
 
 export function CashflowCalendar() {
   const today = new Date()
@@ -178,15 +180,16 @@ export function CashflowCalendar() {
   }
 
   return (
-    <div className="mx-auto min-h-screen flex flex-col" style={{ backgroundColor: 'var(--color-canvas)' }}>
+    <div className="mx-auto min-h-screen flex flex-col relative" style={{ backgroundColor: 'var(--color-canvas)' }}>
+      <InjectionSlot moduleId="calendar" className="absolute inset-0 pointer-events-none" />
       <ModuleNav
         icon={<IoCalendar className="w-4 h-4 text-[#76b900]" />}
         title="Flujo de Caja"
         actions={
-          <button onClick={goToToday}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 hover:text-white rounded-none text-[10px] font-mono font-bold uppercase tracking-wider transition-colors border border-zinc-800 hover:border-zinc-700">
+          <RippleButton onClick={goToToday} rippleColor="#ffffff" duration="600ms"
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 hover:text-white rounded-none text-[10px] font-mono font-bold uppercase tracking-wider transition-colors border border-zinc-800 hover:border-zinc-700 overflow-hidden">
             <IoCalendar className="size-3.5" /> Hoy
-          </button>
+          </RippleButton>
         }
       />
 

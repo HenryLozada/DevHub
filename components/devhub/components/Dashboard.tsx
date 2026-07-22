@@ -4,6 +4,8 @@ import { DevItem } from "../types";
 import { ItemCard } from "./ItemCard";
 import { ItemModal } from "./ItemModal";
 import { DevBotChat } from "./DevBotChat";
+import { RippleButton } from "@/components/ui/ripple-button";
+import { InjectionSlot } from "@/components/playground/InjectionSlot";
 import {
   Search,
   Plus,
@@ -80,7 +82,8 @@ export function Dashboard() {
   });
 
   return (
-    <div className="max-w-7xl mx-auto px-3 md:px-6 lg:px-8 py-4 md:py-8 space-y-4 md:space-y-8 animate-in fade-in duration-300">
+    <div className="max-w-7xl mx-auto px-3 md:px-6 lg:px-8 py-4 md:py-8 space-y-4 md:space-y-8 animate-in fade-in duration-300 relative">
+      <InjectionSlot moduleId="devhub" className="absolute inset-0 pointer-events-none" />
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-zinc-200 dark:border-zinc-800 pb-5">
         <div>
@@ -91,12 +94,14 @@ export function Dashboard() {
             Developer Toolbox & Credentials Locker
           </p>
         </div>
-        <button
+        <RippleButton
           onClick={handleAddNew}
-          className="flex items-center justify-center gap-2 px-5 py-2.5 bg-black hover:bg-zinc-900 dark:bg-[#76b900] dark:hover:bg-[#86cb10] text-white dark:text-black font-bold font-mono text-xs uppercase tracking-wider transition-colors cursor-pointer border border-transparent"
+          rippleColor="rgba(255,255,255,0.5)"
+          duration="600ms"
+          className="flex items-center justify-center gap-2 px-5 py-2.5 bg-black hover:bg-zinc-900 dark:bg-[#76b900] dark:hover:bg-[#86cb10] text-white dark:text-black font-bold font-mono text-xs uppercase tracking-wider transition-colors cursor-pointer border border-transparent overflow-hidden"
         >
           <Plus className="w-4 h-4" /> Añadir Recurso
-        </button>
+        </RippleButton>
       </div>
 
       {/* Stats Widgets */}

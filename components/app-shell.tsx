@@ -11,6 +11,7 @@ const CashflowCalendar = lazy(() => import("@/components/cashflow-calendar").the
 const BudgetedApp = lazy(() => import("@/components/budgeted/index").then(m => ({ default: m.BudgetedApp })))
 const ChoresApp = lazy(() => import("@/components/chores/index").then(m => ({ default: m.ChoresApp })))
 const DevHubApp = lazy(() => import("@/components/devhub/index").then(m => ({ default: m.DevHubApp })))
+const PlaygroundPanel = lazy(() => import("@/components/playground/PlaygroundPanel").then(m => ({ default: m.PlaygroundPanel })))
 const DevBot = lazy(() => import("@/components/devbot").then(m => ({ default: m.DevBot })))
 
 function ModuleLoader() {
@@ -23,7 +24,7 @@ function ModuleLoader() {
 
 function AppInner() {
   const { user, loading } = useAuth()
-  const [activeTab, setActiveTab] = useState<"calendar" | "budgeted" | "chores" | "devhub">("calendar")
+  const [activeTab, setActiveTab] = useState<"calendar" | "budgeted" | "chores" | "devhub" | "playground">("calendar")
   const [theme, setTheme] = useState<"light" | "dark">("light")
 
   useEffect(() => {
@@ -73,9 +74,13 @@ function AppInner() {
             <motion.div key="chores" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.2 }}>
               <ChoresApp />
             </motion.div>
-          ) : (
+          ) : activeTab === "devhub" ? (
             <motion.div key="devhub" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.2 }}>
               <DevHubApp />
+            </motion.div>
+          ) : (
+            <motion.div key="playground" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.2 }}>
+              <PlaygroundPanel />
             </motion.div>
           )}
         </Suspense>

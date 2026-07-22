@@ -4,6 +4,7 @@ import { X } from "lucide-react";
 import { DevItem, DevItemType } from "../types";
 import { saveDevItem, updateDevItem } from "../store";
 import { sileo } from "sileo";
+import { RippleButton } from "@/components/ui/ripple-button";
 
 interface ItemModalProps {
   item?: DevItem | null;
@@ -327,12 +328,14 @@ export function ItemModal({ item, onClose, onSaved }: ItemModalProps) {
             >
               Cancelar
             </button>
-            <button
+            <RippleButton
               type="submit"
-              className="px-4 py-2 bg-black hover:bg-zinc-900 dark:bg-[#76b900] dark:hover:bg-[#86cb10] text-white dark:text-black font-bold font-mono text-xs uppercase tracking-wider border border-transparent dark:border-transparent transition-colors cursor-pointer"
+              rippleColor="rgba(255,255,255,0.5)"
+              duration="600ms"
+              className="px-4 py-2 bg-black hover:bg-zinc-900 dark:bg-[#76b900] dark:hover:bg-[#86cb10] text-white dark:text-black font-bold font-mono text-xs uppercase tracking-wider border border-transparent dark:border-transparent transition-colors cursor-pointer overflow-hidden"
             >
               {item ? "Guardar" : "Crear"}
-            </button>
+            </RippleButton>
           </div>
         </form>
       </motion.div>

@@ -1,4 +1,5 @@
 import * as React from "react"
+import { RippleButton } from "@/components/ui/ripple-button"
 
 interface Props {
   children: React.ReactNode
@@ -35,12 +36,14 @@ export class ErrorBoundary extends React.Component<Props, State> {
             <p className="text-sm text-zinc-500 mb-4">
               Ocurrio un error inesperado. Intenta recargar la pagina.
             </p>
-            <button
+            <RippleButton
               onClick={() => window.location.reload()}
-              className="rounded-full bg-[#0066cc] px-5 py-2.5 text-sm font-medium text-white hover:bg-[#0077ed] transition-colors"
+              rippleColor="#ffffff"
+              duration="600ms"
+              className="rounded-full bg-[#0066cc] px-5 py-2.5 text-sm font-medium text-white hover:bg-[#0077ed] transition-colors overflow-hidden"
             >
               Recargar pagina
-            </button>
+            </RippleButton>
           </div>
         </div>
       )

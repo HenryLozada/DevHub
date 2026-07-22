@@ -2,6 +2,8 @@ import { useState } from "react"
 import { AnimatePresence, motion } from "motion/react"
 import { Plus, Receipt, TrendingUp, TrendingDown } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { RippleButton } from "@/components/ui/ripple-button"
+import { InjectionSlot } from "@/components/playground/InjectionSlot"
 import { togglePaidStatus, deleteExpense } from "../store"
 import { Expense, PaidStatus, fmt } from "../types"
 import { ExpenseModal } from "./ExpenseModal"
@@ -44,7 +46,9 @@ export function Dashboard({ expenses, onRefresh }: DashboardProps) {
   const categories = [...new Set(expenses.map(e => e.category))]
 
   return (
-    <div className="max-w-4xl mx-auto px-3 md:px-4 py-4 md:py-8">
+    <div className="max-w-4xl mx-auto px-3 md:px-4 py-4 md:py-8 relative">
+      <InjectionSlot moduleId="budgeted" className="absolute inset-0 pointer-events-none" />
+      <div className="relative z-10">
       <div className="flex items-center justify-between mb-4 md:mb-8">
         <div className="min-w-0">
           <h2 className="text-xl md:text-3xl font-bold text-zinc-950 dark:text-white font-sans uppercase tracking-tight truncate">Mis Gastos</h2>
@@ -52,10 +56,11 @@ export function Dashboard({ expenses, onRefresh }: DashboardProps) {
             {expenses.length} registros · ${fmt(unpaidTotal)} pendiente
           </p>
         </div>
-        <button onClick={() => { setEditing(null); setShowAdd(true) }}
-          className="flex items-center gap-1.5 px-3 md:px-4 py-1.5 md:py-2 bg-[#76b900] text-black rounded-none text-[10px] md:text-xs font-mono font-bold uppercase tracking-wider hover:bg-[#86cb00] transition-colors border border-[#76b900] shrink-0">
+        <RippleButton onClick={() => { setEditing(null); setShowAdd(true) }}
+          rippleColor="#000000" duration="600ms"
+          className="flex items-center gap-1.5 px-3 md:px-4 py-1.5 md:py-2 bg-[#76b900] text-black rounded-none text-[10px] md:text-xs font-mono font-bold uppercase tracking-wider hover:bg-[#86cb00] transition-colors border border-[#76b900] shrink-0 overflow-hidden">
           <Plus className="w-3.5 h-3.5 md:w-4 md:h-4" /> Gasto
-        </button>
+        </RippleButton>
       </div>
 
       {/* Stats */}
@@ -156,12 +161,13 @@ export function Dashboard({ expenses, onRefresh }: DashboardProps) {
               <p className="text-zinc-400 dark:text-zinc-500 text-xs font-mono uppercase tracking-wider mb-6">Esta acción no se puede deshacer.</p>
               <div className="flex gap-3">
                 <button onClick={() => setConfirmDelete(null)} className="flex-1 py-2.5 bg-zinc-100 dark:bg-zinc-900 text-zinc-900 dark:text-white border border-zinc-200 dark:border-zinc-800 rounded-none font-mono text-xs uppercase tracking-wider font-bold hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-colors">Cancelar</button>
-                <button onClick={() => handleDelete(confirmDelete)} className="flex-1 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-none font-mono text-xs uppercase tracking-wider font-bold transition-colors border border-red-600">Eliminar</button>
+                <RippleButton onClick={() => handleDelete(confirmDelete)} rippleColor="#ffffff" duration="600ms" className="flex-1 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-none font-mono text-xs uppercase tracking-wider font-bold transition-colors border border-red-600 overflow-hidden">Eliminar</RippleButton>
               </div>
             </motion.div>
           </div>
         )}
       </AnimatePresence>
+      </div>{/* relative z-10 */}
     </div>
   )
 }
