@@ -13,9 +13,11 @@ import {
   Lock,
   Layers,
   Key,
+  ShieldCheck,
 } from "lucide-react";
 import { FaGithub } from "@/components/icons";
 import { sileo } from "sileo";
+import { PasswordSecurityDialog } from "./PasswordSecurityDialog";
 
 export function Dashboard() {
   const [items, setItems] = useState<DevItem[]>([]);
@@ -23,6 +25,7 @@ export function Dashboard() {
   const [filterType, setFilterType] = useState<string>("All");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<DevItem | null>(null);
+  const [securityDialogOpen, setSecurityDialogOpen] = useState(false);
 
   const refreshItems = () => {
     setItems(getDevItems());
@@ -56,6 +59,7 @@ export function Dashboard() {
     setSelectedItem(null);
     setIsModalOpen(true);
   };
+
 
   // Calculate statistics
   const totalCount = items.length;
@@ -94,14 +98,19 @@ export function Dashboard() {
             Developer Toolbox & Credentials Locker
           </p>
         </div>
-        <RippleButton
-          onClick={handleAddNew}
+         <div className="flex flex-col sm:flex-row gap-2">
+          <button onClick={() => setSecurityDialogOpen(true)} className="flex items-center justify-center gap-2 px-4 py-2.5 border border-zinc-300 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 hover:border-[#76b900] hover:text-[#76b900] font-bold font-mono text-xs uppercase tracking-wider transition-colors cursor-pointer">
+            <ShieldCheck className="w-4 h-4" /> Seguridad
+          </button>
+          <RippleButton
+           onClick={handleAddNew}
           rippleColor="rgba(255,255,255,0.5)"
           duration="600ms"
           className="flex items-center justify-center gap-2 px-5 py-2.5 bg-black hover:bg-zinc-900 dark:bg-[#76b900] dark:hover:bg-[#86cb10] text-white dark:text-black font-bold font-mono text-xs uppercase tracking-wider transition-colors cursor-pointer border border-transparent overflow-hidden"
         >
           <Plus className="w-4 h-4" /> Añadir Recurso
-        </RippleButton>
+          </RippleButton>
+         </div>
       </div>
 
       {/* Stats Widgets */}
@@ -251,6 +260,7 @@ export function Dashboard() {
           onSaved={refreshItems}
         />
       )}
+      {securityDialogOpen && <PasswordSecurityDialog mode="settings" onClose={() => setSecurityDialogOpen(false)} />}
     </div>
   );
 }

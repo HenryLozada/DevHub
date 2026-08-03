@@ -291,7 +291,8 @@ export function ItemModal({ item, onClose, onSaved }: ItemModalProps) {
           )}
 
           {type === "credential" && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-[10px] font-mono font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-widest mb-1.5">
                   Usuario / Email
@@ -315,6 +316,7 @@ export function ItemModal({ item, onClose, onSaved }: ItemModalProps) {
                   placeholder="••••••••"
                   className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-none text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:border-[#76b900] text-sm transition-colors"
                 />
+              </div>
               </div>
             </div>
           )}

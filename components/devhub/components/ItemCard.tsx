@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   ExternalLink,
   Eye,
@@ -13,6 +13,8 @@ import {
 } from "lucide-react";
 import { FaGithub, FaYoutube } from "@/components/icons";
 import { DevItem } from "../types";
+import { getPasswordSecurity } from "../security";
+import { PasswordSecurityDialog } from "./PasswordSecurityDialog";
 import { sileo } from "sileo";
 
 interface ItemCardProps {
@@ -38,6 +40,20 @@ function getYouTubeId(url: string) {
 
 export function ItemCard({ item, onEdit, onDelete }: ItemCardProps) {
   const [revealed, setRevealed] = useState(false);
+  const [pinDialogOpen, setPinDialogOpen] = useState(false);
+  const pinResolver = useRef<((verified: boolean) => void) | null>(null);
+
+  const verifyPin = async () => {
+    const security = getPasswordSecurity();
+    if (!security.enabled) return true;
+    setPinDialogOpen(true);
+    return new Promise<boolean>((resolve) => { pinResolver.current = resolve; });
+  };
+
+  const revealPassword = async () => {
+    if (revealed || await verifyPin()) setRevealed(!revealed);
+  };
+
 
   const handleCopy = (text: string, fieldName: string) => {
     navigator.clipboard.writeText(text);
@@ -90,8 +106,9 @@ export function ItemCard({ item, onEdit, onDelete }: ItemCardProps) {
           <div className="flex items-center gap-1 text-xs font-mono font-semibold text-zinc-400">
             {meta.icon}
             <span className="text-[10px] uppercase select-none">{meta.label}</span>
-          </div>
-        </div>
+     </div>
+     {pinDialogOpen && <PasswordSecurityDialog mode="verify" onClose={() => setPinDialogOpen(false)} onVerified={(verified) => { pinResolver.current?.(verified); pinResolver.current = null; }} />}
+     </div>
 
         {/* Title & Description */}
         <h4 className="text-base font-bold font-sans text-zinc-900 dark:text-white mt-3 group-hover:text-[#76b900] transition-colors line-clamp-1">
@@ -182,7 +199,7 @@ export function ItemCard({ item, onEdit, onDelete }: ItemCardProps) {
               {revealed ? item.apiKey : "••••••••••••••••"}
             </div>
             <button
-              onClick={() => setRevealed(!revealed)}
+              onClick={revealPassword}
               className="p-1.5 border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-900 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 transition-colors"
               title={revealed ? "Ocultar" : "Revelar"}
             >
@@ -216,17 +233,19 @@ export function ItemCard({ item, onEdit, onDelete }: ItemCardProps) {
             {item.password && (
               <div className="flex items-center gap-1.5 overflow-hidden">
                 <span className="font-bold text-zinc-400">P:</span>
-                <span className="flex-1 truncate select-all">
+                 <span className={`flex-1 truncate ${revealed ? "select-all" : "select-none"}`}>
                   {revealed ? item.password : "••••••••"}
                 </span>
                 <button
-                  onClick={() => setRevealed(!revealed)}
+                   onClick={revealPassword}
                   className="p-0.5 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 transition-colors"
                 >
                   {revealed ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
                 </button>
                 <button
-                  onClick={() => handleCopy(item.password || "", "Contraseña")}
+                   onClick={() => {
+                     verifyPin().then((verified) => { if (verified) handleCopy(item.password || "", "Contraseña"); });
+                   }}
                   className="p-0.5 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 transition-colors"
                 >
                   <Copy className="w-3 h-3" />
@@ -242,7 +261,7 @@ export function ItemCard({ item, onEdit, onDelete }: ItemCardProps) {
         <span className="text-[9px] font-mono text-zinc-300 dark:text-zinc-700 select-none">
           {item.createdAt ? new Date(item.createdAt).toLocaleDateString("es-MX", { day: "numeric", month: "short", year: "numeric" }) : ""}
         </span>
-        <div className="flex items-center gap-2">
+         <div className="flex items-center gap-2">
         <button
           onClick={() => onEdit(item)}
           className="p-1 hover:bg-zinc-50 dark:hover:bg-zinc-900 hover:text-black dark:hover:text-white transition-colors cursor-pointer"
