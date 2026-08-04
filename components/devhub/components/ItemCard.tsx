@@ -206,7 +206,11 @@ export function ItemCard({ item, onEdit, onDelete }: ItemCardProps) {
               {revealed ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
             </button>
             <button
-              onClick={() => handleCopy(item.apiKey || "", "API Key")}
+              onClick={() => {
+                verifyPin().then((ok) => {
+                  if (ok) handleCopy(item.apiKey || "", "API Key")
+                })
+              }}
               className="p-1.5 border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-900 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 transition-colors"
               title="Copiar"
             >

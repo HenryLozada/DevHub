@@ -44,7 +44,8 @@ export function projectPersonalMonth(
       }
     } else if (event.recurrencia === "anual") {
       if (event.mesDelAño === month && event.diaDelMes) {
-        push(new Date(year, month, event.diaDelMes), event)
+        const day = Math.min(event.diaDelMes, totalDays)
+        push(new Date(year, month, day), event)
       }
     } else if (event.recurrencia === "mensual" && event.diaDelMes) {
       const day = Math.min(event.diaDelMes, totalDays)

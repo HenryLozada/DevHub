@@ -32,7 +32,8 @@ export function CalendarView({ chores, onToggle }: CalendarViewProps) {
   function getChoresForDay(day: Date) {
     return chores.filter((c) => {
       if (!c.dueDate) return false
-      return isSameDay(new Date(c.dueDate), day)
+      const [y, m, d] = c.dueDate.split("-").map(Number)
+      return isSameDay(new Date(y, m - 1, d), day)
     })
   }
 

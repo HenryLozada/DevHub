@@ -23,7 +23,7 @@ function ModuleLoader() {
 }
 
 function AppInner() {
-  const { user, loading } = useAuth()
+  const { user, loading, syncVersion } = useAuth()
   const [activeTab, setActiveTab] = useState<"calendar" | "budgeted" | "chores" | "devhub" | "playground">("calendar")
   const [theme, setTheme] = useState<"light" | "dark">("light")
 
@@ -63,23 +63,23 @@ function AppInner() {
       <main className="flex-1">
         <Suspense fallback={<ModuleLoader />}>
           {activeTab === "calendar" ? (
-            <motion.div key="calendar" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.2 }}>
+            <motion.div key={`calendar-${syncVersion}`} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.2 }}>
               <CashflowCalendar />
             </motion.div>
           ) : activeTab === "budgeted" ? (
-            <motion.div key="budgeted" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.2 }}>
+            <motion.div key={`budgeted-${syncVersion}`} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.2 }}>
               <BudgetedApp />
             </motion.div>
           ) : activeTab === "chores" ? (
-            <motion.div key="chores" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.2 }}>
+            <motion.div key={`chores-${syncVersion}`} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.2 }}>
               <ChoresApp />
             </motion.div>
           ) : activeTab === "devhub" ? (
-            <motion.div key="devhub" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.2 }}>
+            <motion.div key={`devhub-${syncVersion}`} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.2 }}>
               <DevHubApp />
             </motion.div>
           ) : (
-            <motion.div key="playground" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.2 }}>
+            <motion.div key={`playground-${syncVersion}`} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.2 }}>
               <PlaygroundPanel />
             </motion.div>
           )}

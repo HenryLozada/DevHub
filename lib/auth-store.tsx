@@ -1,23 +1,14 @@
-import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from "react"
+import { createContext, useContext, useState, useEffect, useCallback, useRef, type ReactNode } from "react"
 import { supabase } from "./supabase"
-import { setUserId, uploadToCloud, downloadFromCloud } from "./local-store"
+import { setUserId, uploadToCloud, downloadFromCloud, clearLocalUserData, getStoreKeys } from "./local-store"
 import type { User } from "@supabase/supabase-js"
 
-const KEYS = [
-  "cashflow_rules",
-  "personal_events_v2",
-  "ph_chores_chores",
-  "ph_budgeted_expenses",
-  "ph_devhub_items",
-  "ph_devbot_history",
-]
-
-const POLL_INTERVAL = 30_000 // 30 segundos
+const POLL_INTERVAL = 30_000
 
 interface AuthContextType {
   user: User | null
   loading: boolean
-  syncVersion: number   // sube cada vez que hay sync exitoso — úsalo como key para forzar re-render
+  syncVersion: number
   signUp: (email: string, password: string) => Promise<string | null>
   signIn: (email: string, password: string) => Promise<string | null>
   signInWithGoogle: () => Promise<void>
@@ -38,44 +29,82 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
   const [syncVersion, setSyncVersion] = useState(0)
+  const syncingRef = useRef(false)
+  const lastUserIdRef = useRef<string | null>(null)
 
-  // Descarga todos los datos de Supabase al localStorage y bump syncVersion
   const syncDown = useCallback(async (u: User | null) => {
     if (!u) return
-    let anyUpdated = false
-    await Promise.all(
-      KEYS.map(async (key) => {
-        const ok = await downloadFromCloud(key)
-        if (ok) anyUpdated = true
-        else await uploadToCloud(key) // primera vez: sube el local
-      })
-    )
-    if (anyUpdated) setSyncVersion(v => v + 1)
+    if (syncingRef.current) return
+    syncingRef.current = true
+    try {
+      let anyUpdated = false
+      const keys = getStoreKeys()
+      await Promise.all(
+        keys.map(async (key) => {
+          const ok = await downloadFromCloud(key)
+          if (ok) anyUpdated = true
+          else await uploadToCloud(key)
+        })
+      )
+      if (anyUpdated) setSyncVersion((v) => v + 1)
+    } finally {
+      syncingRef.current = false
+    }
   }, [])
 
   useEffect(() => {
-    if (!supabase) { setLoading(false); return }
+    if (!supabase) {
+      setLoading(false)
+      return
+    }
 
-    // Al iniciar: restaurar sesión y descargar datos
+    let initialDone = false
+
     supabase.auth.getSession().then(({ data: { session } }) => {
       const u = session?.user ?? null
       setUser(u)
       setUserId(u?.id || null)
-      syncDown(u).finally(() => setLoading(false))
+      lastUserIdRef.current = u?.id || null
+      syncDown(u).finally(() => {
+        initialDone = true
+        setLoading(false)
+      })
     })
 
-    // Cambios de sesión (login / logout)
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
       const u = session?.user ?? null
+      const nextId = u?.id || null
+
+      if (event === "SIGNED_OUT") {
+        clearLocalUserData()
+        lastUserIdRef.current = null
+        setUser(null)
+        setUserId(null)
+        setSyncVersion((v) => v + 1)
+        return
+      }
+
+      if (event === "INITIAL_SESSION") return
+
+      if (nextId && lastUserIdRef.current && lastUserIdRef.current !== nextId) {
+        clearLocalUserData()
+      }
+
       setUser(u)
-      setUserId(u?.id || null)
-      syncDown(u)
+      setUserId(nextId)
+      lastUserIdRef.current = nextId
+
+      if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {
+        if (!initialDone && event === "TOKEN_REFRESHED") return
+        await syncDown(u)
+      }
     })
 
     return () => subscription.unsubscribe()
   }, [syncDown])
 
-  // Polling cada 30s — mantiene los datos sincronizados entre dispositivos
   useEffect(() => {
     if (!user) return
     const id = setInterval(() => syncDown(user), POLL_INTERVAL)
@@ -84,8 +113,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   async function signUp(email: string, password: string): Promise<string | null> {
     if (!supabase) return "Supabase no configurado"
-    const { error } = await supabase.auth.signUp({ email, password })
-    return error?.message || null
+    const { data, error } = await supabase.auth.signUp({ email, password })
+    if (error) return error.message
+    if (data.user && !data.session) {
+      return "Revisa tu correo para confirmar la cuenta antes de iniciar sesión."
+    }
+    return null
   }
 
   async function signIn(email: string, password: string): Promise<string | null> {
@@ -96,13 +129,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   async function signInWithGoogle(): Promise<void> {
     if (!supabase) return
-    await supabase.auth.signInWithOAuth({ provider: "google" })
+    const redirectTo = typeof window !== "undefined" ? `${window.location.origin}/` : undefined
+    await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: redirectTo ? { redirectTo } : undefined,
+    })
   }
 
   async function signOut(): Promise<void> {
     if (!supabase) return
-    await supabase.auth.signOut()
+    clearLocalUserData()
+    lastUserIdRef.current = null
+    setUser(null)
     setUserId(null)
+    setSyncVersion((v) => v + 1)
+    await supabase.auth.signOut()
   }
 
   return (

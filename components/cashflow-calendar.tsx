@@ -44,12 +44,13 @@ export function CashflowCalendar() {
   const [eventDialogOpen, setEventDialogOpen] = useState(false)
   const [editingEvent, setEditingEvent] = useState<PersonalEvent | null>(null)
   const [completed, setCompleted] = useState<Record<string, boolean>>({})
+  const [hydrated, setHydrated] = useState(false)
 
-  // Load from localStorage on mount — sobrescribe los datos semilla
-  useEffect(() => {
+  const loadFromStorage = () => {
     try {
       const savedRules = localStorage.getItem("cashflow_rules")
       if (savedRules) setRules(JSON.parse(savedRules))
+      else setRules([])
     } catch (e) {
       console.error("Error reading cashflow_rules from localStorage", e)
     }
@@ -57,36 +58,45 @@ export function CashflowCalendar() {
     try {
       const savedEvents = localStorage.getItem("personal_events_v2")
       if (savedEvents) setEvents(JSON.parse(savedEvents))
+      else setEvents([])
     } catch (e) {
       console.error("Error reading personal_events_v2 from localStorage", e)
     }
+
+    try {
+      const savedCompleted = localStorage.getItem("ph_event_completed")
+      if (savedCompleted) setCompleted(JSON.parse(savedCompleted))
+      else setCompleted({})
+    } catch (e) {
+      console.error("Error reading ph_event_completed from localStorage", e)
+    }
+  }
+
+  useEffect(() => {
+    loadFromStorage()
+    setHydrated(true)
   }, [])
 
-  // Escuchar cambios del DevBot y recargar datos
   useEffect(() => {
-    const handler = () => {
-      try {
-        const savedRules = localStorage.getItem("cashflow_rules")
-        if (savedRules) setRules(JSON.parse(savedRules))
-      } catch (e) { /* ignore */ }
-      try {
-        const savedEvents = localStorage.getItem("personal_events_v2")
-        if (savedEvents) setEvents(JSON.parse(savedEvents))
-      } catch (e) { /* ignore */ }
-    };
-    window.addEventListener("ph:update", handler);
-    return () => window.removeEventListener("ph:update", handler);
+    const handler = () => loadFromStorage()
+    window.addEventListener("ph:update", handler)
+    return () => window.removeEventListener("ph:update", handler)
   }, [])
 
-  // Save rules to localStorage + cloud
   useEffect(() => {
+    if (!hydrated) return
     writeStore("cashflow_rules", rules)
-  }, [rules])
+  }, [rules, hydrated])
 
-  // Save events to localStorage + cloud
   useEffect(() => {
+    if (!hydrated) return
     writeStore("personal_events_v2", events)
-  }, [events])
+  }, [events, hydrated])
+
+  useEffect(() => {
+    if (!hydrated) return
+    writeStore("ph_event_completed", completed)
+  }, [completed, hydrated])
 
   // Proyección del mes activo: se recalcula solo al cambiar reglas o mes.
   const occByDate = useMemo(

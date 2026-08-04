@@ -6,7 +6,7 @@ import { ChatMessage } from "../types"
 import { getChatHistory, addChatMessage, clearChatHistory } from "../store"
 import { MessageBubble } from "./MessageBubble"
 import { ChatInput } from "./ChatInput"
-import { askGemini } from "@/lib/ai"
+import { askAI } from "@/lib/ai"
 import { parseActions } from "../actions"
 import { getAvatar, setAvatar } from "@/lib/avatar"
 
@@ -105,16 +105,73 @@ export function ChatPanel({ isOpen, onClose }: ChatPanelProps) {
       const rulesRaw = localStorage.getItem("cashflow_rules") || "[]"
       const eventsRaw = localStorage.getItem("personal_events_v2") || "[]"
       const choresRaw = localStorage.getItem("ph_chores_chores") || "[]"
-      const devItemsRaw = localStorage.getItem("ph_devhub_items") || "[]"
-      const groupsRaw = localStorage.getItem("ph_budgeted_groups") || "[]"
       const expensesRaw = localStorage.getItem("ph_budgeted_expenses") || "[]"
+      let devItemsSafe = "[]"
+      try {
+        const items = JSON.parse(localStorage.getItem("ph_devhub_items") || "[]")
+        devItemsSafe = JSON.stringify(
+          (Array.isArray(items) ? items : []).map((item: Record<string, unknown>) => ({
+            id: item.id,
+            title: item.title,
+            type: item.type,
+            url: item.url,
+            category: item.category,
+            description: item.description,
+            hasCredential: Boolean(item.password || item.username),
+            hasApiKey: Boolean(item.apiKey),
+          }))
+        )
+      } catch {
+        devItemsSafe = "[]"
+      }
 
-      const systemPrompt = "Eres DevBot, el copiloto de PersonalHub. Eres directo, proactivo, tecnico. Hablas espanol mexicano. INSTRUCCION ESTRICTA: SIEMPRE respondes en espanol, incluso si el usuario te escribe en ingles. NUNCA respondas en ingles.\n\nARQUITECTURA: SPA (Astro+React+Tailwind). SIN backend. Persistencia 100% localStorage.\n\nMODULOS Y SUS DATOS:\n\n1. FLUJO DE CAJA (cashflow_rules)\n   {id, concepto, monto(numero), tipo:\"ingreso\"|\"egreso\", recurrencia:\"mensual\"|\"semanal\", diaDelMes?, diaSemana?}\n\n2. EVENTOS (personal_events_v2)\n   {id, title, date, type}\n\n3. TAREAS (ph_chores_chores)\n   {id, title, description?, status:\"pending\"|\"done\", dueDate?, color?}\n\n4. GASTOS (ph_budgeted_expenses)\n   {id, amount, description, category, date, paidStatus:\"paid\"|\"unpaid\"|\"partial\"}\n\n5. DEVHUB (ph_devhub_items)\n   {id, title, type:\"tool\"|\"repo\"|\"youtube\"|\"note\"|\"api\"|\"credential\", url?, category, content?, description?}\n\nACCIONES DISPONIBLES - USALAS CUANDO EL USUARIO PIDA GUARDAR, CREAR, ELIMINAR O COMPLETAR ALGO:\n\n|ACTION|\n{\"saveDevHub\":{\"title\":\"Nombre\",\"typeField\":\"youtube\",\"url\":\"https://...\",\"category\":\"Media\"}}\n|END|\n\n|ACTION|\n{\"deleteDevHub\":{\"id\":\"uuid\"}}\n|END|\n\n|ACTION|\n{\"updateDevHub\":{\"id\":\"uuid\",\"title\":\"Nuevo titulo\",\"category\":\"Frontend\"}}\n|END|\n\n|ACTION|\n{\"saveChore\":{\"title\":\"Hacer ejercicio\",\"dueDate\":\"2026-07-12\",\"color\":\"emerald\"}}\n|END|\n\n|ACTION|\n{\"completeChore\":{\"id\":\"uuid\"}}\n|END|\n\n|ACTION|\n{\"deleteChore\":{\"id\":\"uuid\"}}\n|END|\n\n|ACTION|\n{\"saveCashflow\":{\"concepto\":\"Sueldo\",\"monto\":15000,\"tipo\":\"ingreso\",\"recurrencia\":\"mensual\",\"diaDelMes\":15}}\n|END|\n\n|ACTION|\n{\"deleteCashflow\":{\"id\":\"uuid\"}}\n|END|\n\n|ACTION|\n{\"saveExpense\":{\"amount\":500,\"description\":\"Cena\",\"category\":\"Comida\",\"date\":\"2026-07-10\"}}\n|END|\n\n|ACTION|\n{\"deleteExpense\":{\"id\":\"uuid\"}}\n|END|\n\nINSTRUCCIONES:\n- NUNCA ejecutes una accion (bloque |ACTION|) a menos que el usuario te lo pida EXPLICITAMENTE.\n- Si solo te pide una sugerencia, opinion o analisis: NO generes bloques ACTION.\n- Si mencionas que puedes ayudar a hacer algo: NO pongas el ACTION. Espera a que el usuario confirme.\n- Cuando te pidan guardar/crear algo explicitamente: USA LA ACCION.\n- Cuando te pidan eliminar algo explicitamente: USA LA ACCION.\n- Cuando te pidan completar una tarea explicitamente (ej. 'completa', 'termina', 'marca como hecha'): USA completeChore.\n- Responde con texto + el bloque |ACTION| al final.\n- Si no sabes algun campo, dime que te falta informacion.\n- Analiza los datos del usuario y da recomendaciones concretas."
+      const systemPrompt = `Eres DevBot, el copiloto de PersonalHub. Eres directo, proactivo, tecnico. Hablas espanol mexicano. INSTRUCCION ESTRICTA: SIEMPRE respondes en espanol.
 
-      const contextData = "\nDATOS ACTUALES:\nReglas de flujo de caja: " + rulesRaw + "\nEventos: " + eventsRaw + "\nTareas: " + choresRaw + "\nGastos: " + expensesRaw + "\nDevHub: " + devItemsRaw
+ARQUITECTURA: Astro+React+Tailwind. Persistencia localStorage + Supabase. NUNCA pidas ni inventes contraseñas o API keys.
 
-      const response = await askGemini(text, systemPrompt + "\n" + contextData)
-      const hasActionIntent = /crea|guarda|agrega|a[Ã±n]ade|completa|termina|marca|elimina|borra|registra|inserta|nuev/i.test(text)
+MODULOS:
+1. FLUJO DE CAJA (cashflow_rules): {id, concepto, monto, tipo:"ingreso"|"egreso", recurrencia:"mensual"|"semanal", diaDelMes?, diaSemana?}
+2. EVENTOS (personal_events_v2): {id, nombre, categoria, recurrencia, fechaUnica?, horaInicio?, horaFin?, nota?}
+3. TAREAS (ph_chores_chores): {id, title, description?, status:"pending"|"done", dueDate?, color?}
+4. GASTOS (ph_budgeted_expenses): {id, amount, description, category, date, paidStatus:"paid"|"unpaid"|"partial"}
+5. DEVHUB (ph_devhub_items): {id, title, type, url?, category, description?} — SIN password/apiKey
+
+ACCIONES (solo si el usuario pide crear/guardar/eliminar/completar):
+|ACTION|
+{"saveDevHub":{"title":"Nombre","typeField":"youtube","url":"https://...","category":"Media"}}
+|END|
+|ACTION|
+{"deleteDevHub":{"id":"uuid"}}
+|END|
+|ACTION|
+{"updateDevHub":{"id":"uuid","title":"Nuevo titulo","category":"Frontend"}}
+|END|
+|ACTION|
+{"saveChore":{"title":"Hacer ejercicio","dueDate":"2026-07-12","color":"emerald"}}
+|END|
+|ACTION|
+{"completeChore":{"id":"uuid"}}
+|END|
+|ACTION|
+{"deleteChore":{"id":"uuid"}}
+|END|
+|ACTION|
+{"saveCashflow":{"concepto":"Sueldo","monto":15000,"tipo":"ingreso","recurrencia":"mensual","diaDelMes":15}}
+|END|
+|ACTION|
+{"deleteCashflow":{"id":"uuid"}}
+|END|
+|ACTION|
+{"saveExpense":{"amount":500,"description":"Cena","category":"Comida","date":"2026-07-10"}}
+|END|
+|ACTION|
+{"deleteExpense":{"id":"uuid"}}
+|END|`
+
+      const contextData = "\nDATOS ACTUALES:\nReglas de flujo de caja: " + rulesRaw + "\nEventos: " + eventsRaw + "\nTareas: " + choresRaw + "\nGastos: " + expensesRaw + "\nDevHub: " + devItemsSafe
+
+      const response = await askAI(text, systemPrompt + "\n" + contextData)
+      const hasActionIntent = /crea|guarda|agrega|a[ñn]ade|completa|termina|marca|elimina|borra|registra|inserta|nuev/i.test(text)
       const safeResponse = hasActionIntent ? response : response.replace(/\|ACTION\|\s*\{[\s\S]*?\}\s*\|END\|/gi, "")
       const { cleanText, results } = parseActions(safeResponse)
       const botMsg = addChatMessage({ role: "bot", text: cleanText })

@@ -1,6 +1,7 @@
 const TABLE_MAP: Record<string, string> = {
   cashflow_rules: "cashflow_rules",
   personal_events_v2: "personal_events",
+  ph_event_completed: "event_completed",
   ph_chores_chores: "chores",
   ph_budgeted_expenses: "expenses",
   ph_devhub_items: "devhub_items",
@@ -9,11 +10,24 @@ const TABLE_MAP: Record<string, string> = {
 
 const ALL_KEYS = Object.keys(TABLE_MAP)
 
+const LOCAL_ONLY_KEYS = [
+  "ph_devhub_password_security",
+  "ph_user_avatar",
+  "theme",
+  "ph_playground_injections",
+]
+
+export function getStoreKeys(): string[] {
+  return [...ALL_KEYS]
+}
+
 function getUserId(): string | null {
   try {
     const raw = sessionStorage.getItem("ph_user_id")
     return raw || null
-  } catch { return null }
+  } catch {
+    return null
+  }
 }
 
 export function setUserId(id: string | null) {
@@ -31,8 +45,13 @@ export function readStore<T>(key: string, fallback: T): T {
 }
 
 export function writeStore(key: string, value: unknown): void {
-  localStorage.setItem(key, JSON.stringify(value))
-  syncToCloud(key, value)
+  try {
+    localStorage.setItem(key, JSON.stringify(value))
+  } catch (e) {
+    console.error("localStorage write failed", key, e)
+    return
+  }
+  void syncToCloud(key, value)
 }
 
 async function syncToCloud(key: string, value: unknown) {
@@ -48,10 +67,11 @@ async function syncToCloud(key: string, value: unknown) {
   const timestamp = new Date().toISOString()
   localStorage.setItem(`${key}_ts`, timestamp)
 
-  await supabase.from(table).upsert(
+  const { error } = await supabase.from(table).upsert(
     { user_id: userId, data: JSON.parse(JSON.stringify(value)), updated_at: timestamp },
     { onConflict: "user_id" }
   )
+  if (error) console.error("syncToCloud failed", key, error.message)
 }
 
 export async function downloadFromCloud(key: string): Promise<boolean> {
@@ -64,19 +84,23 @@ export async function downloadFromCloud(key: string): Promise<boolean> {
   const table = TABLE_MAP[key]
   if (!table) return false
 
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from(table)
     .select("data, updated_at")
     .eq("user_id", userId)
-    .single()
+    .maybeSingle()
 
-  if (data?.data) {
+  if (error) {
+    console.error("downloadFromCloud failed", key, error.message)
+    return false
+  }
+
+  if (data?.data !== undefined && data?.data !== null) {
     const localTs = localStorage.getItem(`${key}_ts`) || ""
     const cloudTs = data.updated_at || ""
     const existing = localStorage.getItem(key)
     const newStr = JSON.stringify(data.data)
 
-    // Si la nube es más reciente o si no hay timestamp local pero los datos cambiaron
     if (!localTs || !cloudTs || cloudTs >= localTs) {
       if (existing !== newStr) {
         localStorage.setItem(key, newStr)
@@ -101,17 +125,38 @@ export async function uploadToCloud(key: string): Promise<boolean> {
   const table = TABLE_MAP[key]
   if (!table) return false
 
-  const local = readStore<any>(key, null)
-  if (!local) return false
+  const local = readStore<unknown>(key, null)
+  if (local === null || local === undefined) return false
+
+  // Never upload empty arrays as "first sync" if cloud might exist —
+  // caller should only upload when local has meaningful data
+  if (Array.isArray(local) && local.length === 0) return false
 
   const timestamp = new Date().toISOString()
   localStorage.setItem(`${key}_ts`, timestamp)
 
-  await supabase.from(table).upsert(
+  const { error } = await supabase.from(table).upsert(
     { user_id: userId, data: local, updated_at: timestamp },
     { onConflict: "user_id" }
   )
+  if (error) {
+    console.error("uploadToCloud failed", key, error.message)
+    return false
+  }
   return true
+}
+
+export function clearLocalUserData(): void {
+  for (const key of ALL_KEYS) {
+    localStorage.removeItem(key)
+    localStorage.removeItem(`${key}_ts`)
+  }
+  for (const key of LOCAL_ONLY_KEYS) {
+    localStorage.removeItem(key)
+  }
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new Event("ph:update"))
+  }
 }
 
 /* ─── Backup / Restore / Reset ─── */
@@ -120,7 +165,13 @@ export function exportAllData(): string {
   const snapshot: Record<string, unknown> = {}
   for (const key of ALL_KEYS) {
     const raw = localStorage.getItem(key)
-    if (raw) snapshot[key] = JSON.parse(raw)
+    if (raw) {
+      try {
+        snapshot[key] = JSON.parse(raw)
+      } catch {
+        /* skip corrupt */
+      }
+    }
   }
   snapshot._exportedAt = new Date().toISOString()
   snapshot._version = "personalhub-backup-v1"
@@ -140,6 +191,13 @@ export function downloadBackup() {
   URL.revokeObjectURL(url)
 }
 
+function isValidBackupValue(key: string, value: unknown): boolean {
+  if (key === "ph_event_completed") {
+    return value !== null && typeof value === "object" && !Array.isArray(value)
+  }
+  return Array.isArray(value)
+}
+
 export async function importBackup(jsonString: string): Promise<number> {
   const data = JSON.parse(jsonString)
   if (data._version !== "personalhub-backup-v1") {
@@ -147,7 +205,7 @@ export async function importBackup(jsonString: string): Promise<number> {
   }
   let count = 0
   for (const key of ALL_KEYS) {
-    if (data[key] !== undefined) {
+    if (data[key] !== undefined && isValidBackupValue(key, data[key])) {
       writeStore(key, data[key])
       count++
     }
@@ -168,13 +226,14 @@ export async function uploadAllToCloud(): Promise<number> {
 export async function resetAllData(): Promise<void> {
   const userId = getUserId()
 
-  // Limpiar localStorage
   for (const key of ALL_KEYS) {
     localStorage.removeItem(key)
     localStorage.removeItem(`${key}_ts`)
   }
+  for (const key of LOCAL_ONLY_KEYS) {
+    localStorage.removeItem(key)
+  }
 
-  // Limpiar nube
   if (userId) {
     const { supabase } = await import("./supabase")
     if (supabase) {

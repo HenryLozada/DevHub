@@ -84,11 +84,17 @@ function KanbanCard({
   )
 }
 
+function parseLocalDate(isoDate: string): Date {
+  const [y, m, d] = isoDate.split("-").map(Number)
+  if (!y || !m || !d) return new Date(isoDate)
+  return new Date(y, m - 1, d)
+}
+
 function getUrgency(c: Chore): Urgency | null {
   if (c.status === "done") return null
   if (!c.dueDate) return "later"
   const today = startOfDay(new Date())
-  const due = startOfDay(new Date(c.dueDate))
+  const due = startOfDay(parseLocalDate(c.dueDate))
   if (isBefore(due, today) || isSameDay(due, today)) return "urgent"
   if (isBefore(due, endOfWeek(today, { weekStartsOn: 1 }))) return "soon"
   return "later"

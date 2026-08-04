@@ -1,74 +1,121 @@
-import type { APIRoute } from "astro";
+import type { APIRoute } from "astro"
 
-export const prerender = false;
+export const prerender = false
+
+const rateMap = new Map<string, { count: number; resetAt: number }>()
+const RATE_LIMIT = 30
+const RATE_WINDOW_MS = 60_000
+const MAX_BODY_CHARS = 80_000
+
+function getClientIp(request: Request): string {
+  return (
+    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    request.headers.get("x-real-ip") ||
+    "unknown"
+  )
+}
+
+function isRateLimited(ip: string): boolean {
+  const now = Date.now()
+  const entry = rateMap.get(ip)
+  if (!entry || entry.resetAt < now) {
+    rateMap.set(ip, { count: 1, resetAt: now + RATE_WINDOW_MS })
+    return false
+  }
+  entry.count += 1
+  return entry.count > RATE_LIMIT
+}
+
+function json(data: unknown, status = 200) {
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: { "Content-Type": "application/json" },
+  })
+}
 
 export const POST: APIRoute = async ({ request }) => {
   try {
-    const apiKey = import.meta.env.GROQ_API_KEY;
+    const ip = getClientIp(request)
+    if (isRateLimited(ip)) {
+      return json({ error: "Demasiadas solicitudes. Intenta en un minuto." }, 429)
+    }
 
+    const apiKey = import.meta.env.GROQ_API_KEY
     if (!apiKey) {
-      return new Response(
-        JSON.stringify({ error: "GROQ_API_KEY no está configurada en las variables de servidor" }),
-        { status: 500, headers: { "Content-Type": "application/json" } }
-      );
+      return json({ error: "GROQ_API_KEY no está configurada en las variables de servidor" }, 500)
     }
 
-    const bodyData = await request.json();
-    const { prompt, context } = bodyData || {};
+    // Prefer Authorization bearer (Supabase access token) when present
+    const authHeader = request.headers.get("authorization") || ""
+    const hasBearer = authHeader.toLowerCase().startsWith("bearer ") && authHeader.length > 20
 
-    if (!prompt) {
-      return new Response(
-        JSON.stringify({ error: "El prompt es requerido" }),
-        { status: 400, headers: { "Content-Type": "application/json" } }
-      );
+    // Soft gate: require either a session token or same-origin browser request
+    const origin = request.headers.get("origin") || ""
+    const referer = request.headers.get("referer") || ""
+    const host = request.headers.get("host") || ""
+    const sameOrigin =
+      (origin && host && origin.includes(host)) ||
+      (referer && host && referer.includes(host))
+
+    if (!hasBearer && !sameOrigin) {
+      return json({ error: "No autorizado" }, 401)
     }
 
-    const MODEL = "llama-3.3-70b-versatile";
-    const url = "https://api.groq.com/openai/v1/chat/completions";
+    const raw = await request.text()
+    if (raw.length > MAX_BODY_CHARS) {
+      return json({ error: "Payload demasiado grande" }, 413)
+    }
+
+    let bodyData: { prompt?: string; context?: string }
+    try {
+      bodyData = JSON.parse(raw)
+    } catch {
+      return json({ error: "JSON inválido" }, 400)
+    }
+
+    const { prompt, context } = bodyData || {}
+    if (!prompt || typeof prompt !== "string") {
+      return json({ error: "El prompt es requerido" }, 400)
+    }
+
+    const safeContext =
+      typeof context === "string" ? context.slice(0, 40_000) : ""
+
+    const MODEL = "llama-3.3-70b-versatile"
+    const url = "https://api.groq.com/openai/v1/chat/completions"
 
     const payload = {
       model: MODEL,
       messages: [
-        { role: "system", content: context || "" },
-        { role: "user", content: prompt },
+        { role: "system", content: safeContext || "" },
+        { role: "user", content: prompt.slice(0, 8_000) },
       ],
-    };
+      max_tokens: 2048,
+    }
 
     const groqRes = await fetch(url, {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${apiKey}`,
+        Authorization: `Bearer ${apiKey}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify(payload),
-    });
+    })
 
-    const data = await groqRes.json();
+    const data = await groqRes.json()
 
     if (!groqRes.ok) {
-      const errorMsg = data?.error?.message || "Error al comunicarse con la API de IA";
-      return new Response(
-        JSON.stringify({ error: errorMsg }),
-        { status: groqRes.status, headers: { "Content-Type": "application/json" } }
-      );
+      const errorMsg = data?.error?.message || "Error al comunicarse con la API de IA"
+      return json({ error: errorMsg }, groqRes.status)
     }
 
-    const text = data?.choices?.[0]?.message?.content;
+    const text = data?.choices?.[0]?.message?.content
     if (!text) {
-      return new Response(
-        JSON.stringify({ error: "Respuesta vacía del proveedor de IA" }),
-        { status: 500, headers: { "Content-Type": "application/json" } }
-      );
+      return json({ error: "Respuesta vacía del proveedor de IA" }, 500)
     }
 
-    return new Response(
-      JSON.stringify({ text }),
-      { status: 200, headers: { "Content-Type": "application/json" } }
-    );
+    return json({ text })
   } catch (err: any) {
-    return new Response(
-      JSON.stringify({ error: err?.message || "Error interno del servidor" }),
-      { status: 500, headers: { "Content-Type": "application/json" } }
-    );
+    return json({ error: err?.message || "Error interno del servidor" }, 500)
   }
-};
+}

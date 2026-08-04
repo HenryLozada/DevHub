@@ -55,7 +55,7 @@ export function ChoreCard({ chore, onEdit, onDelete, onToggle }: ChoreCardProps)
             <span
               className={cn(
                 "text-[9px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded-none border",
-                isBefore(new Date(chore.dueDate), startOfDay(new Date())) && !isDone
+                isBefore((() => { const [y,m,d]=chore.dueDate!.split("-").map(Number); return new Date(y, m-1, d) })(), startOfDay(new Date())) && !isDone
                   ? "bg-red-50 text-red-700 border-red-200 dark:bg-red-950/30 dark:text-red-400 dark:border-red-900/30"
                   : "bg-zinc-100 text-zinc-500 border-zinc-200 dark:bg-zinc-900 dark:text-zinc-400 dark:border-zinc-800"
               )}

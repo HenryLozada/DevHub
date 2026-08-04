@@ -9,7 +9,7 @@ const GLASS = "backdrop-blur-xl bg-white/40 dark:bg-zinc-950/40 border border-wh
 
 export function AuthScreen() {
   const { signUp, signIn, signInWithGoogle } = useAuth()
-  const [mode, setMode] = useState<"login" | "signup">("signup")
+  const [mode, setMode] = useState<"login" | "signup">("login")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState<string | null>(null)
