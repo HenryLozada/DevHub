@@ -1,7 +1,16 @@
-import { useState, useRef } from "react"
-import { LogOut, Download, Upload, Trash2, CloudUpload } from "lucide-react"
+import { useState, useRef, useEffect } from "react"
+import { LogOut, Download, Upload, Trash2, CloudUpload, Bell, BellOff, Smartphone } from "lucide-react"
 import { useAuth } from "@/lib/auth-store"
 import { downloadBackup, importBackup, resetAllData, uploadAllToCloud } from "@/lib/local-store"
+import {
+  enableNotifications,
+  disableNotifications,
+  getNotificationPref,
+  isNotificationSupported,
+  promptInstallPWA,
+  isStandalone,
+  canInstallPWA,
+} from "@/lib/notifications"
 import { sileo } from "sileo"
 
 export function UserMenu() {
@@ -9,7 +18,14 @@ export function UserMenu() {
   const [open, setOpen] = useState(false)
   const [confirmReset, setConfirmReset] = useState(false)
   const [busy, setBusy] = useState(false)
+  const [notifsOn, setNotifsOn] = useState(false)
+  const [standalone, setStandalone] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    setNotifsOn(getNotificationPref() && Notification.permission === "granted")
+    setStandalone(isStandalone())
+  }, [open])
 
   if (!user) return null
 
@@ -71,6 +87,42 @@ export function UserMenu() {
     }
   }
 
+  const handleToggleNotifs = async () => {
+    setBusy(true)
+    try {
+      if (notifsOn) {
+        await disableNotifications()
+        setNotifsOn(false)
+        sileo.info({ title: "Notificaciones off", description: "Ya no recibirás recordatorios." })
+      } else {
+        const perm = await enableNotifications()
+        if (perm === "granted") {
+          setNotifsOn(true)
+          sileo.success({ title: "Notificaciones on", description: "Te avisaremos de tareas y eventos." })
+        } else if (perm === "denied") {
+          sileo.error({ title: "Permiso denegado", description: "Actívalas en ajustes del teléfono." })
+        } else {
+          sileo.error({ title: "No disponible", description: "Este dispositivo no soporta notificaciones web." })
+        }
+      }
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  const handleInstall = async () => {
+    const result = await promptInstallPWA()
+    if (result === "accepted") {
+      sileo.success({ title: "Instalada", description: "Se abrirá como app, sin navegador." })
+      setOpen(false)
+    } else if (result === "unavailable") {
+      sileo.info({
+        title: "Instalar manualmente",
+        description: "Chrome Android: ⋮ → Instalar app. iPhone: Compartir → Añadir a inicio.",
+      })
+    }
+  }
+
   return (
     <div className="relative">
       <button
@@ -94,6 +146,27 @@ export function UserMenu() {
 
             {/* Actions */}
             <div className="py-1">
+              {!standalone && (
+                <button
+                  onClick={handleInstall}
+                  disabled={busy}
+                  className="w-full flex items-center gap-2.5 px-3 py-2 text-[10px] font-mono text-zinc-600 dark:text-zinc-400 hover:text-[#76b900] hover:bg-[#76b900]/5 transition-colors cursor-pointer disabled:opacity-40"
+                >
+                  <Smartphone className="w-3.5 h-3.5" /> {canInstallPWA() ? "Instalar app" : "Cómo instalar app"}
+                </button>
+              )}
+
+              {isNotificationSupported() && (
+                <button
+                  onClick={handleToggleNotifs}
+                  disabled={busy}
+                  className="w-full flex items-center gap-2.5 px-3 py-2 text-[10px] font-mono text-zinc-600 dark:text-zinc-400 hover:text-[#76b900] hover:bg-[#76b900]/5 transition-colors cursor-pointer disabled:opacity-40"
+                >
+                  {notifsOn ? <BellOff className="w-3.5 h-3.5" /> : <Bell className="w-3.5 h-3.5" />}
+                  {notifsOn ? "Desactivar notificaciones" : "Activar notificaciones"}
+                </button>
+              )}
+
               <button
                 onClick={handleDownload}
                 disabled={busy}

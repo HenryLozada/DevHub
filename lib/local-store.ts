@@ -51,6 +51,9 @@ export function writeStore(key: string, value: unknown): void {
     console.error("localStorage write failed", key, e)
     return
   }
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new Event("ph:update"))
+  }
   void syncToCloud(key, value)
 }
 

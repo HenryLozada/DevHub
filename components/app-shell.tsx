@@ -5,6 +5,7 @@ import { ErrorBoundary } from "@/components/error-boundary"
 import { AuthProvider, useAuth } from "@/lib/auth-store"
 import { AuthScreen } from "@/components/auth/AuthScreen"
 import { UserMenu } from "@/components/auth/UserMenu"
+import { PwaBootstrap } from "@/components/pwa-bootstrap"
 import { Toaster } from "sileo"
 
 const CashflowCalendar = lazy(() => import("@/components/cashflow-calendar").then(m => ({ default: m.CashflowCalendar })))
@@ -86,6 +87,7 @@ function AppInner() {
         </Suspense>
       </main>
       <Toaster position="bottom-right" offset={16} theme="system" />
+      <PwaBootstrap />
       <Suspense fallback={null}>
         <DevBot />
       </Suspense>

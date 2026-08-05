@@ -6,10 +6,21 @@ import "@/src/styles/globals.css";
 <html lang="es">
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="theme-color" content="#76b900" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)" />
+    <meta name="description" content="PersonalHub - Calendario, finanzas, tareas y DevHub en una app personal." />
+    <meta name="application-name" content="PersonalHub" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="PersonalHub" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="apple-touch-icon" href="/apple-icon.png" />
     <link rel="icon" type="image/png" sizes="32x32" href="/icon-light-32x32.png" />
     <link rel="icon" type="image/png" sizes="32x32" href="/icon-dark-32x32.png" media="(prefers-color-scheme: dark)" />
-    <meta name="viewport" content="width=device-width" />
-    <meta name="generator" content={Astro.generator} />
+    <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
     <script is:inline>
       (function() {
         const theme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
@@ -20,9 +31,7 @@ import "@/src/styles/globals.css";
         }
       })();
     </script>
-    <meta name="description" content="PersonalHub - Tu calendario de flujo de caja, agenda, tareas y centro del desarrollador." />
-    <link rel="canonical" href="https://personalhub.example.com/" />
-    <title>PersonalHub - DevWorkspace & Finanzas</title>
+    <title>PersonalHub</title>
   </head>
   <body class="bg-background font-sans antialiased">
     <AppShell client:load />
