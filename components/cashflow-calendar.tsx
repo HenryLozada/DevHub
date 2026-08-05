@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from "react"
+import { useMemo, useState, useEffect, useRef } from "react"
 import { ModuleNav } from "@/components/module-nav"
 import {
   ArrowLeft as IoArrowBack,
@@ -45,31 +45,34 @@ export function CashflowCalendar() {
   const [editingEvent, setEditingEvent] = useState<PersonalEvent | null>(null)
   const [completed, setCompleted] = useState<Record<string, boolean>>({})
   const [hydrated, setHydrated] = useState(false)
+  const skipWriteRef = useRef(false)
 
   const loadFromStorage = () => {
+    skipWriteRef.current = true
     try {
       const savedRules = localStorage.getItem("cashflow_rules")
-      if (savedRules) setRules(JSON.parse(savedRules))
-      else setRules([])
+      setRules(savedRules ? JSON.parse(savedRules) : [])
     } catch (e) {
       console.error("Error reading cashflow_rules from localStorage", e)
     }
 
     try {
       const savedEvents = localStorage.getItem("personal_events_v2")
-      if (savedEvents) setEvents(JSON.parse(savedEvents))
-      else setEvents([])
+      setEvents(savedEvents ? JSON.parse(savedEvents) : [])
     } catch (e) {
       console.error("Error reading personal_events_v2 from localStorage", e)
     }
 
     try {
       const savedCompleted = localStorage.getItem("ph_event_completed")
-      if (savedCompleted) setCompleted(JSON.parse(savedCompleted))
-      else setCompleted({})
+      setCompleted(savedCompleted ? JSON.parse(savedCompleted) : {})
     } catch (e) {
       console.error("Error reading ph_event_completed from localStorage", e)
     }
+    // Allow writes on the next tick after React applies loaded state
+    queueMicrotask(() => {
+      skipWriteRef.current = false
+    })
   }
 
   useEffect(() => {
@@ -83,19 +86,21 @@ export function CashflowCalendar() {
     return () => window.removeEventListener("ph:update", handler)
   }, [])
 
+  // Persist only after hydration, and never while reloading from storage.
+  // emit:false prevents write → ph:update → load → wipe races.
   useEffect(() => {
-    if (!hydrated) return
-    writeStore("cashflow_rules", rules)
+    if (!hydrated || skipWriteRef.current) return
+    writeStore("cashflow_rules", rules, { emit: false })
   }, [rules, hydrated])
 
   useEffect(() => {
-    if (!hydrated) return
-    writeStore("personal_events_v2", events)
+    if (!hydrated || skipWriteRef.current) return
+    writeStore("personal_events_v2", events, { emit: false })
   }, [events, hydrated])
 
   useEffect(() => {
-    if (!hydrated) return
-    writeStore("ph_event_completed", completed)
+    if (!hydrated || skipWriteRef.current) return
+    writeStore("ph_event_completed", completed, { emit: false })
   }, [completed, hydrated])
 
   // Proyección del mes activo: se recalcula solo al cambiar reglas o mes.
@@ -137,19 +142,36 @@ export function CashflowCalendar() {
   }
 
   function handleSave(data: Omit<CashflowRule, "id">) {
-    if (editingRule) {
-      setRules((prev) => prev.map((r) => (r.id === editingRule.id ? { ...r, ...data } : r)))
-      sileo.success({ title: "Regla actualizada", description: `"${data.concepto}" se guardó correctamente.` })
-    } else {
-      setRules((prev) => [...prev, { id: crypto.randomUUID(), ...data }])
-      sileo.success({ title: "Regla creada", description: `"${data.concepto}" agregada al flujo de caja.` })
-    }
+    setRules((prev) => {
+      const next = editingRule
+        ? prev.map((r) => (r.id === editingRule.id ? { ...r, ...data } : r))
+        : [...prev, { id: crypto.randomUUID(), ...data }]
+      try {
+        localStorage.setItem("cashflow_rules", JSON.stringify(next))
+        localStorage.setItem("cashflow_rules_ts", new Date().toISOString())
+      } catch (err) {
+        console.error("Failed to persist rule", err)
+      }
+      return next
+    })
+    sileo.success({
+      title: editingRule ? "Regla actualizada" : "Regla creada",
+      description: `"${data.concepto}" ${editingRule ? "se guardó correctamente" : "agregada al flujo de caja"}.`,
+    })
+    setEditingRule(null)
     setDialogOpen(false)
   }
 
   function handleDelete(id: string) {
     sileo.info({ title: "Regla eliminada", description: "Se eliminó la regla del flujo de caja." })
-    setRules((prev) => prev.filter((r) => r.id !== id))
+    setRules((prev) => {
+      const next = prev.filter((r) => r.id !== id)
+      try {
+        localStorage.setItem("cashflow_rules", JSON.stringify(next))
+        localStorage.setItem("cashflow_rules_ts", new Date().toISOString())
+      } catch { /* ignore */ }
+      return next
+    })
     setDialogOpen(false)
   }
 
@@ -164,25 +186,51 @@ export function CashflowCalendar() {
   }
 
   function handleSaveEvent(data: Omit<PersonalEvent, "id">) {
-    if (editingEvent) {
-      setEvents((prev) => prev.map((e) => (e.id === editingEvent.id ? { ...e, ...data } : e)))
-      sileo.success({ title: "Evento actualizado", description: `"${data.nombre}" se guardó correctamente.` })
-    } else {
-      setEvents((prev) => [...prev, { id: crypto.randomUUID(), ...data }])
-      sileo.success({ title: "Evento creado", description: `"${data.nombre}" agregado a tu agenda.` })
-    }
+    setEvents((prev) => {
+      const next = editingEvent
+        ? prev.map((e) => (e.id === editingEvent.id ? { ...e, ...data } : e))
+        : [...prev, { id: crypto.randomUUID(), ...data }]
+      // Write immediately so a remount/sync cannot lose the create
+      try {
+        localStorage.setItem("personal_events_v2", JSON.stringify(next))
+        localStorage.setItem("personal_events_v2_ts", new Date().toISOString())
+      } catch (err) {
+        console.error("Failed to persist event", err)
+      }
+      return next
+    })
+    sileo.success({
+      title: editingEvent ? "Evento actualizado" : "Evento creado",
+      description: `"${data.nombre}" ${editingEvent ? "se guardó correctamente" : "agregado a tu agenda"}.`,
+    })
+    setEditingEvent(null)
     setEventDialogOpen(false)
   }
 
   function handleDeleteEvent(id: string) {
     sileo.info({ title: "Evento eliminado", description: "Se eliminó el evento de tu agenda." })
-    setEvents((prev) => prev.filter((e) => e.id !== id))
+    setEvents((prev) => {
+      const next = prev.filter((e) => e.id !== id)
+      try {
+        localStorage.setItem("personal_events_v2", JSON.stringify(next))
+        localStorage.setItem("personal_events_v2_ts", new Date().toISOString())
+      } catch { /* ignore */ }
+      return next
+    })
+    setEditingEvent(null)
     setEventDialogOpen(false)
   }
 
   function toggleEventComplete(occ: EventOccurrence) {
     const key = `${occ.event.id}-${toDateKey(occ.date)}`
-    setCompleted((prev) => ({ ...prev, [key]: !prev[key] }))
+    setCompleted((prev) => {
+      const next = { ...prev, [key]: !prev[key] }
+      try {
+        localStorage.setItem("ph_event_completed", JSON.stringify(next))
+        localStorage.setItem("ph_event_completed_ts", new Date().toISOString())
+      } catch { /* ignore */ }
+      return next
+    })
     const isDone = !completed[key]
     sileo.success({
       title: isDone ? "¡Tarea completada!" : "Tarea desmarcada",

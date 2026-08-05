@@ -36,7 +36,7 @@ interface EventDialogProps {
 export function EventDialog({ open, onOpenChange, event, onSave, onDelete }: EventDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md w-full">
         {open && <EventForm event={event} onSave={onSave} onDelete={onDelete} />}
       </DialogContent>
     </Dialog>
@@ -71,22 +71,45 @@ function EventForm({
     }
   }, [categoria, event])
 
+  function normalizeTime(value: string): string | undefined {
+    const v = value.trim()
+    if (!v) return undefined
+    // Accept HTML time "HH:MM" or "HH:MM:SS"
+    const match = v.match(/^(\d{1,2}):(\d{2})(?::\d{2})?/)
+    if (!match) return undefined
+    const h = Math.min(23, Math.max(0, parseInt(match[1], 10)))
+    const m = Math.min(59, Math.max(0, parseInt(match[2], 10)))
+    return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`
+  }
+
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
+    e.stopPropagation()
     if (!nombre.trim()) return
 
-    onSave({
+    if (recurrencia === "unico" && !fechaUnica) return
+
+    const payload: Omit<PersonalEvent, "id"> = {
       nombre: nombre.trim(),
       categoria,
       recurrencia,
-      mesDelAño: recurrencia === "anual" ? parseInt(mesDelAño, 10) : undefined,
-      diaDelMes: recurrencia === "anual" || recurrencia === "mensual" ? parseInt(diaDelMes, 10) : undefined,
-      diasSemana: recurrencia === "semanal" ? [parseInt(diaSemana, 10)] : undefined,
-      fechaUnica: recurrencia === "unico" ? fechaUnica : undefined,
-      horaInicio: horaInicio || undefined,
-      horaFin: horaFin || undefined,
+      horaInicio: normalizeTime(horaInicio),
+      horaFin: normalizeTime(horaFin),
       nota: nota.trim() || undefined,
-    })
+    }
+
+    if (recurrencia === "anual") {
+      payload.mesDelAño = parseInt(mesDelAño, 10)
+      payload.diaDelMes = parseInt(diaDelMes, 10)
+    } else if (recurrencia === "mensual") {
+      payload.diaDelMes = parseInt(diaDelMes, 10)
+    } else if (recurrencia === "semanal") {
+      payload.diasSemana = [parseInt(diaSemana, 10)]
+    } else if (recurrencia === "unico") {
+      payload.fechaUnica = fechaUnica
+    }
+
+    onSave(payload)
   }
 
   return (
@@ -101,8 +124,13 @@ function EventForm({
       <div className="grid gap-4 py-4">
         <div className="grid gap-2">
           <Label>Categoría</Label>
-          <Select value={categoria} onValueChange={(v) => setCategoria(v as EventCategory)}>
-            <SelectTrigger>
+          <Select
+            value={categoria}
+            onValueChange={(v) => {
+              if (typeof v === "string" && v) setCategoria(v as EventCategory)
+            }}
+          >
+            <SelectTrigger className="w-full">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -128,8 +156,13 @@ function EventForm({
 
         <div className="grid gap-2">
           <Label>Recurrencia</Label>
-          <Select value={recurrencia} onValueChange={(v) => setRecurrencia(v as EventRecurrence)}>
-            <SelectTrigger>
+          <Select
+            value={recurrencia}
+            onValueChange={(v) => {
+              if (typeof v === "string" && v) setRecurrencia(v as EventRecurrence)
+            }}
+          >
+            <SelectTrigger className="w-full">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>

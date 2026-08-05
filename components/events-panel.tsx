@@ -115,10 +115,15 @@ export function EventsPanel({
             </p>
           ) : (
             <div className="flex flex-col gap-4">
-              {["rutina", "laboral", "concierto", "cumpleaños"].map((cat) => {
+              {[
+                ...["rutina", "laboral", "concierto", "cumpleaños"],
+                ...Object.keys(groupedEvents).filter(
+                  (c) => !["rutina", "laboral", "concierto", "cumpleaños"].includes(c)
+                ),
+              ].map((cat) => {
                 const catEvents = groupedEvents[cat]
                 if (!catEvents || catEvents.length === 0) return null
-                const meta = getCategoryMeta(cat as any)
+                const meta = getCategoryMeta(cat)
                 return (
                   <div key={cat} className="flex flex-col gap-2">
                     <h3 className="text-[11px] font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">{meta.label}</h3>
@@ -136,7 +141,7 @@ export function EventsPanel({
                                 <span className="truncate text-sm font-medium text-zinc-900 dark:text-zinc-100">{event.nombre}</span>
                               </div>
                               <p className="mt-0.5 truncate text-xs text-zinc-500 dark:text-zinc-400">
-                                {formatEventTime(event)}
+                                {formatEventTime(event)} · {event.recurrencia}
                               </p>
                             </div>
                             <div className="flex shrink-0 items-center gap-2">

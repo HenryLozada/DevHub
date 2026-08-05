@@ -94,7 +94,7 @@ export function formatEventTime(event: PersonalEvent): string {
   return "Todo el día"
 }
 
-export function getCategoryMeta(categoria: EventCategory) {
+export function getCategoryMeta(categoria: EventCategory | string) {
   switch (categoria) {
     case "cumpleaños":
       return { label: "Cumpleaños", color: "bg-violet-500", textColor: "text-violet-600", bgLight: "bg-violet-500/10", border: "border-violet-500/40" }
@@ -104,6 +104,8 @@ export function getCategoryMeta(categoria: EventCategory) {
       return { label: "Laboral", color: "bg-blue-500", textColor: "text-blue-600", bgLight: "bg-blue-500/10", border: "border-blue-500/40" }
     case "rutina":
       return { label: "Rutinas", color: "bg-cyan-500", textColor: "text-cyan-600", bgLight: "bg-cyan-500/10", border: "border-cyan-500/40" }
+    default:
+      return { label: "Otros", color: "bg-zinc-500", textColor: "text-zinc-600", bgLight: "bg-zinc-500/10", border: "border-zinc-500/40" }
   }
 }
 

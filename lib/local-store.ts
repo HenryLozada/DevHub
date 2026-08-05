@@ -44,15 +44,17 @@ export function readStore<T>(key: string, fallback: T): T {
   }
 }
 
-export function writeStore(key: string, value: unknown): void {
+export function writeStore(key: string, value: unknown, opts?: { emit?: boolean }): void {
   try {
     localStorage.setItem(key, JSON.stringify(value))
   } catch (e) {
     console.error("localStorage write failed", key, e)
     return
   }
-  if (typeof window !== "undefined") {
-    window.dispatchEvent(new Event("ph:update"))
+  // Avoid feedback loops: callers that mirror React state should pass emit:false
+  // or rely on the default only when other modules need a refresh.
+  if (opts?.emit !== false && typeof window !== "undefined") {
+    window.dispatchEvent(new CustomEvent("ph:update", { detail: { key } }))
   }
   void syncToCloud(key, value)
 }
