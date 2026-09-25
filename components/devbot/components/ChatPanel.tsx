@@ -118,8 +118,8 @@ export function ChatPanel({ isOpen, onClose }: ChatPanelProps) {
             url: item.url,
             category: item.category,
             description: item.description,
-            hasCredential: Boolean(item.password || item.username),
-            hasApiKey: Boolean(item.apiKey),
+            hasCredential: Boolean(item.password || item.username || (item.type === "credential" && item.secretEnc)),
+            hasApiKey: Boolean(item.apiKey || (item.type === "api" && item.secretEnc)),
           }))
         )
       } catch {

@@ -8,6 +8,7 @@ import {
   verifyPin,
   verifyRecoveryCode,
   isLockedOut,
+  PIN_PATTERN,
 } from "../security"
 import { sileo } from "sileo"
 
@@ -41,14 +42,23 @@ export function PasswordSecurityDialog({
   }
 
   const submitPin = async () => {
-    if (!/^\d{4}$/.test(value) || busy) return
+    if (!PIN_PATTERN.test(value) || busy) return
     if (isLockedOut()) {
       sileo.error({ title: "Bloqueado", description: "Demasiados intentos. Espera un minuto." })
       return
     }
     setBusy(true)
     try {
-      const ok = await verifyPin(value)
+      const { ok, recoveryCode } = await verifyPin(value)
+      if (recoveryCode) {
+        // Legacy PIN was migrated to the encrypted vault: the old recovery code no longer applies
+        onVerified?.(ok)
+        onChanged?.()
+        setPlainRecovery(recoveryCode)
+        setStep("recoveryView")
+        sileo.info({ title: "Seguridad actualizada", description: "Tus credenciales ahora están cifradas. Guarda tu nuevo código de recuperación." })
+        return
+      }
       if (mode === "verify") {
         onVerified?.(ok)
         if (!ok) sileo.error({ title: "PIN incorrecto", description: "No se puede mostrar la contraseña." })
@@ -61,8 +71,13 @@ export function PasswordSecurityDialog({
           return
         }
         if (pendingAction === "disable") {
-          disableProtection()
-          sileo.success({ title: "Protección desactivada", description: "Las contraseñas ya no pedirán PIN." })
+          try {
+            await disableProtection()
+          } catch {
+            sileo.error({ title: "Error", description: "No se pudo desactivar la protección." })
+            return
+          }
+          sileo.success({ title: "Protección desactivada", description: "Las contraseñas ya no pedirán PIN ni estarán cifradas." })
           onChanged?.()
           onClose()
           return
@@ -85,10 +100,10 @@ export function PasswordSecurityDialog({
   }
 
   const submitNewPin = async () => {
-    if (!/^\d{4}$/.test(newPin) || busy) return
+    if (!PIN_PATTERN.test(newPin) || busy) return
     setBusy(true)
     try {
-      if (current.enabled && current.pinHash) {
+      if (current.enabled) {
         const maybeCode = await changePin(newPin)
         if (maybeCode) {
           setPlainRecovery(maybeCode)
@@ -148,7 +163,7 @@ export function PasswordSecurityDialog({
           : step === "recovery"
             ? "Usa el código de recuperación guardado."
             : step === "new"
-              ? "Elige un PIN de 4 dígitos."
+              ? "Elige un PIN de 4 a 8 dígitos (6 o más es más seguro)."
               : "Confirma tu PIN actual para continuar."
 
   const actionClass =
@@ -219,7 +234,7 @@ export function PasswordSecurityDialog({
           </div>
         )}
 
-        {mode === "settings" && step === "recoveryView" ? (
+        {step === "recoveryView" ? (
           <div className="space-y-4">
             <div className="flex items-center gap-2 border border-[#76b900]/50 bg-[#76b900]/10 p-4">
               <code className="flex-1 select-all text-center font-mono text-lg font-bold tracking-widest text-zinc-900 dark:text-white">
@@ -259,13 +274,13 @@ export function PasswordSecurityDialog({
               autoFocus
               type={step === "recovery" ? "text" : "password"}
               inputMode={step === "recovery" ? "text" : "numeric"}
-              maxLength={step === "recovery" ? 12 : 4}
+              maxLength={step === "recovery" ? 12 : 8}
               value={value}
               onChange={(e) =>
                 setValue(
                   step === "recovery"
                     ? e.target.value.toUpperCase().slice(0, 12)
-                    : e.target.value.replace(/\D/g, "").slice(0, 4)
+                    : e.target.value.replace(/\D/g, "").slice(0, 8)
                 )
               }
               placeholder={step === "recovery" ? "CÓDIGO" : "••••"}
@@ -291,10 +306,10 @@ export function PasswordSecurityDialog({
               autoFocus
               type="password"
               inputMode="numeric"
-              maxLength={4}
+              maxLength={8}
               value={newPin}
-              onChange={(e) => setNewPin(e.target.value.replace(/\D/g, "").slice(0, 4))}
-              placeholder="PIN de 4 dígitos"
+              onChange={(e) => setNewPin(e.target.value.replace(/\D/g, "").slice(0, 8))}
+              placeholder="PIN de 4 a 8 dígitos"
               className="w-full border border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900 px-3 py-3 text-center font-mono tracking-[0.4em] text-zinc-900 dark:text-white focus:outline-none focus:border-[#76b900]"
             />
             <button

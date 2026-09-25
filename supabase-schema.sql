@@ -49,6 +49,14 @@ create table if not exists devbot_history (
   primary key (user_id)
 );
 
+-- Bóveda de DevHub: salt + claves envueltas (nunca el PIN). Necesaria para el cifrado de credenciales.
+create table if not exists devhub_vault (
+  user_id uuid references auth.users on delete cascade not null,
+  data jsonb not null default '{}'::jsonb,
+  updated_at timestamptz not null default now(),
+  primary key (user_id)
+);
+
 -- Si las tablas ya existían sin updated_at:
 alter table cashflow_rules add column if not exists updated_at timestamptz not null default now();
 alter table personal_events add column if not exists updated_at timestamptz not null default now();
@@ -64,6 +72,7 @@ alter table chores enable row level security;
 alter table expenses enable row level security;
 alter table devhub_items enable row level security;
 alter table devbot_history enable row level security;
+alter table devhub_vault enable row level security;
 
 drop policy if exists "users can manage own cashflow_rules" on cashflow_rules;
 create policy "users can manage own cashflow_rules"
@@ -104,5 +113,11 @@ create policy "users can manage own devhub_items"
 drop policy if exists "users can manage own devbot_history" on devbot_history;
 create policy "users can manage own devbot_history"
   on devbot_history for all
+  using (auth.uid() = user_id)
+  with check (auth.uid() = user_id);
+
+drop policy if exists "users can manage own devhub_vault" on devhub_vault;
+create policy "users can manage own devhub_vault"
+  on devhub_vault for all
   using (auth.uid() = user_id)
   with check (auth.uid() = user_id);

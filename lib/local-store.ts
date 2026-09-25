@@ -6,6 +6,7 @@ const TABLE_MAP: Record<string, string> = {
   ph_budgeted_expenses: "expenses",
   ph_devhub_items: "devhub_items",
   ph_devbot_history: "devbot_history",
+  ph_devhub_vault: "devhub_vault",
 }
 
 const ALL_KEYS = Object.keys(TABLE_MAP)
@@ -240,7 +241,7 @@ export function downloadBackup() {
 }
 
 function isValidBackupValue(key: string, value: unknown): boolean {
-  if (key === "ph_event_completed") {
+  if (key === "ph_event_completed" || key === "ph_devhub_vault") {
     return value !== null && typeof value === "object" && !Array.isArray(value)
   }
   return Array.isArray(value)

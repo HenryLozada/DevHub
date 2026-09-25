@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef, type FormEvent } from "react";
 import { authFetch } from "@/lib/ai";
+import { getPasswordSecurity, isUnlocked, openSecrets, sealSecrets } from "../security";
+import { useVaultUnlock } from "./useVaultUnlock";
 import { motion } from "motion/react";
 import { X } from "lucide-react";
 import { DevItem, DevItemType } from "../types";
@@ -26,6 +28,20 @@ export function ItemModal({ item, onClose, onSaved }: ItemModalProps) {
   const [username, setUsername] = useState(item?.username ?? "");
   const [password, setPassword] = useState(item?.password ?? "");
   const [metaLoading, setMetaLoading] = useState(false);
+  // Encrypted items: secrets are only prefilled when the vault is unlocked; otherwise blank = keep as is
+  const [secretsLoaded, setSecretsLoaded] = useState(!item?.secretEnc);
+  const { requestUnlock, dialog } = useVaultUnlock();
+
+  useEffect(() => {
+    if (!item?.secretEnc || !isUnlocked()) return;
+    openSecrets(item)
+      .then((s) => {
+        setApiKey(s.apiKey ?? "");
+        setPassword(s.password ?? "");
+        setSecretsLoaded(true);
+      })
+      .catch(() => undefined);
+  }, [item]);
   const userTouchedTitle = useRef(false);
   const userTouchedDesc = useRef(false);
 
@@ -106,6 +122,27 @@ export function ItemModal({ item, onClose, onSaved }: ItemModalProps) {
       }
     }
 
+    const secretInput = {
+      apiKey: type === "api" ? apiKey.trim() || undefined : undefined,
+      password: type === "credential" ? password.trim() || undefined : undefined,
+    };
+    const hasNewSecrets = Boolean(secretInput.apiKey || secretInput.password);
+    // Blank fields on a still-encrypted item mean "unchanged"
+    const keepExisting = !hasNewSecrets && !secretsLoaded && !!item?.secretEnc;
+
+    if (hasNewSecrets && getPasswordSecurity().enabled && !(await requestUnlock())) {
+      sileo.error({ title: "PIN requerido", description: "Desbloquea DevHub para guardar credenciales." });
+      return;
+    }
+
+    let sealed;
+    try {
+      sealed = keepExisting ? { secretEnc: item!.secretEnc } : await sealSecrets(secretInput);
+    } catch {
+      sileo.error({ title: "Error", description: "No se pudieron cifrar las credenciales." });
+      return;
+    }
+
     // Prepare payload
     const payload = {
       title: finalTitle,
@@ -114,9 +151,10 @@ export function ItemModal({ item, onClose, onSaved }: ItemModalProps) {
       category,
       url: ["tool", "repo", "youtube"].includes(type) ? url.trim() : undefined,
       content: type === "note" ? content.trim() : undefined,
-      apiKey: type === "api" ? apiKey.trim() : undefined,
       username: type === "credential" ? username.trim() : undefined,
-      password: type === "credential" ? password.trim() : undefined,
+      apiKey: undefined,
+      password: undefined,
+      ...sealed,
     };
 
     try {
@@ -126,6 +164,9 @@ export function ItemModal({ item, onClose, onSaved }: ItemModalProps) {
       } else {
         saveDevItem(payload);
         sileo.success({ title: "Elemento creado", description: `"${payload.title}" agregado al DevHub.` });
+      }
+      if (hasNewSecrets && !getPasswordSecurity().enabled) {
+        sileo.info({ title: "Credencial sin cifrar", description: "Activa el PIN en DevHub → Seguridad para cifrar tus credenciales." });
       }
       onSaved();
       onClose();
@@ -285,7 +326,7 @@ export function ItemModal({ item, onClose, onSaved }: ItemModalProps) {
                 required
                 value={apiKey}
                 onChange={(e) => setApiKey(e.target.value)}
-                placeholder="sk-proj-..."
+                placeholder={secretsLoaded ? "sk-proj-..." : "Cifrada · déjala vacía para no cambiarla"}
                 className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-none text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:border-[#76b900] font-mono text-sm transition-colors"
               />
             </div>
@@ -315,7 +356,7 @@ export function ItemModal({ item, onClose, onSaved }: ItemModalProps) {
                   autoComplete="off"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
+                  placeholder={secretsLoaded ? "••••••••" : "Cifrada · vacía = sin cambios"}
                   className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-none text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:border-[#76b900] text-sm transition-colors"
                 />
               </div>
@@ -343,6 +384,7 @@ export function ItemModal({ item, onClose, onSaved }: ItemModalProps) {
           </div>
         </form>
       </motion.div>
+      {dialog}
     </div>
   );
 }

@@ -3,6 +3,8 @@ import { authFetch } from "@/lib/ai"
 import { motion, AnimatePresence } from "motion/react"
 import { Terminal, Bot, User, CornerDownLeft, Sparkles } from "lucide-react"
 import { saveDevItem } from "../store"
+import { sealSecrets } from "../security"
+import { useVaultUnlock } from "./useVaultUnlock"
 import { DevItem, DevItemType } from "../types"
 import { sileo } from "sileo"
 import { cn } from "@/lib/utils"
@@ -68,6 +70,7 @@ function UserMessage({ msg }: { msg: Message }) {
 }
 
 export function DevBotChat({ onItemAdded }: DevBotChatProps) {
+  const { requestUnlock, dialog } = useVaultUnlock()
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "bot",
@@ -195,19 +198,20 @@ export function DevBotChat({ onItemAdded }: DevBotChatProps) {
       credential: { label: "Credencial", icon: "🔒" },
     }
 
-    await new Promise(r => setTimeout(r, 400 + Math.random() * 600))
-
     try {
+      const secrets = { apiKey: apiKey || undefined, password: password || undefined }
+      if ((secrets.apiKey || secrets.password) && !(await requestUnlock())) {
+        throw new Error("PIN requerido para guardar credenciales")
+      }
       saveDevItem({
         title,
         description,
         type,
         url: url || undefined,
         content: content || undefined,
-        apiKey: apiKey || undefined,
         username: username || undefined,
-        password: password || undefined,
         category,
+        ...(await sealSecrets(secrets)),
       })
       onItemAdded()
       sileo.success({
@@ -221,10 +225,10 @@ export function DevBotChat({ onItemAdded }: DevBotChatProps) {
         timestamp: new Date(),
         type,
       })
-    } catch {
+    } catch (err) {
       addMessage({
         role: "bot",
-        content: "⚠️ Ocurrió un error al guardar. Intenta de nuevo.",
+        content: `⚠️ ${err instanceof Error && err.message.startsWith("PIN") ? err.message : "Ocurrió un error al guardar. Intenta de nuevo."}`,
         timestamp: new Date(),
         type: "error",
       })
@@ -241,6 +245,7 @@ export function DevBotChat({ onItemAdded }: DevBotChatProps) {
 
   return (
     <div className={cn("rounded-sm overflow-hidden flex flex-col", GLASS)}>
+      {dialog}
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-white/30 dark:border-white/10">
         <div className="flex items-center gap-2.5">
