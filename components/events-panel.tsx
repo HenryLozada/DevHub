@@ -7,7 +7,6 @@ import {
   getCategoryMeta,
   formatEventTime,
 } from "@/lib/events"
-import { sileo } from "sileo"
 import { formatFullDate } from "@/lib/cashflow"
 import { cn } from "@/lib/utils"
 

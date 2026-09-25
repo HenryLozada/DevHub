@@ -3,7 +3,6 @@ import { Download, Bell, X } from "lucide-react"
 import {
   registerServiceWorker,
   captureInstallPrompt,
-  canInstallPWA,
   promptInstallPWA,
   isStandalone,
   enableNotifications,

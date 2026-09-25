@@ -266,7 +266,7 @@ export function PasswordSecurityDialog({
           <form
             onSubmit={(e) => {
               e.preventDefault()
-              step === "recovery" ? void submitRecovery() : void submitPin()
+              void (step === "recovery" ? submitRecovery() : submitPin())
             }}
             className="space-y-4"
           >

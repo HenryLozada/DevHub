@@ -5,7 +5,7 @@ import { Terminal, Bot, User, CornerDownLeft, Sparkles } from "lucide-react"
 import { saveDevItem } from "../store"
 import { sealSecrets } from "../security"
 import { useVaultUnlock } from "./useVaultUnlock"
-import { DevItem, DevItemType } from "../types"
+import type { DevItemType } from "../types"
 import { sileo } from "sileo"
 import { cn } from "@/lib/utils"
 
@@ -100,15 +100,15 @@ export function DevBotChat({ onItemAdded }: DevBotChatProps) {
     setInput("")
     setIsTyping(true)
 
-    let type: DevItemType = "note"
-    let title = ""
-    let description = ""
+    let type: DevItemType
+    let title: string
+    let description: string
     let url = ""
     let content = ""
     let apiKey = ""
     let username = ""
     let password = ""
-    let category = "General"
+    let category: string
 
     if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
       url = trimmed
@@ -124,7 +124,9 @@ export function DevBotChat({ onItemAdded }: DevBotChatProps) {
           metaTitle = metaData.title || null
           metaDesc = metaData.description || null
         }
-      } catch (_) {}
+      } catch {
+        /* metadata is optional */
+      }
 
       if (urlObj.hostname.includes("youtube.com") || urlObj.hostname.includes("youtu.be")) {
         type = "youtube"
