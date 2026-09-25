@@ -7,11 +7,8 @@ export interface InjectedComponent {
   props: Record<string, unknown>
 }
 
-export interface InjectionConfig {
-  [moduleId: string]: {
-    background: InjectedComponent | null
-  }
-}
+/** moduleId → slot name (e.g. "background") → injected component */
+export type InjectionConfig = Record<string, Record<string, InjectedComponent | null>>
 
 export function getInjections(): InjectionConfig {
   return readStore<InjectionConfig>(STORE_KEY, {})
@@ -20,7 +17,7 @@ export function getInjections(): InjectionConfig {
 export function setInjection(moduleId: string, slot: string, injection: InjectedComponent): void {
   const config = getInjections()
   if (!config[moduleId]) config[moduleId] = { background: null }
-  ;(config[moduleId] as any)[slot] = injection
+  config[moduleId][slot] = injection
   writeStore(STORE_KEY, config)
   if (typeof window !== "undefined") {
     window.dispatchEvent(new CustomEvent("ph:injection", { detail: { moduleId, slot } }))
@@ -30,7 +27,7 @@ export function setInjection(moduleId: string, slot: string, injection: Injected
 export function removeInjection(moduleId: string, slot: string): void {
   const config = getInjections()
   if (config[moduleId]) {
-    ;(config[moduleId] as any)[slot] = null
+    config[moduleId][slot] = null
     writeStore(STORE_KEY, config)
     if (typeof window !== "undefined") {
       window.dispatchEvent(new CustomEvent("ph:injection", { detail: { moduleId, slot } }))

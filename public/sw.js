@@ -1,5 +1,7 @@
 /* PersonalHub service worker — standalone PWA + local notifications */
-const CACHE = "personalhub-shell-v1"
+// Versioned per deploy via /sw.js?v=<build id> (see lib/notifications.ts)
+const VERSION = new URL(self.location.href).searchParams.get("v") || "dev"
+const CACHE = `personalhub-${VERSION}`
 const SHELL = ["/", "/manifest.webmanifest", "/apple-icon.png", "/icon-192.png", "/icon-512.png"]
 
 self.addEventListener("install", (event) => {
@@ -22,6 +24,24 @@ self.addEventListener("fetch", (event) => {
   const url = new URL(request.url)
   if (url.origin !== self.location.origin) return
   if (url.pathname.startsWith("/api/")) return
+
+  // Hashed build assets never change: serve from cache first
+  if (url.pathname.startsWith("/_astro/")) {
+    event.respondWith(
+      caches.match(request).then(
+        (cached) =>
+          cached ||
+          fetch(request).then((response) => {
+            if (response.ok) {
+              const copy = response.clone()
+              caches.open(CACHE).then((cache) => cache.put(request, copy)).catch(() => undefined)
+            }
+            return response
+          })
+      )
+    )
+    return
+  }
 
   event.respondWith(
     fetch(request)

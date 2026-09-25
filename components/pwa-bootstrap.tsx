@@ -32,14 +32,21 @@ export function PwaBootstrap() {
     const onAvail = () => setInstallReady(true)
     window.addEventListener("ph:install-available", onAvail)
 
-    if (getNotificationPref() && Notification.permission === "granted") {
-      void pushScheduleToServiceWorker()
-    }
+    const canNotify = () =>
+      isNotificationSupported() && getNotificationPref() && Notification.permission === "granted"
 
+    if (canNotify()) void pushScheduleToServiceWorker()
+
+    // Coalesce bursts of ph:update (sync, bulk edits) into one reschedule
+    let debounce: number | undefined
     const onUpdate = () => {
-      if (getNotificationPref()) void pushScheduleToServiceWorker()
+      window.clearTimeout(debounce)
+      debounce = window.setTimeout(() => {
+        if (canNotify()) void pushScheduleToServiceWorker()
+      }, 1_000)
     }
     window.addEventListener("ph:update", onUpdate)
+    // Periodic refresh also keeps the service worker (and its timers) alive while the app is open
     const interval = window.setInterval(onUpdate, 60_000)
 
     return () => {
@@ -47,6 +54,7 @@ export function PwaBootstrap() {
       window.removeEventListener("ph:install-available", onAvail)
       window.removeEventListener("ph:update", onUpdate)
       clearInterval(interval)
+      window.clearTimeout(debounce)
     }
   }, [])
 

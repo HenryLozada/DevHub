@@ -8,6 +8,9 @@ export type ScheduledNotification = {
 
 const PREF_KEY = "ph_notifications_enabled"
 
+/** Injected at build time (astro.config.mjs) so every deploy gets a fresh service worker cache */
+declare const __BUILD_ID__: string
+
 export function isNotificationSupported(): boolean {
   return typeof window !== "undefined" && "Notification" in window && "serviceWorker" in navigator
 }
@@ -27,7 +30,7 @@ export function setNotificationPref(enabled: boolean): void {
 export async function registerServiceWorker(): Promise<ServiceWorkerRegistration | null> {
   if (!("serviceWorker" in navigator)) return null
   try {
-    const reg = await navigator.serviceWorker.register("/sw.js", { scope: "/" })
+    const reg = await navigator.serviceWorker.register(`/sw.js?v=${__BUILD_ID__}`, { scope: "/" })
     return reg
   } catch (e) {
     console.error("SW register failed", e)

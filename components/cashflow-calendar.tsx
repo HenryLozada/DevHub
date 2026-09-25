@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect, useRef } from "react"
+import { useMemo, useState, useEffect, useRef, lazy, Suspense } from "react"
 import { ModuleNav } from "@/components/module-nav"
 import {
   ArrowLeft as IoArrowBack,
@@ -21,8 +21,9 @@ import {
 import { MonthGrid } from "@/components/month-grid"
 import { FinancePanel } from "@/components/finance-panel"
 import { EventsPanel } from "@/components/events-panel"
-import { RuleDialog } from "@/components/rule-dialog"
-import { EventDialog } from "@/components/event-dialog"
+// Dialogs pull in the dialog/select primitives; load them the first time they open
+const RuleDialog = lazy(() => import("@/components/rule-dialog").then((m) => ({ default: m.RuleDialog })))
+const EventDialog = lazy(() => import("@/components/event-dialog").then((m) => ({ default: m.EventDialog })))
 import { sileo } from "sileo"
 import { cn } from "@/lib/utils"
 import { RippleButton } from "@/components/ui/ripple-button"
@@ -42,6 +43,11 @@ export function CashflowCalendar() {
   const [editingRule, setEditingRule] = useState<CashflowRule | null>(null)
 
   const [eventDialogOpen, setEventDialogOpen] = useState(false)
+  // Stay mounted after the first open so close animations still run
+  const [ruleDialogLoaded, setRuleDialogLoaded] = useState(false)
+  const [eventDialogLoaded, setEventDialogLoaded] = useState(false)
+  if (dialogOpen && !ruleDialogLoaded) setRuleDialogLoaded(true)
+  if (eventDialogOpen && !eventDialogLoaded) setEventDialogLoaded(true)
   const [editingEvent, setEditingEvent] = useState<PersonalEvent | null>(null)
   const [completed, setCompleted] = useState<Record<string, boolean>>({})
   const [hydrated, setHydrated] = useState(false)
@@ -332,20 +338,26 @@ export function CashflowCalendar() {
         </div>
       </main>
 
-      <RuleDialog
-        open={dialogOpen}
-        onOpenChange={setDialogOpen}
-        rule={editingRule}
-        onSave={handleSave}
-        onDelete={handleDelete}
-      />
-      <EventDialog
-        open={eventDialogOpen}
-        onOpenChange={setEventDialogOpen}
-        event={editingEvent}
-        onSave={handleSaveEvent}
-        onDelete={handleDeleteEvent}
-      />
+      <Suspense fallback={null}>
+        {ruleDialogLoaded && (
+          <RuleDialog
+            open={dialogOpen}
+            onOpenChange={setDialogOpen}
+            rule={editingRule}
+            onSave={handleSave}
+            onDelete={handleDelete}
+          />
+        )}
+        {eventDialogLoaded && (
+          <EventDialog
+            open={eventDialogOpen}
+            onOpenChange={setEventDialogOpen}
+            event={editingEvent}
+            onSave={handleSaveEvent}
+            onDelete={handleDeleteEvent}
+          />
+        )}
+      </Suspense>
     </div>
   )
 }
