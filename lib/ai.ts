@@ -1,8 +1,5 @@
-export async function askAI(prompt: string, context: string): Promise<string> {
-  const headers: Record<string, string> = {
-    "Content-Type": "application/json",
-  }
-
+async function authHeaders(): Promise<Record<string, string>> {
+  const headers: Record<string, string> = {}
   try {
     const { supabase } = await import("./supabase")
     if (supabase) {
@@ -12,6 +9,20 @@ export async function askAI(prompt: string, context: string): Promise<string> {
     }
   } catch {
     /* continue without token */
+  }
+  return headers
+}
+
+/** fetch() against our own API routes with the current Supabase session attached. */
+export async function authFetch(input: string, init: RequestInit = {}): Promise<Response> {
+  const headers = { ...(await authHeaders()), ...(init.headers as Record<string, string> | undefined) }
+  return fetch(input, { ...init, headers })
+}
+
+export async function askAI(prompt: string, context: string): Promise<string> {
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+    ...(await authHeaders()),
   }
 
   const res = await fetch("/api/chat", {

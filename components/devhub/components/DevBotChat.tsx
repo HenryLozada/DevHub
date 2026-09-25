@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react"
+import { authFetch } from "@/lib/ai"
 import { motion, AnimatePresence } from "motion/react"
 import { Terminal, Bot, User, CornerDownLeft, Sparkles } from "lucide-react"
 import { saveDevItem } from "../store"
@@ -114,7 +115,7 @@ export function DevBotChat({ onItemAdded }: DevBotChatProps) {
       let metaTitle: string | null = null
       let metaDesc: string | null = null
       try {
-        const metaRes = await fetch(`/api/metadata?url=${encodeURIComponent(trimmed)}`)
+        const metaRes = await authFetch(`/api/metadata?url=${encodeURIComponent(trimmed)}`)
         if (metaRes.ok) {
           const metaData = await metaRes.json()
           metaTitle = metaData.title || null

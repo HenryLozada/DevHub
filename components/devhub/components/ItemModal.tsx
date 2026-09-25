@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, type FormEvent } from "react";
+import { authFetch } from "@/lib/ai";
 import { motion } from "motion/react";
 import { X } from "lucide-react";
 import { DevItem, DevItemType } from "../types";
@@ -49,7 +50,7 @@ export function ItemModal({ item, onClose, onSaved }: ItemModalProps) {
       setMetaLoading(true);
       try {
         const targetUrl = url.trim();
-        const res = await fetch(`/api/metadata?url=${encodeURIComponent(targetUrl)}`)
+        const res = await authFetch(`/api/metadata?url=${encodeURIComponent(targetUrl)}`)
         if (!res.ok) return;
         const data = await res.json();
         if (data.title && !userTouchedTitle.current) setTitle(data.title);
