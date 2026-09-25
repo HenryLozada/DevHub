@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect, useCallback, useRef, type ReactNode } from "react"
 import { supabase } from "./supabase"
-import { setUserId, uploadToCloud, downloadFromCloud, clearLocalUserData, getStoreKeys } from "./local-store"
+import { setUserId, reconcile, clearLocalUserData, getStoreKeys } from "./local-store"
 import type { User } from "@supabase/supabase-js"
 
 const POLL_INTERVAL = 30_000
@@ -41,9 +41,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const keys = getStoreKeys()
       await Promise.all(
         keys.map(async (key) => {
-          const result = await downloadFromCloud(key)
-          if (result === "updated") anyUpdated = true
-          else if (result === "local-newer") await uploadToCloud(key)
+          if ((await reconcile(key)) === "updated") anyUpdated = true
         })
       )
       if (anyUpdated) setSyncVersion((v) => v + 1)

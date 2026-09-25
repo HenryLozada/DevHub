@@ -146,12 +146,8 @@ export function CashflowCalendar() {
       const next = editingRule
         ? prev.map((r) => (r.id === editingRule.id ? { ...r, ...data } : r))
         : [...prev, { id: crypto.randomUUID(), ...data }]
-      try {
-        localStorage.setItem("cashflow_rules", JSON.stringify(next))
-        localStorage.setItem("cashflow_rules_ts", new Date().toISOString())
-      } catch (err) {
-        console.error("Failed to persist rule", err)
-      }
+      // Persist immediately so a remount/sync cannot lose the change
+      writeStore("cashflow_rules", next, { emit: false })
       return next
     })
     sileo.success({
@@ -166,10 +162,8 @@ export function CashflowCalendar() {
     sileo.info({ title: "Regla eliminada", description: "Se eliminó la regla del flujo de caja." })
     setRules((prev) => {
       const next = prev.filter((r) => r.id !== id)
-      try {
-        localStorage.setItem("cashflow_rules", JSON.stringify(next))
-        localStorage.setItem("cashflow_rules_ts", new Date().toISOString())
-      } catch { /* ignore */ }
+      // Persist immediately so a remount/sync cannot lose the change
+      writeStore("cashflow_rules", next, { emit: false })
       return next
     })
     setDialogOpen(false)
@@ -190,13 +184,8 @@ export function CashflowCalendar() {
       const next = editingEvent
         ? prev.map((e) => (e.id === editingEvent.id ? { ...e, ...data } : e))
         : [...prev, { id: crypto.randomUUID(), ...data }]
-      // Write immediately so a remount/sync cannot lose the create
-      try {
-        localStorage.setItem("personal_events_v2", JSON.stringify(next))
-        localStorage.setItem("personal_events_v2_ts", new Date().toISOString())
-      } catch (err) {
-        console.error("Failed to persist event", err)
-      }
+      // Persist immediately so a remount/sync cannot lose the change
+      writeStore("personal_events_v2", next, { emit: false })
       return next
     })
     sileo.success({
@@ -211,10 +200,8 @@ export function CashflowCalendar() {
     sileo.info({ title: "Evento eliminado", description: "Se eliminó el evento de tu agenda." })
     setEvents((prev) => {
       const next = prev.filter((e) => e.id !== id)
-      try {
-        localStorage.setItem("personal_events_v2", JSON.stringify(next))
-        localStorage.setItem("personal_events_v2_ts", new Date().toISOString())
-      } catch { /* ignore */ }
+      // Persist immediately so a remount/sync cannot lose the change
+      writeStore("personal_events_v2", next, { emit: false })
       return next
     })
     setEditingEvent(null)
@@ -225,10 +212,8 @@ export function CashflowCalendar() {
     const key = `${occ.event.id}-${toDateKey(occ.date)}`
     setCompleted((prev) => {
       const next = { ...prev, [key]: !prev[key] }
-      try {
-        localStorage.setItem("ph_event_completed", JSON.stringify(next))
-        localStorage.setItem("ph_event_completed_ts", new Date().toISOString())
-      } catch { /* ignore */ }
+      // Persist immediately so a remount/sync cannot lose the change
+      writeStore("ph_event_completed", next, { emit: false })
       return next
     })
     const isDone = !completed[key]
