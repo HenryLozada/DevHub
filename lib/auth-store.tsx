@@ -41,9 +41,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const keys = getStoreKeys()
       await Promise.all(
         keys.map(async (key) => {
-          const ok = await downloadFromCloud(key)
-          if (ok) anyUpdated = true
-          else await uploadToCloud(key)
+          const result = await downloadFromCloud(key)
+          if (result === "updated") anyUpdated = true
+          else if (result === "local-newer") await uploadToCloud(key)
         })
       )
       if (anyUpdated) setSyncVersion((v) => v + 1)
@@ -107,8 +107,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!user) return
-    const id = setInterval(() => syncDown(user), POLL_INTERVAL)
-    return () => clearInterval(id)
+    // Poll only while the tab is visible; catch up as soon as it becomes visible again
+    const id = setInterval(() => {
+      if (!document.hidden) syncDown(user)
+    }, POLL_INTERVAL)
+    const onVisible = () => {
+      if (!document.hidden) syncDown(user)
+    }
+    document.addEventListener("visibilitychange", onVisible)
+    return () => {
+      clearInterval(id)
+      document.removeEventListener("visibilitychange", onVisible)
+    }
   }, [user, syncDown])
 
   async function signUp(email: string, password: string): Promise<string | null> {

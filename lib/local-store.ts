@@ -56,10 +56,49 @@ export function writeStore(key: string, value: unknown, opts?: { emit?: boolean 
   if (opts?.emit !== false && typeof window !== "undefined") {
     window.dispatchEvent(new CustomEvent("ph:update", { detail: { key } }))
   }
-  void syncToCloud(key, value)
+  scheduleSync(key)
 }
 
-async function syncToCloud(key: string, value: unknown) {
+// Debounce cloud uploads per key so rapid edits (typing, drag) produce a single upsert
+const SYNC_DEBOUNCE_MS = 800
+const pendingSyncs = new Map<string, ReturnType<typeof setTimeout>>()
+
+function scheduleSync(key: string) {
+  if (!TABLE_MAP[key] || !getUserId()) return
+  // Mark local as newer right away so a poll in the debounce window doesn't overwrite it
+  localStorage.setItem(`${key}_ts`, new Date().toISOString())
+  const prev = pendingSyncs.get(key)
+  if (prev) clearTimeout(prev)
+  pendingSyncs.set(
+    key,
+    setTimeout(() => {
+      pendingSyncs.delete(key)
+      void syncToCloud(key)
+    }, SYNC_DEBOUNCE_MS)
+  )
+}
+
+export function flushPendingSyncs() {
+  for (const [key, timer] of pendingSyncs) {
+    clearTimeout(timer)
+    pendingSyncs.delete(key)
+    void syncToCloud(key)
+  }
+}
+
+function cancelPendingSyncs() {
+  for (const timer of pendingSyncs.values()) clearTimeout(timer)
+  pendingSyncs.clear()
+}
+
+if (typeof window !== "undefined") {
+  window.addEventListener("pagehide", flushPendingSyncs)
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) flushPendingSyncs()
+  })
+}
+
+async function syncToCloud(key: string) {
   const userId = getUserId()
   if (!userId) return
 
@@ -69,25 +108,29 @@ async function syncToCloud(key: string, value: unknown) {
   const table = TABLE_MAP[key]
   if (!table) return
 
-  const timestamp = new Date().toISOString()
-  localStorage.setItem(`${key}_ts`, timestamp)
+  const value = readStore<unknown>(key, null)
+  if (value === null) return
+
+  const timestamp = localStorage.getItem(`${key}_ts`) || new Date().toISOString()
 
   const { error } = await supabase.from(table).upsert(
-    { user_id: userId, data: JSON.parse(JSON.stringify(value)), updated_at: timestamp },
+    { user_id: userId, data: value, updated_at: timestamp },
     { onConflict: "user_id" }
   )
   if (error) console.error("syncToCloud failed", key, error.message)
 }
 
-export async function downloadFromCloud(key: string): Promise<boolean> {
+export type DownloadResult = "updated" | "unchanged" | "local-newer" | "error"
+
+export async function downloadFromCloud(key: string): Promise<DownloadResult> {
   const userId = getUserId()
-  if (!userId) return false
+  if (!userId) return "error"
 
   const { supabase } = await import("./supabase")
-  if (!supabase) return false
+  if (!supabase) return "error"
 
   const table = TABLE_MAP[key]
-  if (!table) return false
+  if (!table) return "error"
 
   const { data, error } = await supabase
     .from(table)
@@ -97,27 +140,26 @@ export async function downloadFromCloud(key: string): Promise<boolean> {
 
   if (error) {
     console.error("downloadFromCloud failed", key, error.message)
-    return false
+    return "error"
   }
 
-  if (data?.data !== undefined && data?.data !== null) {
-    const localTs = localStorage.getItem(`${key}_ts`) || ""
-    const cloudTs = data.updated_at || ""
-    const existing = localStorage.getItem(key)
-    const newStr = JSON.stringify(data.data)
+  // Nothing in the cloud yet: local data (if any) should be uploaded
+  if (data?.data === undefined || data?.data === null) return "local-newer"
 
-    if (!localTs || !cloudTs || cloudTs >= localTs) {
-      if (existing !== newStr) {
-        localStorage.setItem(key, newStr)
-        if (cloudTs) localStorage.setItem(`${key}_ts`, cloudTs)
-        if (typeof window !== "undefined") {
-          window.dispatchEvent(new Event("ph:update"))
-        }
-        return true
-      }
-    }
+  const localTs = localStorage.getItem(`${key}_ts`) || ""
+  const cloudTs = data.updated_at || ""
+
+  if (pendingSyncs.has(key) || (localTs && cloudTs && cloudTs < localTs)) return "local-newer"
+
+  const newStr = JSON.stringify(data.data)
+  if (localStorage.getItem(key) === newStr) return "unchanged"
+
+  localStorage.setItem(key, newStr)
+  if (cloudTs) localStorage.setItem(`${key}_ts`, cloudTs)
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new Event("ph:update"))
   }
-  return false
+  return "updated"
 }
 
 export async function uploadToCloud(key: string): Promise<boolean> {
@@ -152,6 +194,7 @@ export async function uploadToCloud(key: string): Promise<boolean> {
 }
 
 export function clearLocalUserData(): void {
+  cancelPendingSyncs()
   for (const key of ALL_KEYS) {
     localStorage.removeItem(key)
     localStorage.removeItem(`${key}_ts`)
@@ -230,6 +273,7 @@ export async function uploadAllToCloud(): Promise<number> {
 
 export async function resetAllData(): Promise<void> {
   const userId = getUserId()
+  cancelPendingSyncs()
 
   for (const key of ALL_KEYS) {
     localStorage.removeItem(key)
