@@ -1,4 +1,5 @@
 import type { APIRoute } from "astro"
+import { createClient } from "@supabase/supabase-js"
 
 export const prerender = false
 
@@ -26,6 +27,18 @@ function isRateLimited(ip: string): boolean {
   return entry.count > RATE_LIMIT
 }
 
+const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL
+const supabaseAnonKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY
+const authClient = supabaseUrl && supabaseAnonKey
+  ? createClient(supabaseUrl, supabaseAnonKey, { auth: { persistSession: false, autoRefreshToken: false } })
+  : null
+
+async function isValidSession(token: string): Promise<boolean> {
+  if (!authClient) return false
+  const { data, error } = await authClient.auth.getUser(token)
+  return !error && !!data.user
+}
+
 function json(data: unknown, status = 200) {
   return new Response(JSON.stringify(data), {
     status,
@@ -45,19 +58,10 @@ export const POST: APIRoute = async ({ request }) => {
       return json({ error: "GROQ_API_KEY no está configurada en las variables de servidor" }, 500)
     }
 
-    // Prefer Authorization bearer (Supabase access token) when present
+    // Require a valid Supabase session: the app only calls this endpoint when logged in
     const authHeader = request.headers.get("authorization") || ""
-    const hasBearer = authHeader.toLowerCase().startsWith("bearer ") && authHeader.length > 20
-
-    // Soft gate: require either a session token or same-origin browser request
-    const origin = request.headers.get("origin") || ""
-    const referer = request.headers.get("referer") || ""
-    const host = request.headers.get("host") || ""
-    const sameOrigin =
-      (origin && host && origin.includes(host)) ||
-      (referer && host && referer.includes(host))
-
-    if (!hasBearer && !sameOrigin) {
+    const token = authHeader.toLowerCase().startsWith("bearer ") ? authHeader.slice(7).trim() : ""
+    if (!token || !(await isValidSession(token))) {
       return json({ error: "No autorizado" }, 401)
     }
 
