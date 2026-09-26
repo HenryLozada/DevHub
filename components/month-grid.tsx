@@ -111,10 +111,10 @@ export function MonthGrid({
                 </span>
                 <div className="flex items-center gap-0.5 sm:gap-1">
                   {hasIngreso && (
-                    <span className="neon-dot size-1.5 rounded-full sm:hidden" style={{ "--neon": "#34d399" } as React.CSSProperties} aria-label="Ingreso" />
+                    <span className="neon-dot size-1.5 rounded-full sm:hidden" style={{ "--neon": "#3ecf9a" } as React.CSSProperties} aria-label="Ingreso" />
                   )}
                   {hasEgreso && (
-                    <span className="neon-dot size-1.5 rounded-full sm:hidden" style={{ "--neon": "#fb7185" } as React.CSSProperties} aria-label="Egreso" />
+                    <span className="neon-dot size-1.5 rounded-full sm:hidden" style={{ "--neon": "#f07a6a" } as React.CSSProperties} aria-label="Egreso" />
                   )}
                 </div>
               </div>
@@ -128,7 +128,7 @@ export function MonthGrid({
                         className={cn(
                           "reveal reveal-tint cal-chip flex items-center gap-1 truncate rounded-r-sm pl-1.5 pr-1 py-0.5 text-[8px] sm:text-[10px] leading-tight font-medium transition-transform duration-200 group-hover:translate-x-0.5",
                                                   )}
-                        style={{ "--neon": item.tipo === "ingreso" ? "#34d399" : "#fb7185" } as React.CSSProperties}
+                        style={{ "--neon": item.tipo === "ingreso" ? "#3ecf9a" : "#f07a6a" } as React.CSSProperties}
                       >
                         <span className="truncate">{item.label}</span>
                       </div>

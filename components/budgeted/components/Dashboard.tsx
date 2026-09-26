@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { AnimatePresence, motion } from "motion/react"
-import { Plus, Receipt, TrendingUp, TrendingDown } from "lucide-react"
+import { Plus, Receipt, Pencil, Trash2, Check, Minus } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { RippleButton } from "@/components/ui/ripple-button"
 import { InjectionSlot } from "@/components/playground/InjectionSlot"
@@ -16,11 +16,15 @@ interface DashboardProps {
   onRefresh: () => void
 }
 
-const STATUS_META: Record<PaidStatus, { label: string; icon: any; style: string }> = {
-  unpaid: { label: "Pendiente", icon: "○", style: "text-zinc-500 dark:text-zinc-400 border-zinc-300 dark:border-zinc-700" },
-  paid: { label: "Pagado", icon: "✓", style: "text-emerald-600 dark:text-emerald-400 border-emerald-400 dark:border-emerald-600" },
-  partial: { label: "Parcial", icon: "◐", style: "text-amber-600 dark:text-amber-400 border-amber-400 dark:border-amber-600" },
+const STATUS_META: Record<PaidStatus, { label: string; next: string }> = {
+  unpaid: { label: "Pendiente", next: "Marcar pagado" },
+  paid: { label: "Pagado", next: "Marcar parcial" },
+  partial: { label: "Parcial", next: "Marcar pendiente" },
 }
+
+// Paleta armónica compartida (ver @theme en globals.css)
+const PALETTE = ["#76b900", "#6a9ef0", "#3cc4d8", "#e9b44c", "#a58af0", "#3ecf9a", "#f07a6a"]
+const catColor = (cats: string[], c: string) => PALETTE[Math.max(0, cats.indexOf(c)) % PALETTE.length]
 
 export function Dashboard({ expenses, onRefresh }: DashboardProps) {
   const [showAdd, setShowAdd] = useState(false)
@@ -35,6 +39,7 @@ export function Dashboard({ expenses, onRefresh }: DashboardProps) {
     : e.paidStatus === "partial" ? Math.min(Math.max(e.paidAmount ?? 0, 0), e.amount)
     : 0
   const unpaidTotal = expenses.reduce((s, e) => s + e.amount - paidPortion(e), 0)
+  const paidPct = total ? Math.round(((total - unpaidTotal) / total) * 100) : 0
 
   const filtered = filter === "all" ? expenses
     : filter === "unpaid" ? expenses.filter(e => (e.paidStatus || "unpaid") !== "paid")
@@ -52,106 +57,145 @@ export function Dashboard({ expenses, onRefresh }: DashboardProps) {
   }
 
   const categories = [...new Set(expenses.map(e => e.category))]
+  const byCategory = categories
+    .map(c => ({ c, sum: expenses.filter(e => e.category === c).reduce((s, e) => s + e.amount, 0) }))
+    .sort((a, b) => b.sum - a.sum)
 
   return (
-    <div className="max-w-4xl mx-auto px-3 md:px-4 py-4 md:py-8 relative">
+    <div className="mx-auto max-w-6xl px-f13 py-f21 md:px-f34 md:py-f34 relative">
       <InjectionSlot moduleId="budgeted" className="absolute inset-0 pointer-events-none" />
-      <div className="relative z-10">
-      <div className="flex items-center justify-between mb-4 md:mb-8">
-        <div className="min-w-0">
-          <h2 className="text-xl md:text-3xl font-bold text-zinc-950 dark:text-white font-sans uppercase tracking-tight truncate">Mis Gastos</h2>
-          <p className="text-zinc-500 text-[10px] md:text-xs mt-0.5 md:mt-1 font-mono uppercase tracking-wider truncate">
-            {expenses.length} registros · ${fmt(unpaidTotal)} pendiente
-          </p>
-        </div>
-        <RippleButton onClick={() => { setEditing(null); setShowAdd(true) }}
-          rippleColor="#000000" duration="600ms"
-          className="flex items-center gap-1.5 px-3 md:px-4 py-1.5 md:py-2 bg-[#76b900] text-black rounded-lg text-[10px] md:text-xs font-mono font-bold uppercase tracking-wider hover:bg-[#86cb00] transition-colors border border-[#76b900] shrink-0 overflow-hidden">
-          <Plus className="w-3.5 h-3.5 md:w-4 md:h-4" /> Gasto
-        </RippleButton>
-      </div>
+      <div className="relative z-10 grid gap-f21 lg:grid-cols-[1.618fr_1fr] lg:items-start">
 
-      {/* Stats */}
-      <div className="grid grid-cols-3 gap-2 md:gap-4 mb-4 md:mb-8 stagger">
-        <div className="bg-white dark:bg-zinc-950/70 dark:backdrop-blur-xl border border-zinc-200 dark:border-zinc-800 p-3 md:p-5 rounded-xl shadow-xs relative overflow-hidden lift">
-          <div className="corner-square" />
-          <p className="font-mono text-[8px] md:text-[9px] uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-1 truncate">Total</p>
-          <p className="text-base md:text-2xl font-mono font-bold text-[#76b900] truncate"><CountUp value={total} format={money} /></p>
-        </div>
-        <div className="bg-white dark:bg-zinc-950/70 dark:backdrop-blur-xl border border-zinc-200 dark:border-zinc-800 p-3 md:p-5 rounded-xl shadow-xs relative overflow-hidden lift">
-          <div className="corner-square" />
-          <p className="font-mono text-[8px] md:text-[9px] uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-1 truncate">Pagado</p>
-          <p className="text-base md:text-2xl font-mono font-bold text-emerald-500 truncate"><CountUp value={total - unpaidTotal} format={money} /></p>
-        </div>
-        <div className="bg-white dark:bg-zinc-950/70 dark:backdrop-blur-xl border border-zinc-200 dark:border-zinc-800 p-3 md:p-5 rounded-xl shadow-xs relative overflow-hidden lift">
-          <div className="corner-square" />
-          <p className="font-mono text-[8px] md:text-[9px] uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-1 truncate">Pendiente</p>
-          <p className="text-base md:text-2xl font-mono font-bold text-amber-500 truncate"><CountUp value={unpaidTotal} format={money} /></p>
-        </div>
-      </div>
+      {/* ── Resumen (38%) ── */}
+      <aside className="flex flex-col gap-f21 lg:order-2 lg:sticky lg:top-f21">
+        <section className="panel p-f21">
+          <div className="flex items-end justify-between gap-f13">
+            <div className="min-w-0">
+              <p className="eyebrow">Total gastado</p>
+              <p className="mt-f5 truncate font-mono text-4xl font-light tracking-tighter tabular-nums text-zinc-900 dark:text-zinc-100">
+                <CountUp value={total} format={money} />
+              </p>
+            </div>
+            <div className="text-right">
+              <p className="font-mono text-lg leading-none tabular-nums text-zinc-900 dark:text-zinc-100">{paidPct}<span className="text-zinc-500">%</span></p>
+              <p className="eyebrow mt-f5 tracking-[0.2em]">Pagado</p>
+            </div>
+          </div>
+          <div className="mt-f21 h-[3px] overflow-hidden rounded-full bg-zinc-900/10 dark:bg-white/[0.06]">
+            <div className="h-full rounded-full bg-brand transition-[width] duration-700 ease-out" style={{ width: `${paidPct}%` }} />
+          </div>
+          <div className="mt-f13 grid grid-cols-2 gap-f13">
+            <div className="cal-chip pl-f8" style={{ "--neon": "var(--color-pos)" } as React.CSSProperties}>
+              <p className="eyebrow tracking-[0.2em]">Pagado</p>
+              <p className="font-mono text-sm tabular-nums text-zinc-900 dark:text-zinc-100"><CountUp value={total - unpaidTotal} format={money} /></p>
+            </div>
+            <div className="cal-chip pl-f8" style={{ "--neon": "var(--color-warn)" } as React.CSSProperties}>
+              <p className="eyebrow tracking-[0.2em]">Pendiente</p>
+              <p className="font-mono text-sm tabular-nums text-zinc-900 dark:text-zinc-100"><CountUp value={unpaidTotal} format={money} /></p>
+            </div>
+          </div>
+        </section>
 
-      {/* Filter */}
-      <div className="flex gap-1.5 mb-4">
-        {(["all", "unpaid", "paid"] as const).map(f => (
-          <button key={f} onClick={() => setFilter(f)}
-            className={cn("px-3 py-1.5 rounded-lg text-[9px] font-mono font-bold uppercase tracking-wider transition-all border",
-              filter === f ? "bg-[#76b900] text-black border-[#76b900]" : "bg-white dark:bg-zinc-950/70 dark:backdrop-blur-xl text-zinc-500 dark:text-zinc-400 border-zinc-200 dark:border-zinc-800 hover:text-zinc-800 dark:hover:text-zinc-200")}>
-            {f === "all" ? "Todos" : f === "unpaid" ? "Pendientes" : "Pagados"}
-          </button>
-        ))}
-      </div>
+        {byCategory.length > 0 && (
+          <section className="panel p-f21">
+            <p className="eyebrow">Por categoría</p>
+            {/* barra apilada: de un vistazo, en qué se va el dinero */}
+            <div className="mt-f13 flex h-f8 overflow-hidden rounded-full">
+              {byCategory.map(({ c, sum }) => (
+                <div key={c} title={c} style={{ width: `${(sum / total) * 100}%`, background: catColor(categories, c) }} className="h-full first:rounded-l-full last:rounded-r-full" />
+              ))}
+            </div>
+            <ul className="mt-f13 flex flex-col gap-f8">
+              {byCategory.map(({ c, sum }) => (
+                <li key={c} className="cal-chip flex items-center justify-between gap-f8 pl-f8 text-xs" style={{ "--neon": catColor(categories, c) } as React.CSSProperties}>
+                  <span className="truncate">{c}</span>
+                  <span className="shrink-0 font-mono tabular-nums text-zinc-500">{money(sum)} · {Math.round((sum / total) * 100)}%</span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+      </aside>
 
-      {/* Expense list */}
-      {filtered.length === 0 ? (
-        <div className="text-center py-16 bg-white dark:bg-zinc-950/70 dark:backdrop-blur-xl rounded-lg border border-zinc-200 dark:border-zinc-800 relative overflow-hidden">
-          <div className="corner-square" />
-          <Receipt className="w-12 h-12 text-[#76b900] mx-auto mb-3 animate-bounce [animation-duration:2.4s]" />
-          <p className="text-zinc-500 dark:text-zinc-400 text-sm font-semibold">Sin gastos por aquí 💸</p>
-          <p className="text-zinc-400 dark:text-zinc-500 text-xs mt-1">Registra el primero con el botón de arriba.</p>
+      {/* ── Lista (62%) ── */}
+      <section className="panel flex flex-col lg:order-1">
+        <header className="flex items-center justify-between gap-f13 px-f21 pb-f13 pt-f21">
+          <div className="min-w-0">
+            <p className="eyebrow">Registro</p>
+            <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
+              Mis gastos <span className="font-mono text-zinc-500">[{expenses.length}]</span>
+            </p>
+          </div>
+          <RippleButton onClick={() => { setEditing(null); setShowAdd(true) }}
+            rippleColor="#000000" duration="600ms"
+            className="flex h-9 shrink-0 items-center gap-f5 overflow-hidden rounded-full bg-brand px-f13 text-xs font-semibold text-black transition-colors hover:bg-brand-hi">
+            <Plus className="size-4" /> Gasto
+          </RippleButton>
+        </header>
+
+        {/* Filtro segmentado */}
+        <div className="px-f21 pb-f13">
+          <div className="inline-flex rounded-full border border-zinc-200 p-f3 dark:border-white/10">
+            {(["all", "unpaid", "paid"] as const).map(f => (
+              <button key={f} onClick={() => setFilter(f)}
+                className={cn("rounded-full px-f13 py-f5 font-mono text-[10px] uppercase tracking-wider transition-colors",
+                  filter === f ? "bg-zinc-900 text-white dark:bg-white/10 dark:text-zinc-100" : "text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-200")}>
+                {f === "all" ? "Todos" : f === "unpaid" ? "Pendientes" : "Pagados"}
+              </button>
+            ))}
+          </div>
         </div>
-      ) : (
-        <div className="bg-white dark:bg-zinc-950/70 dark:backdrop-blur-xl border border-zinc-200 dark:border-zinc-800 rounded-lg overflow-hidden shadow-xs divide-y divide-zinc-200 dark:divide-zinc-800 relative">
-          <div className="corner-square" />
-          <AnimatePresence mode="popLayout">
-            {filtered.map(exp => {
-              const st = STATUS_META[exp.paidStatus || "unpaid"]
-              return (
-                <motion.div key={exp.id}
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  className="flex items-center gap-2 md:gap-4 p-3 md:p-4 hover:bg-zinc-50 dark:hover:bg-zinc-900/50 group transition-colors">
-                  <div className="w-8 h-8 md:w-10 md:h-10 bg-zinc-50 dark:bg-zinc-900 rounded-lg flex items-center justify-center shrink-0 border border-zinc-200 dark:border-zinc-800">
-                    <Receipt className="w-4 h-4 md:w-5 md:h-5 text-[#76b900]" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-bold text-zinc-900 dark:text-white truncate text-xs md:text-sm">{exp.description}</p>
-                    <div className="flex items-center gap-1.5 mt-1 flex-wrap">
-                      <span className="text-[8px] md:text-[9px] font-mono font-bold uppercase tracking-wider text-[#76b900] bg-[#76b900]/10 border border-[#76b900]/20 px-1.5 py-0.5 rounded-lg truncate max-w-[80px] md:max-w-none">{exp.category}</span>
-                      <span className="text-[8px] md:text-[9px] text-zinc-400 dark:text-zinc-500 font-mono uppercase tracking-wider">{exp.date}</span>
-                    </div>
-                  </div>
-                  <div className="flex flex-col items-end gap-1 shrink-0">
-                    <p className="font-bold font-mono text-zinc-900 dark:text-white text-xs md:text-sm whitespace-nowrap">${fmt(exp.amount)}</p>
-                    <button onClick={() => handleToggleStatus(exp)}
-                      className={cn(
-                        "flex items-center gap-1 px-1.5 md:px-2.5 py-1 rounded-lg text-[8px] md:text-[9px] font-mono font-bold uppercase tracking-wider transition-all border shrink-0 whitespace-nowrap",
-                        st.style,
-                        "hover:bg-zinc-100 dark:hover:bg-zinc-800"
-                      )}>
-                      {st.icon} <span className="hidden md:inline">{st.label}</span>
+
+        <div className="hairline" />
+
+        {filtered.length === 0 ? (
+          <div className="m-f21 rounded-f13 border border-dashed border-zinc-300 px-f21 py-f34 text-center dark:border-white/10">
+            <Receipt className="mx-auto mb-f8 size-5 text-zinc-400" />
+            <p className="eyebrow">Sin registros</p>
+            <p className="mt-f5 text-sm text-zinc-500 dark:text-zinc-400">Registra el primero con el botón de arriba.</p>
+          </div>
+        ) : (
+          <ul className="flex flex-col p-f8">
+            <AnimatePresence mode="popLayout">
+              {filtered.map(exp => {
+                const status = exp.paidStatus || "unpaid"
+                const st = STATUS_META[status]
+                return (
+                  <motion.li key={exp.id} layout
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.97 }}
+                    className="reveal group flex items-center gap-f13 rounded-f13 px-f13 py-f8 transition-colors hover:bg-zinc-900/[0.03] dark:hover:bg-white/[0.03]">
+                    {/* nodo de estado, igual que en la agenda */}
+                    <button onClick={() => handleToggleStatus(exp)} title={st.next} aria-label={`${st.label}: ${st.next}`}
+                      className={cn("grid size-[21px] shrink-0 place-items-center rounded-full border transition-all duration-300",
+                        status === "paid" ? "border-pos bg-pos text-black"
+                        : status === "partial" ? "border-warn text-warn"
+                        : "border-zinc-300 bg-white hover:border-brand dark:border-white/20 dark:bg-zinc-950")}>
+                      {status === "paid" ? <Check className="size-3" strokeWidth={3} /> : status === "partial" ? <Minus className="size-3" strokeWidth={3} /> : null}
                     </button>
-                  </div>
-                  <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
-                    <button onClick={() => { setEditing(exp); setShowAdd(true) }} className="p-1 md:p-1.5 hover:bg-[#76b900]/10 text-zinc-400 hover:text-[#76b900] rounded-lg border border-transparent hover:border-[#76b900]/20 transition-colors"><TrendingUp className="w-3.5 h-3.5 md:w-4 md:h-4" /></button>
-                    <button onClick={() => setConfirmDelete(exp)} className="p-1 md:p-1.5 hover:bg-red-500/10 text-zinc-400 hover:text-red-500 rounded-lg border border-transparent hover:border-red-500/20 transition-colors"><TrendingDown className="w-3.5 h-3.5 md:w-4 md:h-4" /></button>
-                  </div>
-                </motion.div>
-              )
-            })}
-          </AnimatePresence>
-        </div>
-      )}
+
+                    <button onClick={() => { setEditing(exp); setShowAdd(true) }} className="min-w-0 flex-1 text-left">
+                      <span className={cn("block truncate text-sm", status === "paid" ? "text-zinc-400 line-through decoration-pos/60 dark:text-zinc-500" : "text-zinc-900 dark:text-zinc-100")}>{exp.description}</span>
+                      <span className="mt-f3 flex items-center gap-f8">
+                        <span className="cal-chip truncate pl-f5 text-[10px]" style={{ "--neon": catColor(categories, exp.category) } as React.CSSProperties}>{exp.category}</span>
+                        <span className="font-mono text-[10px] tabular-nums text-zinc-500">{exp.date}</span>
+                      </span>
+                    </button>
+
+                    <span className="shrink-0 font-mono text-sm tabular-nums text-zinc-900 dark:text-zinc-100">{money(exp.amount)}</span>
+
+                    <div className="flex shrink-0 gap-f3 opacity-100 transition-opacity md:opacity-0 md:group-hover:opacity-100">
+                      <button onClick={() => { setEditing(exp); setShowAdd(true) }} title="Editar" className="rounded-f8 p-f5 text-zinc-400 transition-colors hover:text-brand"><Pencil className="size-3.5" /></button>
+                      <button onClick={() => setConfirmDelete(exp)} title="Eliminar" className="rounded-f8 p-f5 text-zinc-400 transition-colors hover:text-neg"><Trash2 className="size-3.5" /></button>
+                    </div>
+                  </motion.li>
+                )
+              })}
+            </AnimatePresence>
+          </ul>
+        )}
+      </section>
 
       {/* Modals */}
       <AnimatePresence>
@@ -163,14 +207,13 @@ export function Dashboard({ expenses, onRefresh }: DashboardProps) {
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               className="absolute inset-0 bg-black/40 backdrop-blur-xs" onClick={() => setConfirmDelete(null)} />
             <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}
-              className="relative w-full max-w-sm bg-white dark:bg-zinc-950/70 dark:backdrop-blur-xl border border-zinc-200 dark:border-zinc-800 rounded-lg p-4 sm:p-8 text-center shadow-xs overflow-hidden">
-              <div className="corner-square" />
-              <div className="w-12 h-12 sm:w-14 sm:h-14 bg-red-500/10 border border-red-500/20 rounded-lg flex items-center justify-center mx-auto mb-4 sm:mb-5 text-red-600"><TrendingDown className="w-6 h-6 sm:w-7 sm:h-7" /></div>
-              <h3 className="text-sm sm:text-md font-bold text-zinc-900 dark:text-white font-mono uppercase tracking-wider mb-2">¿Eliminar gasto?</h3>
-              <p className="text-zinc-400 dark:text-zinc-500 text-xs font-mono uppercase tracking-wider mb-6">Esta acción no se puede deshacer.</p>
+              className="panel relative w-full max-w-sm p-f34 text-center">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 bg-neg/10 rounded-full flex items-center justify-center mx-auto mb-f21 text-neg"><Trash2 className="w-6 h-6 sm:w-7 sm:h-7" /></div>
+              <h3 className="text-base font-medium text-zinc-900 dark:text-white mb-f8">¿Eliminar gasto?</h3>
+              <p className="text-zinc-500 text-sm mb-f21">Esta acción no se puede deshacer.</p>
               <div className="flex gap-3">
-                <button onClick={() => setConfirmDelete(null)} className="flex-1 py-2.5 bg-zinc-100 dark:bg-zinc-900 text-zinc-900 dark:text-white border border-zinc-200 dark:border-zinc-800 rounded-lg font-mono text-xs uppercase tracking-wider font-bold hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-colors">Cancelar</button>
-                <RippleButton onClick={() => handleDelete(confirmDelete)} rippleColor="#ffffff" duration="600ms" className="flex-1 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-lg font-mono text-xs uppercase tracking-wider font-bold transition-colors border border-red-600 overflow-hidden">Eliminar</RippleButton>
+                <button onClick={() => setConfirmDelete(null)} className="flex-1 py-f13 rounded-full border border-zinc-200 dark:border-white/10 text-zinc-700 dark:text-zinc-300 text-xs font-semibold hover:bg-zinc-100 dark:hover:bg-white/5 transition-colors">Cancelar</button>
+                <RippleButton onClick={() => handleDelete(confirmDelete)} rippleColor="#ffffff" duration="600ms" className="flex-1 py-f13 rounded-full bg-neg hover:brightness-110 text-black text-xs font-semibold transition overflow-hidden">Eliminar</RippleButton>
               </div>
             </motion.div>
           </div>
