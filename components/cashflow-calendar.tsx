@@ -1,4 +1,5 @@
 import { useMemo, useState, useEffect, useRef, lazy, Suspense } from "react"
+import { motion, AnimatePresence } from "motion/react"
 import { ModuleNav } from "@/components/module-nav"
 import {
   ArrowLeft as IoArrowBack,
@@ -29,11 +30,13 @@ import { cn } from "@/lib/utils"
 import { RippleButton } from "@/components/ui/ripple-button"
 import { InjectionSlot } from "@/components/playground/InjectionSlot"
 import { writeStore } from "@/lib/local-store"
+import { confetti } from "@/lib/confetti"
 
 export function CashflowCalendar() {
   const today = new Date()
   const [viewYear, setViewYear] = useState(today.getFullYear())
   const [viewMonth, setViewMonth] = useState(today.getMonth())
+  const [monthDir, setMonthDir] = useState(1)
   const [selectedDate, setSelectedDate] = useState(today)
   const [activeTab, setActiveTab] = useState<"finanzas" | "eventos">("eventos")
   const [rules, setRules] = useState<CashflowRule[]>([])
@@ -126,12 +129,14 @@ export function CashflowCalendar() {
   const dayEventOccurrences = eventsByDate[toDateKey(selectedDate)] ?? []
 
   function goToMonth(offset: number) {
+    setMonthDir(offset >= 0 ? 1 : -1)
     const next = new Date(viewYear, viewMonth + offset, 1)
     setViewYear(next.getFullYear())
     setViewMonth(next.getMonth())
   }
 
   function goToToday() {
+    setMonthDir(today.getFullYear() * 12 + today.getMonth() >= viewYear * 12 + viewMonth ? 1 : -1)
     setViewYear(today.getFullYear())
     setViewMonth(today.getMonth())
     setSelectedDate(today)
@@ -223,6 +228,7 @@ export function CashflowCalendar() {
       return next
     })
     const isDone = !completed[key]
+    if (isDone) confetti()
     sileo.success({
       title: isDone ? "¡Tarea completada!" : "Tarea desmarcada",
       description: `${occ.event.nombre} — ${isDone ? "marcado como hecho" : "pendiente de nuevo"}`,
@@ -230,14 +236,14 @@ export function CashflowCalendar() {
   }
 
   return (
-    <div className="mx-auto min-h-screen flex flex-col relative" style={{ backgroundColor: 'var(--color-canvas)' }}>
+    <div className="mx-auto min-h-screen flex flex-col relative">
       <InjectionSlot moduleId="calendar" className="absolute inset-0 pointer-events-none" />
       <ModuleNav
         icon={<IoCalendar className="w-4 h-4 text-[#76b900]" />}
         title="Flujo de Caja"
         actions={
           <RippleButton onClick={goToToday} rippleColor="#ffffff" duration="600ms"
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 hover:text-white rounded-none text-[10px] font-mono font-bold uppercase tracking-wider transition-colors border border-zinc-800 hover:border-zinc-700 overflow-hidden">
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 hover:text-white rounded-lg text-[10px] font-mono font-bold uppercase tracking-wider transition-colors border border-zinc-800 hover:border-zinc-700 overflow-hidden">
             <IoCalendar className="size-3.5" /> Hoy
           </RippleButton>
         }
@@ -253,14 +259,14 @@ export function CashflowCalendar() {
             <button
               onClick={() => goToMonth(-1)}
               aria-label="Mes anterior"
-              className="size-8 flex items-center justify-center rounded-none bg-white/40 dark:bg-white/10 hover:bg-white dark:hover:bg-white/20 text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white border border-white/40 dark:border-white/10 hover:border-[#76b900]/60 dark:hover:border-[#76b900]/70 transition-all duration-200"
+              className="size-8 flex items-center justify-center rounded-lg bg-white/40 dark:bg-white/10 hover:bg-white dark:hover:bg-white/20 text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white border border-white/40 dark:border-white/10 hover:border-[#76b900]/60 dark:hover:border-[#76b900]/70 transition-all duration-200"
             >
               <IoArrowBack className="size-4" />
             </button>
             <button
               onClick={() => goToMonth(1)}
               aria-label="Mes siguiente"
-              className="size-8 flex items-center justify-center rounded-none bg-white/40 dark:bg-white/10 hover:bg-white dark:hover:bg-white/20 text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white border border-white/40 dark:border-white/10 hover:border-[#76b900]/60 dark:hover:border-[#76b900]/70 transition-all duration-200"
+              className="size-8 flex items-center justify-center rounded-lg bg-white/40 dark:bg-white/10 hover:bg-white dark:hover:bg-white/20 text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white border border-white/40 dark:border-white/10 hover:border-[#76b900]/60 dark:hover:border-[#76b900]/70 transition-all duration-200"
             >
               <IoArrowForward className="size-4" />
             </button>
@@ -273,19 +279,45 @@ export function CashflowCalendar() {
 
           <div className="flex flex-1 flex-col gap-4 lg:flex-row lg:items-start">
             <div className="flex flex-1 flex-col">
-              <MonthGrid
-                year={viewYear}
-                month={viewMonth}
-                selectedDate={selectedDate}
-                occByDate={occByDate}
-                eventsByDate={eventsByDate}
-                onSelectDate={(date) => {
-                  setSelectedDate(date)
-                  if (typeof window !== "undefined" && window.innerWidth < 1024) {
-                    document.getElementById("detail-panel")?.scrollIntoView({ behavior: "smooth", block: "nearest" })
-                  }
-                }}
-              />
+              <AnimatePresence mode="wait" custom={monthDir} initial={false}>
+                <motion.div
+                  key={`${viewYear}-${viewMonth}`}
+                  custom={monthDir}
+                  variants={{
+                    enter: (d: number) => ({ opacity: 0, x: 40 * d }),
+                    center: { opacity: 1, x: 0, transitionEnd: { transform: "none" } },
+                    exit: (d: number) => ({ opacity: 0, x: -40 * d }),
+                  }}
+                  initial="enter"
+                  animate="center"
+                  exit="exit"
+                  transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+                  // Swipe left/right to change month (touch friendly)
+                  drag="x"
+                  dragDirectionLock
+                  dragConstraints={{ left: 0, right: 0 }}
+                  dragElastic={0.18}
+                  onDragEnd={(_, info) => {
+                    if (info.offset.x < -70) goToMonth(1)
+                    else if (info.offset.x > 70) goToMonth(-1)
+                  }}
+                  className="touch-pan-y"
+                >
+                <MonthGrid
+                  year={viewYear}
+                  month={viewMonth}
+                  selectedDate={selectedDate}
+                  occByDate={occByDate}
+                  eventsByDate={eventsByDate}
+                  onSelectDate={(date) => {
+                    setSelectedDate(date)
+                    if (typeof window !== "undefined" && window.innerWidth < 1024) {
+                      document.getElementById("detail-panel")?.scrollIntoView({ behavior: "smooth", block: "nearest" })
+                    }
+                  }}
+                />
+                </motion.div>
+              </AnimatePresence>
             </div>
 
             <div id="detail-panel" className="flex w-full flex-col gap-4 lg:sticky lg:top-6 lg:w-80 lg:max-h-[calc(100vh-3rem)]">

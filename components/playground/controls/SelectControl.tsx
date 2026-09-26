@@ -15,7 +15,7 @@ export function SelectControl({ def, value, onChange }: Props) {
       <select
         value={(value as string) ?? ""}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-none text-zinc-900 dark:text-white text-sm focus:outline-none focus:border-[#76b900] transition-colors"
+        className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg text-zinc-900 dark:text-white text-sm focus:outline-none focus:border-[#76b900] transition-colors"
       >
         {def.options?.map((opt) => (
           <option key={String(opt.value)} value={String(opt.value)}>

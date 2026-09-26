@@ -41,18 +41,18 @@ export function CalendarView({ chores, onToggle }: CalendarViewProps) {
     <div>
       <div className="flex items-center justify-between mb-4">
         <button onClick={() => setCurrent(subMonths(current, 1))}
-          className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-900 rounded-none transition-colors border border-transparent hover:border-zinc-200 dark:hover:border-zinc-800">
+          className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-900 rounded-lg transition-colors border border-transparent hover:border-zinc-200 dark:hover:border-zinc-800">
           <ChevronLeft className="w-4 h-4 text-zinc-500" />
         </button>
         <h3 className="font-bold text-zinc-950 dark:text-white uppercase font-mono text-xs tracking-wider">
           {format(current, "MMMM yyyy", { locale: es })}
         </h3>
         <button onClick={() => setCurrent(addMonths(current, 1))}
-          className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-900 rounded-none transition-colors border border-transparent hover:border-zinc-200 dark:hover:border-zinc-800">
+          className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-900 rounded-lg transition-colors border border-transparent hover:border-zinc-200 dark:hover:border-zinc-800">
           <ChevronRightIcon className="w-4 h-4 text-zinc-500" />
         </button>
       </div>
-      <div className="grid grid-cols-7 gap-px bg-zinc-200 dark:bg-zinc-800 rounded-none overflow-hidden border border-zinc-200 dark:border-zinc-800">
+      <div className="grid grid-cols-7 gap-px bg-zinc-200 dark:bg-zinc-800 rounded-lg overflow-hidden border border-zinc-200 dark:border-zinc-800">
         {["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"].map((d) => (
           <div key={d} className="bg-zinc-50 dark:bg-zinc-900 py-2 text-center font-mono text-[9px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">{d}</div>
         ))}
@@ -62,14 +62,14 @@ export function CalendarView({ chores, onToggle }: CalendarViewProps) {
           const today = isToday(day)
           return (
             <div key={i} className={cn("bg-white dark:bg-zinc-950 p-2 min-h-[80px]", !inMonth && "opacity-40")}>
-              <p className={cn("text-xs font-mono font-bold mb-1 w-6 h-6 flex items-center justify-center rounded-none select-none",
+              <p className={cn("text-xs font-mono font-bold mb-1 w-6 h-6 flex items-center justify-center rounded-lg select-none",
                 today ? "bg-[#76b900] text-black" : "text-zinc-500 dark:text-zinc-400")}>
                 {format(day, "d")}
               </p>
               <div className="space-y-0.5">
                 {dayChores.slice(0, 3).map((c) => (
                   <button key={c.id} onClick={() => onToggle(c)}
-                    className={cn("w-full text-left font-mono text-[9px] font-bold px-1.5 py-0.5 rounded-none truncate border transition-all",
+                    className={cn("w-full text-left font-mono text-[9px] font-bold px-1.5 py-0.5 rounded-lg truncate border transition-all",
                       c.status === "done" ? "opacity-50 line-through" : "",
                       COLOR_BG[c.color ?? "violet"] ?? COLOR_BG.violet)}>
                     {c.title}

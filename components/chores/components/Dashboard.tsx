@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react"
+import { confetti } from "@/lib/confetti"
 import { AnimatePresence, motion } from "motion/react"
 import { CheckCircle2, Circle, Plus, Pencil, Trash2, ChevronRight, Sparkles } from "lucide-react"
 import { isBefore, startOfDay, endOfWeek, isSameDay } from "date-fns"
@@ -137,6 +138,7 @@ export function Dashboard({ chores, onRefresh }: DashboardProps) {
 
   function handleToggle(c: Chore) {
     toggleChore(c.id)
+    if (c.status !== "done") confetti()
     onRefresh()
   }
 
@@ -231,8 +233,9 @@ export function Dashboard({ chores, onRefresh }: DashboardProps) {
                   )}
                 </AnimatePresence>
                 {col.chores.length === 0 && (
-                  <div className="flex items-center justify-center h-20 text-[10px] font-mono text-zinc-400 dark:text-zinc-500 uppercase tracking-wider border border-dashed border-white/30 dark:border-white/10 backdrop-blur-sm bg-white/10 dark:bg-zinc-950/10 rounded-sm">
-                    Sin tareas
+                  <div className="flex flex-col items-center justify-center gap-1 h-24 text-[11px] text-zinc-400 dark:text-zinc-500 border border-dashed border-zinc-300/60 dark:border-white/10 bg-white/10 dark:bg-zinc-950/10 rounded-xl">
+                    <span className="text-xl animate-bounce [animation-duration:2.4s]">{col.key === "urgent" ? "🎉" : col.key === "soon" ? "🌤️" : "🧘"}</span>
+                    {col.key === "urgent" ? "Nada urgente, ¡bien!" : "Todo tranquilo por aquí"}
                   </div>
                 )}
               </div>

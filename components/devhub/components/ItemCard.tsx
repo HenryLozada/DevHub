@@ -111,7 +111,7 @@ export function ItemCard({ item, onEdit, onDelete }: ItemCardProps) {
   const ytVideoId = item.type === "youtube" && item.url ? getYouTubeId(item.url) : null;
 
   return (
-    <div className="relative flex flex-col justify-between border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-5 rounded-none shadow-sm min-h-[220px] group overflow-hidden transition-all">
+    <div className="relative flex flex-col justify-between border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-5 rounded-xl shadow-sm min-h-[220px] group overflow-hidden lift">
       {/* Signature NVIDIA green corner square */}
       <div className="corner-square" />
 

@@ -29,7 +29,7 @@ export function MonthGrid({
   const today = new Date()
 
   return (
-    <div className="flex flex-col overflow-hidden rounded-none backdrop-blur-2xl bg-white/40 dark:bg-zinc-950/40 border border-white/30 dark:border-white/10 shadow-lg shadow-black/10">
+    <div className="flex flex-col overflow-hidden rounded-lg backdrop-blur-2xl bg-white/40 dark:bg-zinc-950/40 border border-white/30 dark:border-white/10 shadow-lg shadow-black/10">
       <div className="grid grid-cols-7 border-b border-white/30 dark:border-white/10">
         {WEEKDAYS.map((day) => (
           <div
@@ -80,7 +80,7 @@ export function MonthGrid({
                 <span
                   className={cn(
                     "flex size-5 sm:size-7 items-center justify-center rounded-sm text-[10px] sm:text-[13px] font-bold",
-                    isToday && "bg-[#76b900] text-black",
+                    isToday && "bg-gradient-to-br from-[#76b900] to-[#b6f03a] text-black rounded-md pulse-ring shadow-[0_0_14px_rgba(118,185,0,0.5)]",
                     !isToday && !inMonth && "text-zinc-400 dark:text-zinc-600",
                     !isToday && inMonth && "text-zinc-900 dark:text-zinc-100",
                   )}
@@ -89,10 +89,10 @@ export function MonthGrid({
                 </span>
                 <div className="flex items-center gap-0.5 sm:gap-1">
                   {hasIngreso && (
-                    <span className="size-1.5 sm:size-2 rounded-none bg-emerald-500" aria-label="Ingreso" />
+                    <span className="size-1.5 sm:size-2 rounded-full bg-emerald-500" aria-label="Ingreso" />
                   )}
                   {hasEgreso && (
-                    <span className="size-1.5 sm:size-2 rounded-none bg-red-500" aria-label="Egreso" />
+                    <span className="size-1.5 sm:size-2 rounded-full bg-red-500" aria-label="Egreso" />
                   )}
                 </div>
               </div>
@@ -140,7 +140,7 @@ export function MonthGrid({
 
               <div className="mt-auto flex flex-wrap items-center gap-1 pt-1">
                 {Array.from(new Set(dayEvents.map(e => e.event.categoria))).map(cat => (
-                  <span key={cat} className={cn("size-1.5 rounded-none", getCategoryMeta(cat).color)} />
+                  <span key={cat} className={cn("size-1.5 rounded-full", getCategoryMeta(cat).color)} />
                 ))}
               </div>
             </button>

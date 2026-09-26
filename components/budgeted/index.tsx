@@ -19,7 +19,7 @@ export function BudgetedApp() {
   }, [reload])
 
   return (
-    <div className="min-h-screen bg-[#fafafc] dark:bg-[#000000]">
+    <div className="min-h-screen">
       <ModuleNav
         icon={<Wallet className="w-4 h-4 text-[#76b900]" />}
         title="Gastos"

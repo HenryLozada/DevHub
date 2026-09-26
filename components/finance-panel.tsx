@@ -8,6 +8,7 @@ import {
   formatFullDate,
   recurrenceLabel,
 } from "@/lib/cashflow"
+import { CountUp } from "@/components/ui/count-up"
 import { cn } from "@/lib/utils"
 
 interface FinancePanelProps {
@@ -41,7 +42,7 @@ export function FinancePanel({
           "mt-1.5 text-2xl sm:text-[34px] font-semibold leading-none tracking-tight tabular-nums truncate",
           summary.balance >= 0 ? "text-emerald-600 dark:text-emerald-400" : "text-red-600 dark:text-red-400",
         )}>
-          {formatCurrency(summary.balance)}
+          <CountUp value={summary.balance} format={formatCurrency} />
         </p>
 
         <div className="mt-3 md:mt-4 grid grid-cols-2 gap-2">
@@ -51,7 +52,7 @@ export function FinancePanel({
               <span className="text-[10px] sm:text-xs font-semibold truncate">Ingresos</span>
             </div>
             <p className="mt-1 text-xs sm:text-sm font-semibold tabular-nums text-emerald-600 dark:text-emerald-400 truncate">
-              {formatCurrency(summary.ingresos)}
+              <CountUp value={summary.ingresos} format={formatCurrency} />
             </p>
           </div>
           <div className="rounded-sm border border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-950/40 p-2 sm:p-3">
@@ -60,7 +61,7 @@ export function FinancePanel({
               <span className="text-[10px] sm:text-xs font-semibold truncate">Egresos</span>
             </div>
             <p className="mt-1 text-xs sm:text-sm font-semibold tabular-nums text-red-600 dark:text-red-400 truncate">
-              {formatCurrency(summary.egresos)}
+              <CountUp value={summary.egresos} format={formatCurrency} />
             </p>
           </div>
         </div>

@@ -5,11 +5,11 @@ import { Dashboard } from "./components/Dashboard";
 
 export function DevHubApp() {
   return (
-    <div className="min-h-screen bg-[#ffffff] dark:bg-[#000000] text-zinc-900 dark:text-zinc-100 font-sans transition-colors duration-300">
+    <div className="min-h-screen text-zinc-900 dark:text-zinc-100 font-sans transition-colors duration-300">
       <ModuleNav
         icon={<Terminal className="w-4 h-4 text-[#76b900]" />}
         title="DevHub"
-        subtitle="NVIDIA GEOMETRY ACTIVE"
+        subtitle="Links, notas y credenciales"
       />
 
       {/* Main Dashboard view */}
