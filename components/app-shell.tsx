@@ -49,7 +49,37 @@ function AppInner() {
     window.scrollTo({ top: 0 })
   }
   const [theme, setTheme] = useState<"light" | "dark">("light")
-  const [spaceFx, setSpaceFxState] = useState(true)
+  const [spaceFx, setSpaceFxState] = useState(false)
+
+  // Efecto "Reveal" estilo Windows 10: la luz del cursor ilumina bordes cercanos de .reveal
+  useEffect(() => {
+    let raf = 0, x = -9999, y = -9999
+    const paint = () => {
+      raf = 0
+      document.querySelectorAll<HTMLElement>(".reveal").forEach((el) => {
+        const r = el.getBoundingClientRect()
+        if (x < r.left - 160 || x > r.right + 160 || y < r.top - 160 || y > r.bottom + 160) {
+          if (el.style.getPropertyValue("--rx") !== "-9999px") el.style.setProperty("--rx", "-9999px")
+          return
+        }
+        el.style.setProperty("--rx", `${x - r.left}px`)
+        el.style.setProperty("--ry", `${y - r.top}px`)
+      })
+    }
+    const onMove = (e: PointerEvent) => {
+      if (e.pointerType === "touch") return
+      x = e.clientX; y = e.clientY
+      if (!raf) raf = requestAnimationFrame(paint)
+    }
+    const onLeave = () => { x = y = -9999; if (!raf) raf = requestAnimationFrame(paint) }
+    window.addEventListener("pointermove", onMove, { passive: true })
+    document.documentElement.addEventListener("pointerleave", onLeave)
+    return () => {
+      cancelAnimationFrame(raf)
+      window.removeEventListener("pointermove", onMove)
+      document.documentElement.removeEventListener("pointerleave", onLeave)
+    }
+  }, [])
 
   useEffect(() => {
     const sync = () => setSpaceFxState(getSpaceFx())
