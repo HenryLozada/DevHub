@@ -11,11 +11,15 @@ export function getAvatar(): string | null {
 export function setAvatar(dataUrl: string) {
   try {
     localStorage.setItem(KEY, dataUrl)
-  } catch {}
+  } catch {
+    /* storage unavailable or full */
+  }
 }
 
 export function clearAvatar() {
   try {
     localStorage.removeItem(KEY)
-  } catch {}
+  } catch {
+    /* storage unavailable or full */
+  }
 }

@@ -92,7 +92,7 @@ export function PlaygroundPanel() {
               <label className="block text-[10px] font-mono font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-widest mb-2">
                 Controles
               </label>
-              <div className="bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-none p-4 md:p-5">
+              <div className="bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg p-4 md:p-5">
                 <DynamicControls meta={meta} values={propValues} onChange={handleChange} />
               </div>
             </div>

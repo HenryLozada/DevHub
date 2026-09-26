@@ -7,8 +7,7 @@ import {
   getCategoryMeta,
   formatEventTime,
 } from "@/lib/events"
-import { sileo } from "sileo"
-import { formatFullDate } from "@/lib/cashflow"
+import { formatFullDate, toDateKey } from "@/lib/cashflow"
 import { cn } from "@/lib/utils"
 
 interface EventsPanelProps {
@@ -58,12 +57,12 @@ export function EventsPanel({
         </h2>
 
         {dayOccurrences.length === 0 ? (
-          <p className="mt-3 text-sm text-zinc-500 dark:text-zinc-400">Sin eventos programados.</p>
+          <p className="mt-3 text-sm text-zinc-500 dark:text-zinc-400">☕ Día libre: sin eventos programados.</p>
         ) : (
-          <ul className="mt-3 flex flex-col gap-1.5">
+          <ul className="mt-3 flex flex-col gap-1.5 stagger">
             {dayOccurrences.map((o) => {
               const meta = getCategoryMeta(o.event.categoria)
-              const taskKey = `${o.event.id}-${selectedDate.toISOString().split("T")[0]}`
+              const taskKey = `${o.event.id}-${toDateKey(o.date)}`
               const isCompleted = !!completed[taskKey]
               return (
                 <li
@@ -127,7 +126,7 @@ export function EventsPanel({
                 return (
                   <div key={cat} className="flex flex-col gap-2">
                     <h3 className="text-[11px] font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">{meta.label}</h3>
-                    <ul className="flex flex-col gap-1.5">
+                    <ul className="flex flex-col gap-1.5 stagger">
                       {catEvents.map((event) => (
                         <li key={event.id}>
                           <button

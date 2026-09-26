@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect, useCallback, useRef, type ReactNode } from "react"
 import { supabase } from "./supabase"
-import { setUserId, uploadToCloud, downloadFromCloud, clearLocalUserData, getStoreKeys } from "./local-store"
+import { setUserId, reconcile, clearLocalUserData, getStoreKeys } from "./local-store"
 import type { User } from "@supabase/supabase-js"
 
 const POLL_INTERVAL = 30_000
@@ -41,9 +41,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const keys = getStoreKeys()
       await Promise.all(
         keys.map(async (key) => {
-          const ok = await downloadFromCloud(key)
-          if (ok) anyUpdated = true
-          else await uploadToCloud(key)
+          if ((await reconcile(key)) === "updated") anyUpdated = true
         })
       )
       if (anyUpdated) setSyncVersion((v) => v + 1)
@@ -54,6 +52,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!supabase) {
+      // Dev only: without Supabase credentials run as a local demo user (stripped from production builds)
+      if (import.meta.env.DEV) {
+        void import("./demo-seed").then(({ seedDemoData }) => {
+          seedDemoData()
+          setUser({ id: "demo-user", email: "demo@local" } as User)
+          setLoading(false)
+        })
+        return
+      }
       setLoading(false)
       return
     }
@@ -107,8 +114,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!user) return
-    const id = setInterval(() => syncDown(user), POLL_INTERVAL)
-    return () => clearInterval(id)
+    // Poll only while the tab is visible; catch up as soon as it becomes visible again
+    const id = setInterval(() => {
+      if (!document.hidden) syncDown(user)
+    }, POLL_INTERVAL)
+    const onVisible = () => {
+      if (!document.hidden) syncDown(user)
+    }
+    document.addEventListener("visibilitychange", onVisible)
+    return () => {
+      clearInterval(id)
+      document.removeEventListener("visibilitychange", onVisible)
+    }
   }, [user, syncDown])
 
   async function signUp(email: string, password: string): Promise<string | null> {

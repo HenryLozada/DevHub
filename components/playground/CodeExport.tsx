@@ -64,13 +64,13 @@ export function CodeExport({ meta, values, integrationSnippet }: Props) {
         </div>
         <button
           onClick={handleCopy}
-          className="flex items-center gap-1 px-2.5 py-1.5 text-[10px] font-mono font-bold uppercase tracking-wider border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-900 text-zinc-600 dark:text-zinc-400 hover:text-[#76b900] transition-colors rounded-none cursor-pointer"
+          className="flex items-center gap-1 px-2.5 py-1.5 text-[10px] font-mono font-bold uppercase tracking-wider border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-900 text-zinc-600 dark:text-zinc-400 hover:text-[#76b900] transition-colors rounded-lg cursor-pointer"
         >
           {copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
           {copied ? "Copiado" : "Copiar"}
         </button>
       </div>
-      <pre className="w-full overflow-x-auto bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-none p-4 text-xs font-mono text-zinc-700 dark:text-zinc-300 leading-relaxed select-all">
+      <pre className="w-full overflow-x-auto bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-4 text-xs font-mono text-zinc-700 dark:text-zinc-300 leading-relaxed select-all">
         <code>{code}</code>
       </pre>
     </div>

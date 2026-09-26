@@ -1,34 +1,17 @@
 import type { APIRoute } from "astro"
+import { lookup } from "node:dns/promises"
+import { isIP } from "node:net"
+import { getSessionUser, isRateLimited, json } from "@/lib/server-auth"
+import { isPrivateIp } from "@/lib/ip-safety"
 
 export const prerender = false
 
 const GROQ_API_KEY = import.meta.env.GROQ_API_KEY
-const BLOCKED_HOSTS = new Set([
-  "localhost",
-  "127.0.0.1",
-  "0.0.0.0",
-  "::1",
-  "metadata.google.internal",
-])
+const RATE_LIMIT = 20
+const MAX_REDIRECTS = 3
+const BLOCKED_HOSTS = new Set(["localhost", "metadata.google.internal"])
 
-function isPrivateIp(hostname: string): boolean {
-  if (BLOCKED_HOSTS.has(hostname.toLowerCase())) return true
-  if (hostname.endsWith(".local") || hostname.endsWith(".internal")) return true
-
-  const ipv4 = hostname.match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/)
-  if (ipv4) {
-    const [a, b] = [Number(ipv4[1]), Number(ipv4[2])]
-    if (a === 10) return true
-    if (a === 127) return true
-    if (a === 0) return true
-    if (a === 169 && b === 254) return true
-    if (a === 172 && b >= 16 && b <= 31) return true
-    if (a === 192 && b === 168) return true
-  }
-  return false
-}
-
-function isSafeUrl(raw: string): { ok: true; url: URL } | { ok: false; error: string } {
+async function isSafeUrl(raw: string): Promise<{ ok: true; url: URL } | { ok: false; error: string }> {
   let parsed: URL
   try {
     parsed = new URL(raw)
@@ -40,7 +23,19 @@ function isSafeUrl(raw: string): { ok: true; url: URL } | { ok: false; error: st
     return { ok: false, error: "Solo se permiten URLs http(s)" }
   }
 
-  if (isPrivateIp(parsed.hostname)) {
+  const hostname = parsed.hostname.replace(/^\[|\]$/g, "").toLowerCase()
+  if (BLOCKED_HOSTS.has(hostname) || hostname.endsWith(".local") || hostname.endsWith(".internal")) {
+    return { ok: false, error: "Host no permitido" }
+  }
+
+  // Resolve DNS so names pointing at private addresses are rejected too
+  let addresses: string[]
+  try {
+    addresses = isIP(hostname) ? [hostname] : (await lookup(hostname, { all: true })).map((r) => r.address)
+  } catch {
+    return { ok: false, error: "No se pudo resolver el host" }
+  }
+  if (addresses.length === 0 || addresses.some(isPrivateIp)) {
     return { ok: false, error: "Host no permitido" }
   }
 
@@ -89,44 +84,30 @@ export const GET: APIRoute = async ({ request, url }) => {
     })
   }
 
-  const origin = request.headers.get("origin") || ""
-  const referer = request.headers.get("referer") || ""
-  const host = request.headers.get("host") || ""
-  const sameOrigin =
-    (origin && host && origin.includes(host)) ||
-    (referer && host && referer.includes(host))
-  if (!sameOrigin) {
-    return new Response(JSON.stringify({ error: "No autorizado" }), {
-      status: 401,
-      headers: { "Content-Type": "application/json" },
-    })
-  }
-
-  const safe = isSafeUrl(target)
-  if (!safe.ok) {
-    return new Response(JSON.stringify({ error: safe.error }), {
-      status: 400,
-      headers: { "Content-Type": "application/json" },
-    })
+  const user = await getSessionUser(request)
+  if (!user) return json({ error: "No autorizado" }, 401)
+  if (isRateLimited(`metadata:${user.id}`, RATE_LIMIT)) {
+    return json({ error: "Demasiadas solicitudes. Intenta en un minuto." }, 429)
   }
 
   try {
-    const res = await fetch(safe.url.toString(), {
-      signal: AbortSignal.timeout(8000),
-      headers: { "User-Agent": "PersonalHub/1.0" },
-      redirect: "follow",
-    })
-
-    // Block redirects into private networks
-    if (res.url) {
-      const final = isSafeUrl(res.url)
-      if (!final.ok) {
-        return new Response(JSON.stringify({ error: "Redirect a host no permitido" }), {
-          status: 400,
-          headers: { "Content-Type": "application/json" },
-        })
-      }
+    // Follow redirects manually so every hop is validated against private networks
+    let current = target
+    let res: Response | null = null
+    for (let hop = 0; hop <= MAX_REDIRECTS; hop++) {
+      const safe = await isSafeUrl(current)
+      if (!safe.ok) return json({ error: safe.error }, 400)
+      res = await fetch(safe.url.toString(), {
+        signal: AbortSignal.timeout(8000),
+        headers: { "User-Agent": "PersonalHub/1.0" },
+        redirect: "manual",
+      })
+      const location = res.status >= 300 && res.status < 400 ? res.headers.get("location") : null
+      if (!location) break
+      current = new URL(location, safe.url).toString()
+      res = null
     }
+    if (!res) return json({ error: "Demasiadas redirecciones" }, 400)
 
     const html = (await res.text()).slice(0, 500_000)
 
@@ -196,3 +177,4 @@ function decodeEntities(str: string): string {
     .replace(/&#x27;/g, "'")
     .replace(/&#x2F;/g, "/")
 }
+

@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { FlickeringGrid } from "@/components/ui/flickering-grid"
 import { motion } from "motion/react"
 import { Mail, Lock } from "lucide-react"
 import { cn } from "@/lib/utils"
@@ -35,24 +36,40 @@ export function AuthScreen() {
   }
 
   return (
-    <div className="min-h-screen bg-[#fafafc] dark:bg-[#000000] flex items-center justify-center p-4 relative overflow-hidden">
-      <div className="absolute -top-20 right-10 w-72 h-72 bg-[#76b900]/5 blur-3xl rounded-full pointer-events-none" />
-      <div className="absolute -bottom-20 left-10 w-56 h-56 bg-violet-500/5 blur-3xl rounded-full pointer-events-none" />
+    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
+      <FlickeringGrid
+        className="absolute inset-0 [mask-image:radial-gradient(ellipse_at_center,black_20%,transparent_75%)]"
+        squareSize={3}
+        gridGap={7}
+        color="#76b900"
+        maxOpacity={0.35}
+        flickerChance={0.12}
+      />
+      <motion.div
+        aria-hidden
+        animate={{ scale: [1, 1.15, 1], opacity: [0.35, 0.6, 0.35] }}
+        transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+        className="absolute size-[28rem] rounded-full bg-[#76b900]/20 blur-3xl pointer-events-none"
+      />
 
       <motion.div
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3 }}
-        className={cn(GLASS, "w-full max-w-sm rounded-sm p-4 sm:p-8 shadow-sm")}
+        initial={{ opacity: 0, y: 24, scale: 0.96 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ type: "spring", stiffness: 260, damping: 24 }}
+        className={cn(GLASS, "relative w-full max-w-sm rounded-2xl p-5 sm:p-8 shadow-2xl shadow-black/20")}
       >
         {/* Logo */}
-        <div className="flex items-center gap-2.5 mb-6 justify-center">
-          <div className="w-9 h-9 bg-zinc-900 dark:bg-zinc-800 border border-zinc-700 flex items-center justify-center relative">
-            <div className="absolute top-0 left-0 w-2 h-2 bg-[#76b900]" />
-            <span className="text-[#76b900] font-bold font-mono text-sm tracking-tight">P</span>
-          </div>
+        <div className="flex items-center gap-3 mb-6 justify-center">
+          <motion.div
+            initial={{ rotate: -20, scale: 0.6 }}
+            animate={{ rotate: 0, scale: 1 }}
+            transition={{ type: "spring", stiffness: 300, damping: 14, delay: 0.1 }}
+            className="w-11 h-11 rounded-xl bg-gradient-to-br from-[#76b900] to-[#b6f03a] flex items-center justify-center shadow-[0_0_24px_rgba(118,185,0,0.55)]"
+          >
+            <span className="text-black font-black font-mono text-lg tracking-tight">P</span>
+          </motion.div>
           <div>
-            <h1 className="text-sm font-bold text-zinc-900 dark:text-white font-mono uppercase tracking-wider">PersonalHub</h1>
+            <h1 className="text-base font-bold text-zinc-900 dark:text-white tracking-tight">Personal<span className="text-brand-gradient">Hub</span></h1>
             <p className="text-[9px] font-mono text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Tu espacio personal</p>
           </div>
         </div>

@@ -20,7 +20,7 @@ export function ChoresApp() {
   }, [reload])
 
   return (
-    <div className="min-h-screen bg-[#fafafc] dark:bg-[#000000]">
+    <div className="min-h-screen">
       <ModuleNav
         icon={<CheckCircle2 className="w-4 h-4 text-[#76b900]" />}
         title="Tareas"

@@ -9,6 +9,9 @@ export default defineConfig({
   adapter: vercel(),
   integrations: [react()],
   vite: {
-    plugins: [tailwindcss()]
+    plugins: [tailwindcss()],
+    define: {
+      __BUILD_ID__: JSON.stringify(Date.now().toString(36)),
+    },
   }
 });

@@ -1,8 +1,11 @@
 import { useState, useRef, useEffect } from "react"
+import { authFetch } from "@/lib/ai"
 import { motion, AnimatePresence } from "motion/react"
 import { Terminal, Bot, User, CornerDownLeft, Sparkles } from "lucide-react"
 import { saveDevItem } from "../store"
-import { DevItem, DevItemType } from "../types"
+import { sealSecrets } from "../security"
+import { useVaultUnlock } from "./useVaultUnlock"
+import type { DevItemType } from "../types"
 import { sileo } from "sileo"
 import { cn } from "@/lib/utils"
 
@@ -67,6 +70,7 @@ function UserMessage({ msg }: { msg: Message }) {
 }
 
 export function DevBotChat({ onItemAdded }: DevBotChatProps) {
+  const { requestUnlock, dialog } = useVaultUnlock()
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "bot",
@@ -77,11 +81,13 @@ export function DevBotChat({ onItemAdded }: DevBotChatProps) {
   ])
   const [input, setInput] = useState("")
   const [isTyping, setIsTyping] = useState(false)
-  const chatEndRef = useRef<HTMLDivElement>(null)
+  const messagesRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
 
   useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: "smooth" })
+    // Scroll only the message list; scrollIntoView would also scroll the whole page on mount
+    const el = messagesRef.current
+    if (el) el.scrollTo({ top: el.scrollHeight, behavior: "smooth" })
   }, [messages, isTyping])
 
   function addMessage(msg: Message) {
@@ -96,15 +102,15 @@ export function DevBotChat({ onItemAdded }: DevBotChatProps) {
     setInput("")
     setIsTyping(true)
 
-    let type: DevItemType = "note"
-    let title = ""
-    let description = ""
+    let type: DevItemType
+    let title: string
+    let description: string
     let url = ""
     let content = ""
     let apiKey = ""
     let username = ""
     let password = ""
-    let category = "General"
+    let category: string
 
     if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
       url = trimmed
@@ -114,13 +120,15 @@ export function DevBotChat({ onItemAdded }: DevBotChatProps) {
       let metaTitle: string | null = null
       let metaDesc: string | null = null
       try {
-        const metaRes = await fetch(`/api/metadata?url=${encodeURIComponent(trimmed)}`)
+        const metaRes = await authFetch(`/api/metadata?url=${encodeURIComponent(trimmed)}`)
         if (metaRes.ok) {
           const metaData = await metaRes.json()
           metaTitle = metaData.title || null
           metaDesc = metaData.description || null
         }
-      } catch (_) {}
+      } catch {
+        /* metadata is optional */
+      }
 
       if (urlObj.hostname.includes("youtube.com") || urlObj.hostname.includes("youtu.be")) {
         type = "youtube"
@@ -194,19 +202,20 @@ export function DevBotChat({ onItemAdded }: DevBotChatProps) {
       credential: { label: "Credencial", icon: "🔒" },
     }
 
-    await new Promise(r => setTimeout(r, 400 + Math.random() * 600))
-
     try {
+      const secrets = { apiKey: apiKey || undefined, password: password || undefined }
+      if ((secrets.apiKey || secrets.password) && !(await requestUnlock())) {
+        throw new Error("PIN requerido para guardar credenciales")
+      }
       saveDevItem({
         title,
         description,
         type,
         url: url || undefined,
         content: content || undefined,
-        apiKey: apiKey || undefined,
         username: username || undefined,
-        password: password || undefined,
         category,
+        ...(await sealSecrets(secrets)),
       })
       onItemAdded()
       sileo.success({
@@ -220,10 +229,10 @@ export function DevBotChat({ onItemAdded }: DevBotChatProps) {
         timestamp: new Date(),
         type,
       })
-    } catch {
+    } catch (err) {
       addMessage({
         role: "bot",
-        content: "⚠️ Ocurrió un error al guardar. Intenta de nuevo.",
+        content: `⚠️ ${err instanceof Error && err.message.startsWith("PIN") ? err.message : "Ocurrió un error al guardar. Intenta de nuevo."}`,
         timestamp: new Date(),
         type: "error",
       })
@@ -240,6 +249,7 @@ export function DevBotChat({ onItemAdded }: DevBotChatProps) {
 
   return (
     <div className={cn("rounded-sm overflow-hidden flex flex-col", GLASS)}>
+      {dialog}
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-white/30 dark:border-white/10">
         <div className="flex items-center gap-2.5">
@@ -259,7 +269,7 @@ export function DevBotChat({ onItemAdded }: DevBotChatProps) {
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 min-h-[280px] max-h-[420px] scrollbar-thin">
+      <div ref={messagesRef} className="flex-1 overflow-y-auto p-4 space-y-4 min-h-[280px] max-h-[420px] scrollbar-thin">
         <AnimatePresence>
           {messages.map((msg, i) =>
             msg.role === "bot" ? (
@@ -287,7 +297,6 @@ export function DevBotChat({ onItemAdded }: DevBotChatProps) {
           </motion.div>
         )}
 
-        <div ref={chatEndRef} />
       </div>
 
       {/* Input */}

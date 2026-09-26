@@ -7,7 +7,7 @@ import { getChatHistory, addChatMessage, clearChatHistory } from "../store"
 import { MessageBubble } from "./MessageBubble"
 import { ChatInput } from "./ChatInput"
 import { askAI } from "@/lib/ai"
-import { parseActions } from "../actions"
+import { parseActions, type PendingAction } from "../actions"
 import { getAvatar, setAvatar } from "@/lib/avatar"
 
 interface ChatPanelProps {
@@ -65,6 +65,7 @@ function pickSuggestions(count = 5) {
 export function ChatPanel({ isOpen, onClose }: ChatPanelProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [loading, setLoading] = useState(false)
+  const [pending, setPending] = useState<PendingAction[]>([])
   const scrollRef = useRef<HTMLDivElement>(null)
   const [suggestions] = useState(() => pickSuggestions(5))
   const [avatar, setAvatarState] = useState<string | null>(null)
@@ -117,8 +118,8 @@ export function ChatPanel({ isOpen, onClose }: ChatPanelProps) {
             url: item.url,
             category: item.category,
             description: item.description,
-            hasCredential: Boolean(item.password || item.username),
-            hasApiKey: Boolean(item.apiKey),
+            hasCredential: Boolean(item.password || item.username || (item.type === "credential" && item.secretEnc)),
+            hasApiKey: Boolean(item.apiKey || (item.type === "api" && item.secretEnc)),
           }))
         )
       } catch {
@@ -173,7 +174,8 @@ ACCIONES (solo si el usuario pide crear/guardar/eliminar/completar):
       const response = await askAI(text, systemPrompt + "\n" + contextData)
       const hasActionIntent = /crea|guarda|agrega|a[ñn]ade|completa|termina|marca|elimina|borra|registra|inserta|nuev/i.test(text)
       const safeResponse = hasActionIntent ? response : response.replace(/\|ACTION\|\s*\{[\s\S]*?\}\s*\|END\|/gi, "")
-      const { cleanText, results } = parseActions(safeResponse)
+      const { cleanText, results, pending: newPending } = parseActions(safeResponse)
+      setPending(newPending)
       const botMsg = addChatMessage({ role: "bot", text: cleanText })
       setMessages(prev => [...prev, botMsg])
       for (const result of results) {
@@ -185,6 +187,15 @@ ACCIONES (solo si el usuario pide crear/guardar/eliminar/completar):
       setMessages(prev => [...prev, errorMsg])
     } finally {
       setLoading(false)
+    }
+  }
+
+  const resolvePending = (confirm: boolean) => {
+    const texts = confirm ? pending.map((a) => a.run()) : ["❌ Eliminación cancelada"]
+    setPending([])
+    for (const text of texts) {
+      const msg = addChatMessage({ role: "bot", text })
+      setMessages(prev => [...prev, msg])
     }
   }
 
@@ -218,8 +229,8 @@ ACCIONES (solo si el usuario pide crear/guardar/eliminar/completar):
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 20, scale: 0.97 }}
           transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-          className={cn("fixed bottom-24 right-3 md:right-6 left-3 md:left-auto w-auto md:w-[26rem] flex flex-col z-50 rounded-sm overflow-hidden", GLASS)}
-          style={{ height: "520px", maxHeight: "80vh" }}
+          className={cn("fixed bottom-40 md:bottom-24 right-3 md:right-6 left-3 md:left-auto w-auto md:w-[26rem] flex flex-col z-50 rounded-sm overflow-hidden", GLASS)}
+          style={{ height: "520px", maxHeight: "calc(100dvh - 12rem)" }}
         >
           <div className="flex items-center justify-between px-4 py-3 border-b border-white/30 dark:border-white/10 shrink-0">
             <div className="flex items-center gap-2.5">
@@ -276,6 +287,19 @@ ACCIONES (solo si el usuario pide crear/guardar/eliminar/completar):
               </div>
             )}
           </div>
+
+          {pending.length > 0 && (
+            <div className="border-t border-red-500/20 bg-red-500/5 px-4 py-3 shrink-0 space-y-2">
+              <p className="text-[10px] font-mono font-bold uppercase tracking-wider text-red-500">Confirmar eliminación</p>
+              <ul className="text-xs text-zinc-600 dark:text-zinc-300 space-y-0.5">
+                {pending.map((a, i) => <li key={i}>• {a.label}</li>)}
+              </ul>
+              <div className="flex gap-2">
+                <button onClick={() => resolvePending(true)} className="px-3 py-1 text-xs font-mono rounded-sm bg-red-500 text-white hover:bg-red-600 cursor-pointer">Eliminar</button>
+                <button onClick={() => resolvePending(false)} className="px-3 py-1 text-xs font-mono rounded-sm border border-zinc-300 dark:border-zinc-700 text-zinc-600 dark:text-zinc-300 cursor-pointer">Cancelar</button>
+              </div>
+            </div>
+          )}
 
           <div className="border-t border-white/30 dark:border-white/10 p-3 shrink-0">
             <ChatInput onSend={handleSend} disabled={loading} />

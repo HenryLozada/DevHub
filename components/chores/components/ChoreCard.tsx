@@ -29,7 +29,7 @@ export function ChoreCard({ chore, onEdit, onDelete, onToggle }: ChoreCardProps)
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.95 }}
       className={cn(
-        "group flex items-start gap-4 p-4 rounded-none border transition-all relative overflow-hidden",
+        "group flex items-start gap-4 p-4 rounded-lg border transition-all relative overflow-hidden",
         isDone
           ? "bg-zinc-50 dark:bg-zinc-900/30 border-zinc-200 dark:border-zinc-800 opacity-60"
           : "bg-white dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800 hover:border-[#76b900]/30 shadow-xs"
@@ -49,12 +49,12 @@ export function ChoreCard({ chore, onEdit, onDelete, onToggle }: ChoreCardProps)
         {chore.description && <p className="text-xs text-zinc-400 mt-0.5 line-clamp-1">{chore.description}</p>}
         <div className="flex items-center gap-2 mt-1.5 flex-wrap">
           {chore.color && (
-            <span className={cn("w-2 h-2 rounded-none shrink-0", COLOR_BORDER[chore.color]?.replace("border-", "bg-").replace("dark:border-", "dark:bg-"))} />
+            <span className={cn("w-2 h-2 rounded-full shrink-0", COLOR_BORDER[chore.color]?.replace("border-", "bg-").replace("dark:border-", "dark:bg-"))} />
           )}
           {chore.dueDate && (
             <span
               className={cn(
-                "text-[9px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded-none border",
+                "text-[9px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded-md border",
                 isBefore((() => { const [y,m,d]=chore.dueDate!.split("-").map(Number); return new Date(y, m-1, d) })(), startOfDay(new Date())) && !isDone
                   ? "bg-red-50 text-red-700 border-red-200 dark:bg-red-950/30 dark:text-red-400 dark:border-red-900/30"
                   : "bg-zinc-100 text-zinc-500 border-zinc-200 dark:bg-zinc-900 dark:text-zinc-400 dark:border-zinc-800"
@@ -66,8 +66,8 @@ export function ChoreCard({ chore, onEdit, onDelete, onToggle }: ChoreCardProps)
         </div>
       </div>
       <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
-        <button onClick={onEdit} className="p-1.5 hover:bg-[#76b900]/10 text-zinc-400 hover:text-[#76b900] rounded-none transition-colors border border-transparent hover:border-[#76b900]/20"><Pencil className="w-3.5 h-3.5" /></button>
-        <button onClick={onDelete} className="p-1.5 hover:bg-red-500/10 text-zinc-400 hover:text-red-500 rounded-none transition-colors border border-transparent hover:border-red-500/20"><Trash2 className="w-3.5 h-3.5" /></button>
+        <button onClick={onEdit} className="p-1.5 hover:bg-[#76b900]/10 text-zinc-400 hover:text-[#76b900] rounded-lg transition-colors border border-transparent hover:border-[#76b900]/20"><Pencil className="w-3.5 h-3.5" /></button>
+        <button onClick={onDelete} className="p-1.5 hover:bg-red-500/10 text-zinc-400 hover:text-red-500 rounded-lg transition-colors border border-transparent hover:border-red-500/20"><Trash2 className="w-3.5 h-3.5" /></button>
       </div>
     </motion.div>
   )

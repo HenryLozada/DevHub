@@ -114,9 +114,9 @@ export function Dashboard() {
       </div>
 
       {/* Stats Widgets */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 stagger">
         {/* Total Items */}
-        <div className="relative border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-3 md:p-5 rounded-none overflow-hidden select-none">
+        <div className="relative border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-3 md:p-5 rounded-lg overflow-hidden select-none">
           <div className="corner-square" />
           <div className="flex justify-between items-start">
             <div className="min-w-0">
@@ -132,7 +132,7 @@ export function Dashboard() {
         </div>
 
         {/* Tools */}
-        <div className="relative border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-3 md:p-5 rounded-none overflow-hidden select-none">
+        <div className="relative border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-3 md:p-5 rounded-lg overflow-hidden select-none">
           <div className="corner-square" />
           <div className="flex justify-between items-start">
             <div className="min-w-0">
@@ -148,7 +148,7 @@ export function Dashboard() {
         </div>
 
         {/* Repositories */}
-        <div className="relative border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-3 md:p-5 rounded-none overflow-hidden select-none">
+        <div className="relative border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-3 md:p-5 rounded-lg overflow-hidden select-none">
           <div className="corner-square" />
           <div className="flex justify-between items-start">
             <div className="min-w-0">
@@ -164,7 +164,7 @@ export function Dashboard() {
         </div>
 
         {/* Credentials / API Keys */}
-        <div className="relative border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-3 md:p-5 rounded-none overflow-hidden select-none">
+        <div className="relative border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-3 md:p-5 rounded-lg overflow-hidden select-none">
           <div className="corner-square" />
           <div className="flex justify-between items-start">
             <div className="min-w-0">
@@ -223,14 +223,14 @@ export function Dashboard() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Buscar por título, descripción, categoría..."
-            className="w-full pl-9 pr-4 py-2 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-none text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:border-[#76b900] font-sans text-xs transition-colors"
+            className="w-full pl-9 pr-4 py-2 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:border-[#76b900] font-sans text-xs transition-colors"
           />
         </div>
       </div>
 
       {/* Grid Layout of Items */}
       {filteredItems.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 stagger">
           {filteredItems.map((item) => (
             <ItemCard
               key={item.id}
@@ -241,8 +241,8 @@ export function Dashboard() {
           ))}
         </div>
       ) : (
-        <div className="text-center py-16 border border-dashed border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/10">
-          <Layers className="w-10 h-10 text-zinc-300 dark:text-zinc-700 mx-auto mb-3" />
+        <div className="text-center py-16 rounded-2xl border border-dashed border-zinc-300 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/10">
+          <Layers className="w-10 h-10 text-[#76b900] mx-auto mb-3 animate-bounce [animation-duration:2.4s]" />
           <p className="text-sm font-mono font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
             No se encontraron elementos
           </p>

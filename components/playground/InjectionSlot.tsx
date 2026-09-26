@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from "react"
-import { getInjections, type InjectedComponent } from "./injection-store"
-import { getComponentById } from "./registry"
+import { getInjections } from "./injection-store"
+
+type Registry = typeof import("./registry")
 
 interface Props {
   moduleId: string
@@ -10,6 +11,8 @@ interface Props {
 
 export function InjectionSlot({ moduleId, slot = "background", className }: Props) {
   const [version, setVersion] = useState(0)
+  // The registry pulls in every animated background; load it only when something is injected
+  const [registry, setRegistry] = useState<Registry | null>(null)
 
   useEffect(() => {
     const handler = () => setVersion((v) => v + 1)
@@ -21,21 +24,21 @@ export function InjectionSlot({ moduleId, slot = "background", className }: Prop
     }
   }, [])
 
-  const rendered = useMemo(() => {
-    const config = getInjections()
-    const injection: InjectedComponent | null = config[moduleId]?.[slot] ?? null
-    if (!injection) return null
-
-    const meta = getComponentById(injection.componentId)
-    if (!meta || !meta.component) return null
-
-    const Comp = meta.component
-    const props = meta.transformProps
-      ? meta.transformProps(injection.props as Record<string, unknown>)
-      : injection.props
-    return <Comp {...(props as any)} className={className} />
+  const injection = useMemo(
+    () => getInjections()[moduleId]?.[slot] ?? null,
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [version, moduleId, slot, className])
+    [version, moduleId, slot]
+  )
 
-  return rendered
+  useEffect(() => {
+    if (injection && !registry) void import("./registry").then(setRegistry)
+  }, [injection, registry])
+
+  if (!injection || !registry) return null
+  const meta = registry.getComponentById(injection.componentId)
+  if (!meta || !meta.component) return null
+
+  const Comp = meta.component
+  const props = meta.transformProps ? meta.transformProps(injection.props) : injection.props
+  return <Comp {...(props as any)} className={className} />
 }

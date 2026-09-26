@@ -40,7 +40,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
               onClick={() => window.location.reload()}
               rippleColor="#ffffff"
               duration="600ms"
-              className="rounded-full bg-[#0066cc] px-5 py-2.5 text-sm font-medium text-white hover:bg-[#0077ed] transition-colors overflow-hidden"
+              className="rounded-full bg-[#76b900] px-5 py-2.5 text-sm font-semibold text-black hover:bg-[#86cb10] transition-colors overflow-hidden"
             >
               Recargar pagina
             </RippleButton>

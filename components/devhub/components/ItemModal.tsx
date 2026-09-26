@@ -1,4 +1,7 @@
 import React, { useState, useEffect, useRef, type FormEvent } from "react";
+import { authFetch } from "@/lib/ai";
+import { getPasswordSecurity, isUnlocked, openSecrets, sealSecrets } from "../security";
+import { useVaultUnlock } from "./useVaultUnlock";
 import { motion } from "motion/react";
 import { X } from "lucide-react";
 import { DevItem, DevItemType } from "../types";
@@ -25,6 +28,20 @@ export function ItemModal({ item, onClose, onSaved }: ItemModalProps) {
   const [username, setUsername] = useState(item?.username ?? "");
   const [password, setPassword] = useState(item?.password ?? "");
   const [metaLoading, setMetaLoading] = useState(false);
+  // Encrypted items: secrets are only prefilled when the vault is unlocked; otherwise blank = keep as is
+  const [secretsLoaded, setSecretsLoaded] = useState(!item?.secretEnc);
+  const { requestUnlock, dialog } = useVaultUnlock();
+
+  useEffect(() => {
+    if (!item?.secretEnc || !isUnlocked()) return;
+    openSecrets(item)
+      .then((s) => {
+        setApiKey(s.apiKey ?? "");
+        setPassword(s.password ?? "");
+        setSecretsLoaded(true);
+      })
+      .catch(() => undefined);
+  }, [item]);
   const userTouchedTitle = useRef(false);
   const userTouchedDesc = useRef(false);
 
@@ -49,7 +66,7 @@ export function ItemModal({ item, onClose, onSaved }: ItemModalProps) {
       setMetaLoading(true);
       try {
         const targetUrl = url.trim();
-        const res = await fetch(`/api/metadata?url=${encodeURIComponent(targetUrl)}`)
+        const res = await authFetch(`/api/metadata?url=${encodeURIComponent(targetUrl)}`)
         if (!res.ok) return;
         const data = await res.json();
         if (data.title && !userTouchedTitle.current) setTitle(data.title);
@@ -105,6 +122,27 @@ export function ItemModal({ item, onClose, onSaved }: ItemModalProps) {
       }
     }
 
+    const secretInput = {
+      apiKey: type === "api" ? apiKey.trim() || undefined : undefined,
+      password: type === "credential" ? password.trim() || undefined : undefined,
+    };
+    const hasNewSecrets = Boolean(secretInput.apiKey || secretInput.password);
+    // Blank fields on a still-encrypted item mean "unchanged"
+    const keepExisting = !hasNewSecrets && !secretsLoaded && !!item?.secretEnc;
+
+    if (hasNewSecrets && getPasswordSecurity().enabled && !(await requestUnlock())) {
+      sileo.error({ title: "PIN requerido", description: "Desbloquea DevHub para guardar credenciales." });
+      return;
+    }
+
+    let sealed;
+    try {
+      sealed = keepExisting ? { secretEnc: item!.secretEnc } : await sealSecrets(secretInput);
+    } catch {
+      sileo.error({ title: "Error", description: "No se pudieron cifrar las credenciales." });
+      return;
+    }
+
     // Prepare payload
     const payload = {
       title: finalTitle,
@@ -113,9 +151,10 @@ export function ItemModal({ item, onClose, onSaved }: ItemModalProps) {
       category,
       url: ["tool", "repo", "youtube"].includes(type) ? url.trim() : undefined,
       content: type === "note" ? content.trim() : undefined,
-      apiKey: type === "api" ? apiKey.trim() : undefined,
       username: type === "credential" ? username.trim() : undefined,
-      password: type === "credential" ? password.trim() : undefined,
+      apiKey: undefined,
+      password: undefined,
+      ...sealed,
     };
 
     try {
@@ -125,6 +164,9 @@ export function ItemModal({ item, onClose, onSaved }: ItemModalProps) {
       } else {
         saveDevItem(payload);
         sileo.success({ title: "Elemento creado", description: `"${payload.title}" agregado al DevHub.` });
+      }
+      if (hasNewSecrets && !getPasswordSecurity().enabled) {
+        sileo.info({ title: "Credencial sin cifrar", description: "Activa el PIN en DevHub → Seguridad para cifrar tus credenciales." });
       }
       onSaved();
       onClose();
@@ -149,7 +191,7 @@ export function ItemModal({ item, onClose, onSaved }: ItemModalProps) {
         initial={{ opacity: 0, scale: 0.95, y: 15 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: 15 }}
-        className="relative w-full max-w-lg bg-[#ffffff] dark:bg-[#121212] border border-zinc-200 dark:border-zinc-800 rounded-none shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
+        className="relative w-full max-w-lg bg-[#ffffff] dark:bg-[#121212] border border-zinc-200 dark:border-zinc-800 rounded-lg shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
       >
         {/* Signature NVIDIA green corner square */}
         <div className="corner-square" />
@@ -181,7 +223,7 @@ export function ItemModal({ item, onClose, onSaved }: ItemModalProps) {
               value={title}
               onChange={(e) => { setTitle(e.target.value); userTouchedTitle.current = true }}
               placeholder="ej. GitHub Copilot, Servidor de Producción..."
-              className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-none text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:border-[#76b900] font-sans text-sm transition-colors"
+              className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:border-[#76b900] font-sans text-sm transition-colors"
             />
           </div>
 
@@ -194,7 +236,7 @@ export function ItemModal({ item, onClose, onSaved }: ItemModalProps) {
               <select
                 value={type}
                 onChange={(e) => setType(e.target.value as DevItemType)}
-                className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-none text-zinc-900 dark:text-white text-sm focus:outline-none focus:border-[#76b900] transition-colors"
+                className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg text-zinc-900 dark:text-white text-sm focus:outline-none focus:border-[#76b900] transition-colors"
               >
                 <option value="tool">Herramienta (Tool)</option>
                 <option value="repo">Repositorio (GitHub)</option>
@@ -211,7 +253,7 @@ export function ItemModal({ item, onClose, onSaved }: ItemModalProps) {
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-none text-zinc-900 dark:text-white text-sm focus:outline-none focus:border-[#76b900] transition-colors"
+                className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg text-zinc-900 dark:text-white text-sm focus:outline-none focus:border-[#76b900] transition-colors"
               >
                 {CATEGORIES.map((cat) => (
                   <option key={cat} value={cat}>
@@ -232,7 +274,7 @@ export function ItemModal({ item, onClose, onSaved }: ItemModalProps) {
               value={description}
               onChange={(e) => { setDescription(e.target.value); userTouchedDesc.current = true }}
               placeholder="Detalles sobre este recurso..."
-              className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-none text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:border-[#76b900] text-sm resize-none transition-colors"
+              className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:border-[#76b900] text-sm resize-none transition-colors"
             />
           </div>
 
@@ -248,7 +290,7 @@ export function ItemModal({ item, onClose, onSaved }: ItemModalProps) {
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
                 placeholder="https://..."
-                className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-none text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:border-[#76b900] font-sans text-sm transition-colors"
+                className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:border-[#76b900] font-sans text-sm transition-colors"
               />
               {metaLoading && (
                 <span className="inline-block mt-1.5 text-[10px] font-mono text-zinc-400 animate-pulse">
@@ -269,7 +311,7 @@ export function ItemModal({ item, onClose, onSaved }: ItemModalProps) {
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 placeholder="Escribe tu código, snippet o apuntes aquí..."
-                className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-none text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:border-[#76b900] font-mono text-xs resize-y transition-colors"
+                className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:border-[#76b900] font-mono text-xs resize-y transition-colors"
               />
             </div>
           )}
@@ -284,8 +326,8 @@ export function ItemModal({ item, onClose, onSaved }: ItemModalProps) {
                 required
                 value={apiKey}
                 onChange={(e) => setApiKey(e.target.value)}
-                placeholder="sk-proj-..."
-                className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-none text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:border-[#76b900] font-mono text-sm transition-colors"
+                placeholder={secretsLoaded ? "sk-proj-..." : "Cifrada · déjala vacía para no cambiarla"}
+                className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:border-[#76b900] font-mono text-sm transition-colors"
               />
             </div>
           )}
@@ -302,7 +344,7 @@ export function ItemModal({ item, onClose, onSaved }: ItemModalProps) {
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   placeholder="admin, email@host.com"
-                  className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-none text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:border-[#76b900] text-sm transition-colors"
+                  className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:border-[#76b900] text-sm transition-colors"
                 />
               </div>
               <div>
@@ -314,8 +356,8 @@ export function ItemModal({ item, onClose, onSaved }: ItemModalProps) {
                   autoComplete="off"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-none text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:border-[#76b900] text-sm transition-colors"
+                  placeholder={secretsLoaded ? "••••••••" : "Cifrada · vacía = sin cambios"}
+                  className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:border-[#76b900] text-sm transition-colors"
                 />
               </div>
               </div>
@@ -342,6 +384,7 @@ export function ItemModal({ item, onClose, onSaved }: ItemModalProps) {
           </div>
         </form>
       </motion.div>
+      {dialog}
     </div>
   );
 }

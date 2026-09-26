@@ -46,15 +46,15 @@
   --color-input: var(--color-hairline);
   --color-ring: #76b900;
 
-  /* NVIDIA angular geometry: 2px border radius */
-  --radius: 2px;
-  --radius-sm: 2px;
-  --radius-md: 2px;
-  --radius-lg: 2px;
-  --radius-xl: 2px;
-  --radius-2xl: 2px;
-  --radius-3xl: 2px;
-  --radius-4xl: 2px;
+  /* Soft geometry: rounded but still crisp */
+  --radius: 10px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 20px;
+  --radius-3xl: 24px;
+  --radius-4xl: 28px;
   --animate-rippling: rippling var(--duration) ease-out;
   @keyframes rippling {
   0% {
@@ -70,7 +70,7 @@
 :root {
   color-scheme: light;
   --font-poppins: 'Inter', sans-serif;
-  --radius: 2px;
+  --radius: 10px;
 }
 
 .dark {
@@ -106,7 +106,7 @@
 
   body {
     font-family: var(--font-body);
-    background-color: var(--color-canvas);
+    background-color: #f6f7f9;
     color: var(--color-ink);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -115,7 +115,7 @@
 
   /* Dark mode class overrides for bodies */
   .dark body {
-    background-color: #000000;
+    background-color: #050505;
     color: #ffffff;
   }
 
@@ -145,25 +145,102 @@
   }
 }
 
-/* NVIDIA Green Corner Square */
-.corner-square {
-  width: 10px;
-  height: 10px;
-  background-color: #76b900;
+/* Brand accent: glowing green tab on the top edge of a card (was a square corner) */
+.corner-square,
+.corner-square-br {
   position: absolute;
-  top: 0;
-  left: 0;
   z-index: 10;
+  width: 22px;
+  height: 3px;
+  border-radius: 0 0 3px 3px;
+  background: linear-gradient(90deg, #76b900, #b6f03a);
+  box-shadow: 0 0 12px rgba(118, 185, 0, 0.55);
+}
+.corner-square { top: 0; left: 16px; }
+.corner-square-br { bottom: 0; right: 16px; border-radius: 3px 3px 0 0; }
+
+/* ─── Ambient background ─── */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(60rem 40rem at 10% -10%, rgba(118, 185, 0, 0.10), transparent 60%),
+    radial-gradient(50rem 35rem at 110% 10%, rgba(56, 189, 248, 0.07), transparent 60%),
+    radial-gradient(45rem 30rem at 50% 120%, rgba(168, 85, 247, 0.06), transparent 60%);
+  animation: ambient-drift 24s ease-in-out infinite alternate;
+}
+.dark body::before {
+  background:
+    radial-gradient(60rem 40rem at 10% -10%, rgba(118, 185, 0, 0.16), transparent 60%),
+    radial-gradient(50rem 35rem at 110% 10%, rgba(56, 189, 248, 0.08), transparent 60%),
+    radial-gradient(45rem 30rem at 50% 120%, rgba(168, 85, 247, 0.08), transparent 60%);
+}
+@keyframes ambient-drift {
+  from { transform: translate3d(0, 0, 0) scale(1); }
+  to { transform: translate3d(-2%, 1.5%, 0) scale(1.05); }
 }
 
-.corner-square-br {
-  width: 10px;
-  height: 10px;
-  background-color: #76b900;
+/* ─── Motion utilities ─── */
+/* Cards: lift + glow on hover, press feedback */
+.lift {
+  transition: transform 220ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 220ms ease, border-color 220ms ease;
+}
+.lift:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 28px -12px rgba(0, 0, 0, 0.18), 0 0 0 1px rgba(118, 185, 0, 0.25);
+}
+.dark .lift:hover {
+  box-shadow: 0 12px 32px -12px rgba(118, 185, 0, 0.35), 0 0 0 1px rgba(118, 185, 0, 0.35);
+}
+.lift:active { transform: translateY(-1px) scale(0.99); }
+
+/* Children fade up one after another */
+.stagger > * {
+  animation: fade-up 420ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.stagger > *:nth-child(1) { animation-delay: 0ms; }
+.stagger > *:nth-child(2) { animation-delay: 50ms; }
+.stagger > *:nth-child(3) { animation-delay: 100ms; }
+.stagger > *:nth-child(4) { animation-delay: 150ms; }
+.stagger > *:nth-child(5) { animation-delay: 200ms; }
+.stagger > *:nth-child(6) { animation-delay: 250ms; }
+.stagger > *:nth-child(7) { animation-delay: 300ms; }
+.stagger > *:nth-child(n + 8) { animation-delay: 350ms; }
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* Soft pulse ring (today in calendar, live dots) */
+.pulse-ring { position: relative; }
+.pulse-ring::after {
+  content: "";
   position: absolute;
-  bottom: 0;
-  right: 0;
-  z-index: 10;
+  inset: -3px;
+  border-radius: inherit;
+  border: 2px solid rgba(118, 185, 0, 0.6);
+  animation: pulse-ring 2.2s ease-out infinite;
+  pointer-events: none;
+}
+@keyframes pulse-ring {
+  0% { opacity: 0.9; transform: scale(0.92); }
+  80%, 100% { opacity: 0; transform: scale(1.25); }
+}
+
+/* Brand gradient text */
+.text-brand-gradient {
+  background: linear-gradient(90deg, #76b900, #b6f03a 60%, #5eead4);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body::before, .stagger > *, .pulse-ring::after { animation: none !important; }
+  .lift, .lift:hover { transition: none; transform: none; }
 }
 
 /* Animaciones del Diálogo (scale + fade). Sin translate: el centrado lo hace el layout flex. */

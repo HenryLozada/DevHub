@@ -29,7 +29,7 @@ export function NumberControl({ def, value, onChange }: Props) {
           step={def.step ?? 1}
           value={(value as number) ?? 0}
           onChange={(e) => onChange(Number(e.target.value))}
-          className="w-16 px-2 py-1.5 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-none text-zinc-900 dark:text-white text-xs font-mono text-center focus:outline-none focus:border-[#76b900] transition-colors"
+          className="w-16 px-2 py-1.5 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg text-zinc-900 dark:text-white text-xs font-mono text-center focus:outline-none focus:border-[#76b900] transition-colors"
         />
       </div>
     </div>

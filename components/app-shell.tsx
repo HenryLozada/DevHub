@@ -1,6 +1,6 @@
 import { useState, useEffect, lazy, Suspense } from "react"
-import { motion } from "motion/react"
-import { GlobalNav } from "@/components/global-nav"
+import { motion, AnimatePresence } from "motion/react"
+import { GlobalNav, TABS, type TabId } from "@/components/global-nav"
 import { ErrorBoundary } from "@/components/error-boundary"
 import { AuthProvider, useAuth } from "@/lib/auth-store"
 import { AuthScreen } from "@/components/auth/AuthScreen"
@@ -25,7 +25,27 @@ function ModuleLoader() {
 
 function AppInner() {
   const { user, loading, syncVersion } = useAuth()
-  const [activeTab, setActiveTab] = useState<"calendar" | "budgeted" | "chores" | "devhub" | "playground">("calendar")
+  const [activeTab, setActiveTabState] = useState<TabId>(() => {
+    try {
+      const saved = localStorage.getItem("ph_active_tab") as TabId | null
+      return saved && TABS.some((t) => t.id === saved) ? saved : "calendar"
+    } catch {
+      return "calendar"
+    }
+  })
+  // +1 when moving right in the tab order, -1 when moving left (drives the slide direction)
+  const [direction, setDirection] = useState(1)
+  const setActiveTab = (next: TabId) => {
+    const idx = (id: TabId) => TABS.findIndex((t) => t.id === id)
+    setDirection(idx(next) >= idx(activeTab) ? 1 : -1)
+    setActiveTabState(next)
+    try {
+      localStorage.setItem("ph_active_tab", next)
+    } catch {
+      /* ignore */
+    }
+    window.scrollTo({ top: 0 })
+  }
   const [theme, setTheme] = useState<"light" | "dark">("light")
 
   useEffect(() => {
@@ -46,8 +66,13 @@ function AppInner() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#fafafc] dark:bg-[#000000] flex items-center justify-center">
-        <div className="w-6 h-6 border-2 border-[#76b900] border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen flex flex-col items-center justify-center gap-4">
+        <motion.div
+          animate={{ rotate: [0, 90, 180, 270, 360], borderRadius: ["30%", "50%", "30%", "50%", "30%"] }}
+          transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
+          className="size-10 bg-gradient-to-br from-[#76b900] to-[#b6f03a] shadow-[0_0_30px_rgba(118,185,0,0.5)]"
+        />
+        <p className="font-mono text-[11px] uppercase tracking-[0.3em] text-zinc-500">Cargando</p>
       </div>
     )
   }
@@ -58,35 +83,42 @@ function AppInner() {
 
   return (
     <ErrorBoundary>
-    <div className="min-h-screen flex flex-col bg-[#fafafc] dark:bg-[#000000] text-zinc-900 dark:text-zinc-100 transition-colors duration-300">
+    <div className="min-h-screen flex flex-col text-zinc-900 dark:text-zinc-100 transition-colors duration-300">
       <GlobalNav activeTab={activeTab} onTabChange={setActiveTab} theme={theme} onToggleTheme={toggleTheme} rightSlot={<UserMenu />} />
 
-      <main className="flex-1">
-        <Suspense fallback={<ModuleLoader />}>
-          {activeTab === "calendar" ? (
-            <motion.div key={`calendar-${syncVersion}`} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.2 }}>
-              <CashflowCalendar />
-            </motion.div>
-          ) : activeTab === "budgeted" ? (
-            <motion.div key={`budgeted-${syncVersion}`} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.2 }}>
-              <BudgetedApp />
-            </motion.div>
-          ) : activeTab === "chores" ? (
-            <motion.div key={`chores-${syncVersion}`} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.2 }}>
-              <ChoresApp />
-            </motion.div>
-          ) : activeTab === "devhub" ? (
-            <motion.div key={`devhub-${syncVersion}`} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.2 }}>
-              <DevHubApp />
-            </motion.div>
-          ) : (
-            <motion.div key={`playground-${syncVersion}`} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.2 }}>
-              <PlaygroundPanel />
-            </motion.div>
-          )}
-        </Suspense>
+      <main className="flex-1 overflow-x-clip pb-20 md:pb-0">
+        <AnimatePresence mode="wait" custom={direction} initial={false}>
+          <motion.div
+            key={`${activeTab}-${syncVersion}`}
+            custom={direction}
+            variants={{
+              // No filter/lingering transform: they would break sticky headers and fixed modals inside
+              enter: (d: number) => ({ opacity: 0, x: 24 * d }),
+              center: { opacity: 1, x: 0, transitionEnd: { transform: "none" } },
+              exit: (d: number) => ({ opacity: 0, x: -24 * d }),
+            }}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <Suspense fallback={<ModuleLoader />}>
+              {activeTab === "calendar" ? (
+                <CashflowCalendar />
+              ) : activeTab === "budgeted" ? (
+                <BudgetedApp />
+              ) : activeTab === "chores" ? (
+                <ChoresApp />
+              ) : activeTab === "devhub" ? (
+                <DevHubApp />
+              ) : (
+                <PlaygroundPanel />
+              )}
+            </Suspense>
+          </motion.div>
+        </AnimatePresence>
       </main>
-      <Toaster position="bottom-right" offset={16} theme="system" />
+      <Toaster position="top-center" offset={80} theme="system" />
       <PwaBootstrap />
       <Suspense fallback={null}>
         <DevBot />

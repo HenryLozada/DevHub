@@ -23,7 +23,11 @@ npm run dev
 - `npm run dev` — servidor local
 - `npm run build` — build de producción
 - `npm run check` — typecheck Astro
+- `npm run lint` — ESLint
+- `npm test` — tests (Vitest)
 - `npm run preview` — preview del build
+
+CI (GitHub Actions) ejecuta check, lint, test y build en cada push a `main` y en cada PR.
 
 ## Variables de entorno
 
@@ -37,11 +41,24 @@ En Vercel: Settings → Environment Variables → `GROQ_API_KEY` (Sensitive).
 
 ## Supabase
 
-Ejecuta `supabase-schema.sql` en el SQL Editor del proyecto (incluye `updated_at` y RLS).
+Ejecuta `supabase-schema.sql` en el SQL Editor del proyecto (incluye `updated_at` y RLS). Es idempotente: vuelve a ejecutarlo cuando se agreguen tablas (p. ej. `devhub_vault`).
+
+La sincronización hace merge por ítem (`lib/sync-merge.ts`): si editas en dos dispositivos se conservan los cambios de ambos, y los borrados se propagan.
+
+## Supabase sin pausas
+
+El plan gratuito de Supabase pausa el proyecto tras ~7 días sin actividad. Un Vercel Cron (`vercel.json`) llama a `/api/keepalive` todos los días a las 09:17 UTC, y ese endpoint hace una consulta mínima a la base de datos.
+
+- Revísalo en Vercel → Settings → Cron Jobs; desde ahí puedes ejecutarlo a mano.
+- Recomendado: agrega `CRON_SECRET` (valor aleatorio largo) en las variables de entorno de Vercel. Vercel lo envía automáticamente en sus crons, y así nadie más puede llamar al endpoint.
 
 ## Seguridad
 
-- Credenciales DevHub se guardan en local/cloud; activa el **PIN global** en DevHub → Seguridad.
-- El PIN y el código de recuperación se almacenan hasheados (SHA-256).
-- DevBot **no** envía contraseñas ni API keys al modelo.
-- `/api/chat` y `/api/metadata` validan origen y limitan abuso.
+- Activa el **PIN** en DevHub → Seguridad: las contraseñas y API keys se cifran (AES-GCM) con una clave maestra protegida por el PIN (PBKDF2) y por el código de recuperación. Solo se sincroniza el material cifrado; el PIN nunca sale del dispositivo. Usa 6–8 dígitos.
+- Sin PIN activo, las credenciales se guardan sin cifrar.
+- DevBot **no** envía contraseñas ni API keys al modelo, y pide confirmación antes de eliminar datos.
+- `/api/chat` y `/api/metadata` exigen sesión de Supabase válida y limitan solicitudes por usuario. `/api/metadata` bloquea IPs privadas en cada redirección.
+
+## Limitaciones conocidas
+
+- **Recordatorios con la app cerrada:** se programan dentro del service worker con `setTimeout`, y el navegador lo suspende cuando la app no está abierta. Para recibirlos siempre haría falta Web Push (VAPID) con un cron en el servidor.

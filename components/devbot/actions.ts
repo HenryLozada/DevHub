@@ -1,7 +1,7 @@
-import { saveDevItem, deleteDevItem, updateDevItem } from "@/components/devhub/store";
+import { getDevItems, saveDevItem, deleteDevItem, updateDevItem } from "@/components/devhub/store";
 import type { DevItemType } from "@/components/devhub/types";
-import { saveChore, deleteChore, updateChore } from "@/components/chores/store";
-import { saveExpense, deleteExpense } from "@/components/budgeted/store";
+import { getChores, saveChore, deleteChore, updateChore } from "@/components/chores/store";
+import { getExpenses, saveExpense, deleteExpense } from "@/components/budgeted/store";
 import { readStore, writeStore } from "@/lib/local-store";
 
 type DevHubSave = {
@@ -76,8 +76,19 @@ function notify() {
   window.dispatchEvent(new CustomEvent(EVT_NAME));
 }
 
-export function parseActions(text: string): { cleanText: string; results: string[] } {
+/** Destructive action proposed by the model; only runs after the user confirms it in the UI. */
+export interface PendingAction {
+  label: string;
+  run: () => string;
+}
+
+function isValidDate(v: unknown): v is string {
+  return typeof v === "string" && !Number.isNaN(Date.parse(v));
+}
+
+export function parseActions(text: string): { cleanText: string; results: string[]; pending: PendingAction[] } {
   const results: string[] = [];
+  const pending: PendingAction[] = [];
   const cleanText = text.replace(ACTION_RE, (_match, jsonRaw) => {
     try {
       const payload: ActionPayload = JSON.parse(jsonRaw.trim());
@@ -113,9 +124,13 @@ export function parseActions(text: string): { cleanText: string; results: string
       }
 
       if (payload.deleteDevHub) {
-        deleteDevItem(payload.deleteDevHub.id);
-        notify();
-        results.push(`🗑️ Eliminado de DevHub`);
+        const id = String(payload.deleteDevHub.id);
+        const item = getDevItems().find((i) => i.id === id);
+        if (!item) { results.push(`⚠️ Ítem de DevHub no encontrado`); return ""; }
+        pending.push({
+          label: `Eliminar de DevHub: ${item.title}`,
+          run: () => { deleteDevItem(id); notify(); return `🗑️ Eliminado de DevHub: **${item.title}**`; },
+        });
         return "";
       }
 
@@ -154,14 +169,27 @@ export function parseActions(text: string): { cleanText: string; results: string
       }
 
       if (payload.deleteChore) {
-        deleteChore(payload.deleteChore.id);
-        notify();
-        results.push(`🗑️ Tarea eliminada`);
+        const id = String(payload.deleteChore.id);
+        const chore = getChores().find((c) => c.id === id);
+        if (!chore) { results.push(`⚠️ Tarea no encontrada`); return ""; }
+        pending.push({
+          label: `Eliminar tarea: ${chore.title}`,
+          run: () => { deleteChore(id); notify(); return `🗑️ Tarea eliminada: **${chore.title}**`; },
+        });
         return "";
       }
 
       if (payload.saveCashflow) {
         const d = payload.saveCashflow;
+        if (
+          typeof d.concepto !== "string" || !d.concepto.trim() ||
+          typeof d.monto !== "number" || !Number.isFinite(d.monto) || d.monto <= 0 ||
+          (d.tipo !== "ingreso" && d.tipo !== "egreso") ||
+          (d.recurrencia !== "mensual" && d.recurrencia !== "semanal")
+        ) {
+          results.push(`⚠️ Regla de flujo inválida, no se guardó`);
+          return "";
+        }
         const rules = readStore<any[]>("cashflow_rules", []);
         const newRule = { id: crypto.randomUUID(), ...d };
         writeStore("cashflow_rules", [...rules, newRule]);
@@ -171,16 +199,30 @@ export function parseActions(text: string): { cleanText: string; results: string
       }
 
       if (payload.deleteCashflow) {
-        const id = payload.deleteCashflow.id;
-        const rules = readStore<any[]>("cashflow_rules", []).filter((r: any) => r.id !== id);
-        writeStore("cashflow_rules", rules);
-        notify();
-        results.push(`🗑️ Regla de flujo eliminada`);
+        const id = String(payload.deleteCashflow.id);
+        const rule = readStore<any[]>("cashflow_rules", []).find((r: any) => r.id === id);
+        if (!rule) { results.push(`⚠️ Regla de flujo no encontrada`); return ""; }
+        pending.push({
+          label: `Eliminar regla de flujo: ${rule.concepto ?? id}`,
+          run: () => {
+            writeStore("cashflow_rules", readStore<any[]>("cashflow_rules", []).filter((r: any) => r.id !== id));
+            notify();
+            return `🗑️ Regla de flujo eliminada`;
+          },
+        });
         return "";
       }
 
       if (payload.saveExpense) {
         const d = payload.saveExpense;
+        if (
+          typeof d.amount !== "number" || !Number.isFinite(d.amount) || d.amount <= 0 ||
+          typeof d.description !== "string" || !d.description.trim() ||
+          !isValidDate(d.date)
+        ) {
+          results.push(`⚠️ Gasto inválido, no se guardó`);
+          return "";
+        }
         saveExpense({
           amount: d.amount,
           description: d.description,
@@ -194,9 +236,13 @@ export function parseActions(text: string): { cleanText: string; results: string
       }
 
       if (payload.deleteExpense) {
-        deleteExpense(payload.deleteExpense.id);
-        notify();
-        results.push(`🗑️ Gasto eliminado`);
+        const id = String(payload.deleteExpense.id);
+        const expense = getExpenses().find((e) => e.id === id);
+        if (!expense) { results.push(`⚠️ Gasto no encontrado`); return ""; }
+        pending.push({
+          label: `Eliminar gasto: ${expense.description} ($${expense.amount})`,
+          run: () => { deleteExpense(id); notify(); return `🗑️ Gasto eliminado`; },
+        });
         return "";
       }
 
@@ -207,5 +253,5 @@ export function parseActions(text: string): { cleanText: string; results: string
       return "";
     }
   });
-  return { cleanText, results };
+  return { cleanText, results, pending };
 }

@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import {
   ExternalLink,
   Eye,
@@ -13,8 +13,8 @@ import {
 } from "lucide-react";
 import { FaGithub, FaYoutube } from "@/components/icons";
 import { DevItem } from "../types";
-import { getPasswordSecurity } from "../security";
-import { PasswordSecurityDialog } from "./PasswordSecurityDialog";
+import { openSecrets, type ItemSecrets } from "../security";
+import { useVaultUnlock } from "./useVaultUnlock";
 import { sileo } from "sileo";
 
 interface ItemCardProps {
@@ -40,20 +40,38 @@ function getYouTubeId(url: string) {
 
 export function ItemCard({ item, onEdit, onDelete }: ItemCardProps) {
   const [revealed, setRevealed] = useState(false);
-  const [pinDialogOpen, setPinDialogOpen] = useState(false);
-  const pinResolver = useRef<((verified: boolean) => void) | null>(null);
+  const [secrets, setSecrets] = useState<ItemSecrets | null>(null);
+  const { requestUnlock, dialog } = useVaultUnlock();
+  const hasApiKey = Boolean(item.apiKey || (item.type === "api" && item.secretEnc));
+  const hasPassword = Boolean(item.password || (item.type === "credential" && item.secretEnc));
 
-  const verifyPin = async () => {
-    const security = getPasswordSecurity();
-    if (!security.enabled) return true;
-    setPinDialogOpen(true);
-    return new Promise<boolean>((resolve) => { pinResolver.current = resolve; });
+  const getSecrets = async (): Promise<ItemSecrets | null> => {
+    if (!(await requestUnlock())) return null;
+    try {
+      return await openSecrets(item);
+    } catch {
+      sileo.error({ title: "No se pudo descifrar", description: "Desbloquea DevHub con tu PIN en este dispositivo." });
+      return null;
+    }
   };
 
   const revealPassword = async () => {
-    if (revealed || await verifyPin()) setRevealed(!revealed);
+    if (revealed) {
+      setRevealed(false);
+      setSecrets(null);
+      return;
+    }
+    const s = await getSecrets();
+    if (s) {
+      setSecrets(s);
+      setRevealed(true);
+    }
   };
 
+  const copySecret = async (field: keyof ItemSecrets, label: string) => {
+    const s = await getSecrets();
+    if (s?.[field]) handleCopy(s[field]!, label);
+  };
 
   const handleCopy = (text: string, fieldName: string) => {
     navigator.clipboard.writeText(text);
@@ -93,7 +111,7 @@ export function ItemCard({ item, onEdit, onDelete }: ItemCardProps) {
   const ytVideoId = item.type === "youtube" && item.url ? getYouTubeId(item.url) : null;
 
   return (
-    <div className="relative flex flex-col justify-between border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-5 rounded-none shadow-sm min-h-[220px] group overflow-hidden transition-all">
+    <div className="relative flex flex-col justify-between border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-5 rounded-xl shadow-sm min-h-[220px] group overflow-hidden lift">
       {/* Signature NVIDIA green corner square */}
       <div className="corner-square" />
 
@@ -107,7 +125,7 @@ export function ItemCard({ item, onEdit, onDelete }: ItemCardProps) {
             {meta.icon}
             <span className="text-[10px] uppercase select-none">{meta.label}</span>
      </div>
-     {pinDialogOpen && <PasswordSecurityDialog mode="verify" onClose={() => setPinDialogOpen(false)} onVerified={(verified) => { pinResolver.current?.(verified); pinResolver.current = null; }} />}
+     {dialog}
      </div>
 
         {/* Title & Description */}
@@ -193,10 +211,10 @@ export function ItemCard({ item, onEdit, onDelete }: ItemCardProps) {
         )}
 
         {/* API Key */}
-        {item.type === "api" && item.apiKey && (
+        {item.type === "api" && hasApiKey && (
           <div className="flex items-center gap-2">
             <div className="flex-1 bg-zinc-50 dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 px-2 py-1 font-mono text-[11px] text-zinc-700 dark:text-zinc-300 overflow-hidden truncate">
-              {revealed ? item.apiKey : "••••••••••••••••"}
+              {revealed ? secrets?.apiKey : "••••••••••••••••"}
             </div>
             <button
               onClick={revealPassword}
@@ -206,11 +224,7 @@ export function ItemCard({ item, onEdit, onDelete }: ItemCardProps) {
               {revealed ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
             </button>
             <button
-              onClick={() => {
-                verifyPin().then((ok) => {
-                  if (ok) handleCopy(item.apiKey || "", "API Key")
-                })
-              }}
+              onClick={() => void copySecret("apiKey", "API Key")}
               className="p-1.5 border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-900 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 transition-colors"
               title="Copiar"
             >
@@ -234,11 +248,11 @@ export function ItemCard({ item, onEdit, onDelete }: ItemCardProps) {
                 </button>
               </div>
             )}
-            {item.password && (
+            {hasPassword && (
               <div className="flex items-center gap-1.5 overflow-hidden">
                 <span className="font-bold text-zinc-400">P:</span>
                  <span className={`flex-1 truncate ${revealed ? "select-all" : "select-none"}`}>
-                  {revealed ? item.password : "••••••••"}
+                  {revealed ? secrets?.password : "••••••••"}
                 </span>
                 <button
                    onClick={revealPassword}
@@ -247,9 +261,7 @@ export function ItemCard({ item, onEdit, onDelete }: ItemCardProps) {
                   {revealed ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
                 </button>
                 <button
-                   onClick={() => {
-                     verifyPin().then((verified) => { if (verified) handleCopy(item.password || "", "Contraseña"); });
-                   }}
+                   onClick={() => void copySecret("password", "Contraseña")}
                   className="p-0.5 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 transition-colors"
                 >
                   <Copy className="w-3 h-3" />
