@@ -4,9 +4,9 @@ export const SPACE_FX_EVENT = "ph:space-fx"
 
 export function getSpaceFx(): boolean {
   try {
-    return localStorage.getItem(KEY) !== "0"
+    return localStorage.getItem(KEY) === "1"
   } catch {
-    return true
+    return false
   }
 }
 

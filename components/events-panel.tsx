@@ -34,7 +34,7 @@ const RECURRENCE_LABEL: Record<string, string> = {
 const recurrenceLabel = (r: string) => RECURRENCE_LABEL[r] ?? r.replace(/_/g, " ")
 
 const panel =
-  "relative overflow-hidden rounded-2xl border border-black/5 dark:border-white/[0.06] bg-white/60 dark:bg-[linear-gradient(160deg,rgba(24,24,27,0.75),rgba(9,9,11,0.9))] backdrop-blur-xl shadow-[0_1px_0_0_rgba(255,255,255,0.06)_inset,0_20px_40px_-24px_rgba(0,0,0,0.6)]"
+  "relative overflow-hidden rounded-2xl border border-black/5 dark:border-white/[0.06] bg-white/60 dark:bg-zinc-950/60 backdrop-blur-xl"
 
 const eyebrow = "font-mono text-[10px] uppercase tracking-[0.25em] text-zinc-500 dark:text-zinc-500"
 
@@ -68,11 +68,10 @@ export function EventsPanel({
     <aside className="flex w-full flex-col gap-4 lg:w-80">
       {/* ── Agenda del día ── */}
       <section className={cn(panel, "p-5")}>
-        <div className="pointer-events-none absolute -right-16 -top-16 size-48 rounded-full bg-[#76b900]/15 blur-3xl" />
 
         <div className="relative flex items-end justify-between gap-3">
           <div className="flex items-end gap-3">
-            <span className="bg-gradient-to-b from-zinc-900 to-zinc-500 dark:from-white dark:to-zinc-500 bg-clip-text font-mono text-5xl font-light leading-none tracking-tighter text-transparent tabular-nums">
+            <span className="font-mono text-5xl font-light leading-none tracking-tighter tabular-nums text-zinc-900 dark:text-zinc-100">
               {String(selectedDate.getDate()).padStart(2, "0")}
             </span>
             <div className="pb-0.5">
@@ -93,7 +92,7 @@ export function EventsPanel({
 
         <div className="relative mt-4 h-[3px] overflow-hidden rounded-full bg-zinc-900/10 dark:bg-white/[0.06]">
           <div
-            className="h-full rounded-full bg-gradient-to-r from-[#76b900] to-[#b6ff3b] shadow-[0_0_12px_rgba(118,185,0,0.8)] transition-[width] duration-700 ease-out"
+            className="h-full rounded-full bg-[#76b900] transition-[width] duration-700 ease-out"
             style={{ width: `${progress}%` }}
           />
         </div>
@@ -105,7 +104,7 @@ export function EventsPanel({
           </div>
         ) : (
           <ol className="relative mt-5 flex flex-col stagger">
-            <span className="absolute bottom-3 left-[58px] top-3 w-px bg-gradient-to-b from-[#76b900]/60 via-zinc-300 to-transparent dark:via-white/10" />
+            <span className="absolute bottom-3 left-[58px] top-3 w-px bg-gradient-to-b from-zinc-300 via-zinc-200 to-transparent dark:via-white/10" />
             {dayOccurrences.map((o) => {
               const meta = getCategoryMeta(o.event.categoria)
               const isCompleted = !!completed[`${o.event.id}-${toDateKey(o.date)}`]
@@ -115,7 +114,7 @@ export function EventsPanel({
                     type="button"
                     onClick={() => onToggleComplete(o)}
                     aria-pressed={isCompleted}
-                    className="group relative flex w-full items-center gap-3 rounded-xl py-2 pr-2 text-left transition-colors hover:bg-zinc-900/[0.04] dark:hover:bg-white/[0.03] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#76b900]/60"
+                    className="reveal group flex w-full items-center gap-3 rounded-xl py-2 pr-2 text-left transition-colors hover:bg-zinc-900/[0.04] dark:hover:bg-white/[0.03] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#76b900]/60"
                   >
                     <span className="w-11 shrink-0 text-right font-mono text-xs tabular-nums text-zinc-500">
                       {o.event.horaInicio ?? "—"}
@@ -124,7 +123,7 @@ export function EventsPanel({
                       className={cn(
                         "relative z-10 grid size-[18px] shrink-0 place-items-center rounded-full border transition-all duration-300",
                         isCompleted
-                          ? "border-[#76b900] bg-[#76b900] shadow-[0_0_14px_rgba(118,185,0,0.7)]"
+                          ? "border-[#76b900] bg-[#76b900]"
                           : "border-zinc-300 bg-white dark:border-white/20 dark:bg-zinc-950 group-hover:border-[#76b900]"
                       )}
                     >
@@ -177,7 +176,7 @@ export function EventsPanel({
             <Button
               size="sm"
               onClick={onAddEvent}
-              className="h-9 rounded-full px-4 shadow-[0_0_24px_-6px_rgba(118,185,0,0.9)]"
+              className="h-9 rounded-full px-4"
             >
               <IoAdd className="size-4" />
               Nuevo
@@ -215,7 +214,7 @@ export function EventsPanel({
                           <button
                             type="button"
                             onClick={() => onEditEvent(event)}
-                            className="group flex w-full items-center gap-3 rounded-xl px-2 py-2.5 text-left transition-all duration-200 hover:bg-zinc-900/[0.04] dark:hover:bg-white/[0.04] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#76b900]/60"
+                            className="reveal group flex w-full items-center gap-3 rounded-xl px-2 py-2.5 text-left transition-all duration-200 hover:bg-zinc-900/[0.04] dark:hover:bg-white/[0.04] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#76b900]/60"
                           >
                             <span className="min-w-0 flex-1">
                               <span className="block truncate text-sm text-zinc-900 dark:text-zinc-100">{event.nombre}</span>

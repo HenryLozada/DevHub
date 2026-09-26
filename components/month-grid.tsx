@@ -69,19 +69,19 @@ export function MonthGrid({
               onClick={() => onSelectDate(date)}
               aria-pressed={isSelected}
               className={cn(
-                "group relative flex min-h-[40px] sm:min-h-[80px] lg:min-h-[100px] flex-col gap-0.5 sm:gap-1 border-b border-r border-black/5 dark:border-white/[0.05] p-1 sm:p-1.5 text-left transition-[background-color,box-shadow] duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#76b900] focus-visible:ring-inset [&:nth-child(7n)]:border-r-0",
+                "reveal group flex min-h-[40px] sm:min-h-[80px] lg:min-h-[100px] flex-col gap-0.5 sm:gap-1 border-b border-r border-black/5 dark:border-white/[0.05] p-1 sm:p-1.5 text-left transition-[background-color,box-shadow] duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#76b900] focus-visible:ring-inset [&:nth-child(7n)]:border-r-0",
                 "hover:bg-white/60 dark:hover:bg-white/[0.035]",
                 !inMonth && "text-zinc-300 dark:text-zinc-700 [&>*]:opacity-50",
                 inMonth && "text-zinc-900 dark:text-zinc-100",
-                isToday && "bg-[#76b900]/[0.06] shadow-[inset_0_0_24px_-8px_rgba(118,185,0,0.55)]",
-                isSelected && "z-10 bg-[#76b900]/[0.08] shadow-[inset_0_0_0_1px_rgba(155,224,28,0.7),inset_0_0_28px_-6px_rgba(118,185,0,0.45),0_0_24px_-6px_rgba(118,185,0,0.5)]",
+                isToday && "bg-[#76b900]/[0.04]",
+                isSelected && "z-10 bg-[#76b900]/[0.06] shadow-[inset_0_0_0_1px_rgba(118,185,0,0.6)]",
               )}
             >
               <div className="flex items-center justify-between w-full">
                 <span
                   className={cn(
                     "flex size-5 sm:size-7 items-center justify-center rounded-md text-[10px] sm:text-[13px] font-semibold tabular-nums",
-                    isToday && "bg-gradient-to-br from-[#76b900] to-[#b6f03a] text-black rounded-md pulse-ring shadow-[0_0_14px_rgba(118,185,0,0.5)]",
+                    isToday && "bg-[#76b900] text-black rounded-md",
                     !isToday && !inMonth && "text-zinc-400 dark:text-zinc-600",
                     !isToday && inMonth && "text-zinc-900 dark:text-zinc-100",
                   )}
