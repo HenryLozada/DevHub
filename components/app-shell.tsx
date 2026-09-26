@@ -7,6 +7,7 @@ import { AuthScreen } from "@/components/auth/AuthScreen"
 import { UserMenu } from "@/components/auth/UserMenu"
 import { PwaBootstrap } from "@/components/pwa-bootstrap"
 import { Toaster } from "sileo"
+import { FlickeringGrid } from "@/components/ui/flickering-grid"
 import { getSpaceFx, SPACE_FX_EVENT } from "@/lib/space-fx"
 
 const CashflowCalendar = lazy(() => import("@/components/cashflow-calendar").then(m => ({ default: m.CashflowCalendar })))
@@ -108,7 +109,20 @@ function AppInner() {
     <Suspense fallback={null}>
       <SpaceBackground />
     </Suspense>
-  ) : null
+  ) : (
+    // Fondo por defecto: la rejilla parpadeante del login, más tenue para no competir con el contenido
+    <div aria-hidden className="pointer-events-none fixed inset-0 -z-10">
+      <FlickeringGrid
+        className="absolute inset-0 [mask-image:radial-gradient(ellipse_at_center,black_10%,transparent_80%)]"
+        squareSize={3}
+        gridGap={7}
+        color="#76b900"
+        maxOpacity={0.18}
+        flickerChance={0.08}
+      />
+      <div className="absolute left-1/2 top-1/3 size-[36rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#76b900]/10 blur-3xl" />
+    </div>
+  )
 
   if (loading) {
     return (
@@ -127,7 +141,7 @@ function AppInner() {
   if (!user) {
     return (
       <>
-        {backdrop}
+        {theme === "dark" && spaceFx && backdrop}
         <AuthScreen />
       </>
     )
