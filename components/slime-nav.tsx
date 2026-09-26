@@ -1,5 +1,4 @@
 import { useEffect, useRef } from "react"
-import * as THREE from "three"
 
 const MAX_BALLS = 32
 const CORE = 7
@@ -65,41 +64,71 @@ export function SlimeNav({ target: el }: { target: HTMLElement | null }) {
   useEffect(() => {
     const host = hostRef.current
     if (!host) return
-    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: false, premultipliedAlpha: false })
+    const canvas = document.createElement("canvas")
+    const gl = canvas.getContext("webgl", { alpha: true, antialias: false, premultipliedAlpha: false })
+    if (!gl) return
     const dpr = Math.min(window.devicePixelRatio, 2)
-    renderer.setPixelRatio(dpr)
-    renderer.domElement.style.cssText = "position:absolute;inset:0;width:100%;height:100%;pointer-events:none"
-    host.appendChild(renderer.domElement)
+    canvas.style.cssText = "position:absolute;inset:0;width:100%;height:100%;pointer-events:none"
+    host.appendChild(canvas)
 
-    const uBalls = Array.from({ length: MAX_BALLS }, () => new THREE.Vector3())
-    const mat = new THREE.ShaderMaterial({
-      fragmentShader: frag,
-      vertexShader: "void main(){gl_Position=vec4(position.xy,0.,1.);}",
-      uniforms: { uRes: { value: new THREE.Vector2() }, uTime: { value: 0 }, uBalls: { value: uBalls }, uCount: { value: 0 } },
-      transparent: true,
-    })
-    const scene = new THREE.Scene()
-    scene.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), mat))
-    const cam = new THREE.Camera()
+    const compile = (type: number, src: string) => {
+      const sh = gl.createShader(type)!
+      gl.shaderSource(sh, src)
+      gl.compileShader(sh)
+      return sh
+    }
+    const vs = compile(gl.VERTEX_SHADER, "attribute vec2 position;void main(){gl_Position=vec4(position,0.,1.);}")
+    const fs = compile(gl.FRAGMENT_SHADER, frag)
+    const prog = gl.createProgram()!
+    gl.attachShader(prog, vs)
+    gl.attachShader(prog, fs)
+    gl.linkProgram(prog)
+    gl.useProgram(prog)
+
+    const buf = gl.createBuffer()
+    gl.bindBuffer(gl.ARRAY_BUFFER, buf)
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW)
+    const aPos = gl.getAttribLocation(prog, "position")
+    gl.enableVertexAttribArray(aPos)
+    gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0)
+    gl.enable(gl.BLEND)
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
+    gl.clearColor(0, 0, 0, 0)
+
+    const uRes = gl.getUniformLocation(prog, "uRes")
+    const uTime = gl.getUniformLocation(prog, "uTime")
+    const uBallsLoc = gl.getUniformLocation(prog, "uBalls")
+    const uCount = gl.getUniformLocation(prog, "uCount")
+    const uBalls = new Float32Array(MAX_BALLS * 3)
 
     let W = 0, H = 0
-    const resize = () => {
-      W = host.clientWidth; H = host.clientHeight
-      renderer.setSize(W, H, false)
-      mat.uniforms.uRes.value.set(W * dpr, H * dpr)
-    }
-    resize()
-    const ro = new ResizeObserver(resize)
-    ro.observe(host)
-
+    type Rect = { x: number; y: number; w: number; h: number }
+    let rect = null as Rect | null
+    let measuredEl: HTMLElement | null = null
     const measure = () => {
       const e = elRef.current
       if (!e) return null
       const a = e.getBoundingClientRect(), h = host.getBoundingClientRect()
-      return { x: a.left - h.left, y: a.top - h.top, w: a.width, h: a.height }
+      measuredEl = e
+      rect = { x: a.left - h.left, y: a.top - h.top, w: a.width, h: a.height }
+      return rect
     }
+    const resize = () => {
+      W = host.clientWidth; H = host.clientHeight
+      canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr)
+      gl.viewport(0, 0, canvas.width, canvas.height)
+      gl.uniform2f(uRes, canvas.width, canvas.height)
+      measure()
+    }
+    resize()
+    // la posición del tab solo se mide cuando algo cambia de tamaño o cambia el tab activo
+    const ro = new ResizeObserver(resize)
+    ro.observe(host)
+    if (host.parentElement) ro.observe(host.parentElement)
+    window.addEventListener("resize", resize)
+
     const balls: Ball[] = []
-    const init = measure()
+    const init = rect as Rect | null
     for (let i = 0; i < CORE; i++) {
       const ox = (i / (CORE - 1) - 0.5)
       const x = init ? init.x + init.w / 2 + ox * init.w * 0.8 : 0
@@ -119,7 +148,12 @@ export function SlimeNav({ target: el }: { target: HTMLElement | null }) {
     const loop = (now: number) => {
       const dt = Math.min((now - last) / 1000, 1 / 30)
       last = now; t += dt
-      const tg = measure()
+      if (elRef.current !== measuredEl) {
+        if (measuredEl) ro.unobserve(measuredEl)
+        measure()
+        if (measuredEl) ro.observe(measuredEl)
+      }
+      const tg = elRef.current ? (rect as Rect | null) : null
       if (tg) {
         const cx = tg.x + tg.w / 2, cy = tg.y + tg.h / 2
         for (let i = 0; i < balls.length; i++) {
@@ -152,11 +186,13 @@ export function SlimeNav({ target: el }: { target: HTMLElement | null }) {
       }
       for (let i = 0; i < MAX_BALLS; i++) {
         const b = balls[i]
-        if (b) uBalls[i].set(b.x * dpr, b.y * dpr, b.r * dpr)
+        if (b) { uBalls[i * 3] = b.x * dpr; uBalls[i * 3 + 1] = b.y * dpr; uBalls[i * 3 + 2] = b.r * dpr }
       }
-      mat.uniforms.uCount.value = tg ? balls.length : 0
-      mat.uniforms.uTime.value = t
-      renderer.render(scene, cam)
+      gl.uniform3fv(uBallsLoc, uBalls)
+      gl.uniform1i(uCount, tg ? balls.length : 0)
+      gl.uniform1f(uTime, t)
+      gl.clear(gl.COLOR_BUFFER_BIT)
+      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4)
       raf = requestAnimationFrame(loop)
     }
     raf = requestAnimationFrame(loop)
@@ -164,10 +200,11 @@ export function SlimeNav({ target: el }: { target: HTMLElement | null }) {
     return () => {
       cancelAnimationFrame(raf)
       ro.disconnect()
+      window.removeEventListener("resize", resize)
       window.removeEventListener("pointermove", onMove)
       host.parentElement?.removeEventListener("pointerleave", onLeave)
-      mat.dispose(); renderer.dispose()
-      renderer.domElement.remove()
+      gl.deleteBuffer(buf); gl.deleteProgram(prog); gl.deleteShader(vs); gl.deleteShader(fs)
+      canvas.remove()
     }
   }, [])
 
