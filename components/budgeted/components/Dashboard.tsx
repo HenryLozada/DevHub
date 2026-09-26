@@ -26,7 +26,12 @@ export function Dashboard({ expenses, onRefresh }: DashboardProps) {
   const [confirmDelete, setConfirmDelete] = useState<Expense | null>(null)
 
   const total = expenses.reduce((s, e) => s + e.amount, 0)
-  const unpaidTotal = expenses.filter(e => (e.paidStatus || "unpaid") !== "paid").reduce((s, e) => s + e.amount, 0)
+  // Partial payments count toward "paid"; only the remainder is pending
+  const paidPortion = (e: Expense) =>
+    e.paidStatus === "paid" ? e.amount
+    : e.paidStatus === "partial" ? Math.min(Math.max(e.paidAmount ?? 0, 0), e.amount)
+    : 0
+  const unpaidTotal = expenses.reduce((s, e) => s + e.amount - paidPortion(e), 0)
 
   const filtered = filter === "all" ? expenses
     : filter === "unpaid" ? expenses.filter(e => (e.paidStatus || "unpaid") !== "paid")

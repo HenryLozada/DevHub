@@ -52,6 +52,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!supabase) {
+      // Dev only: without Supabase credentials run as a local demo user (stripped from production builds)
+      if (import.meta.env.DEV) {
+        void import("./demo-seed").then(({ seedDemoData }) => {
+          seedDemoData()
+          setUser({ id: "demo-user", email: "demo@local" } as User)
+          setLoading(false)
+        })
+        return
+      }
       setLoading(false)
       return
     }

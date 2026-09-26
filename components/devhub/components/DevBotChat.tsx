@@ -81,11 +81,13 @@ export function DevBotChat({ onItemAdded }: DevBotChatProps) {
   ])
   const [input, setInput] = useState("")
   const [isTyping, setIsTyping] = useState(false)
-  const chatEndRef = useRef<HTMLDivElement>(null)
+  const messagesRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
 
   useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: "smooth" })
+    // Scroll only the message list; scrollIntoView would also scroll the whole page on mount
+    const el = messagesRef.current
+    if (el) el.scrollTo({ top: el.scrollHeight, behavior: "smooth" })
   }, [messages, isTyping])
 
   function addMessage(msg: Message) {
@@ -267,7 +269,7 @@ export function DevBotChat({ onItemAdded }: DevBotChatProps) {
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 min-h-[280px] max-h-[420px] scrollbar-thin">
+      <div ref={messagesRef} className="flex-1 overflow-y-auto p-4 space-y-4 min-h-[280px] max-h-[420px] scrollbar-thin">
         <AnimatePresence>
           {messages.map((msg, i) =>
             msg.role === "bot" ? (
@@ -295,7 +297,6 @@ export function DevBotChat({ onItemAdded }: DevBotChatProps) {
           </motion.div>
         )}
 
-        <div ref={chatEndRef} />
       </div>
 
       {/* Input */}
