@@ -45,6 +45,13 @@ Ejecuta `supabase-schema.sql` en el SQL Editor del proyecto (incluye `updated_at
 
 La sincronización hace merge por ítem (`lib/sync-merge.ts`): si editas en dos dispositivos se conservan los cambios de ambos, y los borrados se propagan.
 
+## Supabase sin pausas
+
+El plan gratuito de Supabase pausa el proyecto tras ~7 días sin actividad. Un Vercel Cron (`vercel.json`) llama a `/api/keepalive` todos los días a las 09:17 UTC, y ese endpoint hace una consulta mínima a la base de datos.
+
+- Revísalo en Vercel → Settings → Cron Jobs; desde ahí puedes ejecutarlo a mano.
+- Recomendado: agrega `CRON_SECRET` (valor aleatorio largo) en las variables de entorno de Vercel. Vercel lo envía automáticamente en sus crons, y así nadie más puede llamar al endpoint.
+
 ## Seguridad
 
 - Activa el **PIN** en DevHub → Seguridad: las contraseñas y API keys se cifran (AES-GCM) con una clave maestra protegida por el PIN (PBKDF2) y por el código de recuperación. Solo se sincroniza el material cifrado; el PIN nunca sale del dispositivo. Usa 6–8 dígitos.
