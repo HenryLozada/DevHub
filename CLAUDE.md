@@ -26,6 +26,10 @@ Astro 7 (`output: 'server'`, adapter Vercel) + React 19 + Tailwind 4 + shadcn (`
 - `components/devhub/security.ts` + `crypto.ts`: bóveda cifrada de credenciales
 - `supabase-schema.sql`: esquema con RLS y `updated_at`
 
+## Publicación
+- Los cambios en ramas `claude/**` se publican solos (`.github/workflows/auto-deploy.yml`): si pasan check/lint/test/build se fusionan a `main` y Vercel despliega.
+- Antes de cada push: correr `npm run check`, `npm run lint`, `npm test`, `npm run build`, y probar en el navegador los cambios visuales.
+
 ## Reglas
 - `GROQ_API_KEY` es solo de servidor: nunca con prefijo `PUBLIC_` ni enviada al cliente.
 - DevBot no debe enviar contraseñas ni API keys al modelo.

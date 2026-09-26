@@ -326,7 +326,7 @@ export function CashflowCalendar() {
                 <button
                   className={cn(
                     "flex flex-1 items-center justify-center gap-2 rounded-sm py-1.5 text-sm font-medium transition-all",
-                    activeTab === "eventos" ? "bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 shadow-sm border border-[#76b900]" : "text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200"
+                    activeTab === "eventos" ? "bg-white dark:bg-zinc-950/70 dark:backdrop-blur-xl text-zinc-900 dark:text-zinc-100 shadow-sm border border-[#76b900]" : "text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200"
                   )}
                   onClick={() => setActiveTab("eventos")}
                 >
@@ -336,7 +336,7 @@ export function CashflowCalendar() {
                 <button
                   className={cn(
                     "flex flex-1 items-center justify-center gap-2 rounded-sm py-1.5 text-sm font-medium transition-all",
-                    activeTab === "finanzas" ? "bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 shadow-sm border border-[#76b900]" : "text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200"
+                    activeTab === "finanzas" ? "bg-white dark:bg-zinc-950/70 dark:backdrop-blur-xl text-zinc-900 dark:text-zinc-100 shadow-sm border border-[#76b900]" : "text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200"
                   )}
                   onClick={() => setActiveTab("finanzas")}
                 >

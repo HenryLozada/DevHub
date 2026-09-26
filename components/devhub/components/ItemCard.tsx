@@ -111,7 +111,7 @@ export function ItemCard({ item, onEdit, onDelete }: ItemCardProps) {
   const ytVideoId = item.type === "youtube" && item.url ? getYouTubeId(item.url) : null;
 
   return (
-    <div className="relative flex flex-col justify-between border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-5 rounded-xl shadow-sm min-h-[220px] group overflow-hidden lift">
+    <div className="relative flex flex-col justify-between border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950/70 dark:backdrop-blur-xl p-5 rounded-xl shadow-sm min-h-[220px] group overflow-hidden lift">
       {/* Signature NVIDIA green corner square */}
       <div className="corner-square" />
 
@@ -201,7 +201,7 @@ export function ItemCard({ item, onEdit, onDelete }: ItemCardProps) {
           <div className="relative bg-zinc-50 dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 p-2 font-mono text-[10px] max-h-20 overflow-y-auto text-zinc-700 dark:text-zinc-300 whitespace-pre-wrap select-all">
             <button
               onClick={() => handleCopy(item.content || "", "Nota")}
-              className="absolute top-1 right-1 p-1 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 transition-colors shadow-xs"
+              className="absolute top-1 right-1 p-1 bg-white dark:bg-zinc-950/70 dark:backdrop-blur-xl border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 transition-colors shadow-xs"
               title="Copiar nota"
             >
               <Copy className="w-3 h-3" />

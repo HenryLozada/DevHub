@@ -58,7 +58,7 @@ export function ChoreModal({ chore, onClose, onSaved }: ChoreModalProps) {
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
         className="absolute inset-0 bg-black/40 backdrop-blur-xs" onClick={onClose} />
       <motion.div initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }}
-        className="relative w-full max-w-lg bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg shadow-sm overflow-hidden overflow-y-auto max-h-[90vh]">
+        className="relative w-full max-w-lg bg-white dark:bg-zinc-950/70 dark:backdrop-blur-xl border border-zinc-200 dark:border-zinc-800 rounded-lg shadow-sm overflow-hidden overflow-y-auto max-h-[90vh]">
         <div className="corner-square" />
         <div className="p-4 sm:p-8">
           <div className="flex items-center justify-between mb-6">

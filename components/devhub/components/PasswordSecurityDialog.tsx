@@ -172,7 +172,7 @@ export function PasswordSecurityDialog({
   return (
     <div className="fixed inset-0 z-[70] flex items-center justify-center p-4">
       <button className="absolute inset-0 bg-black/60 backdrop-blur-sm cursor-default" onClick={close} aria-label="Cerrar" />
-      <div className="relative w-full max-w-sm border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-950 p-5 shadow-2xl">
+      <div className="relative w-full max-w-sm border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-950/70 dark:backdrop-blur-xl p-5 shadow-2xl">
         <div className="flex items-start justify-between border-b border-zinc-200 dark:border-zinc-800 pb-3 mb-5">
           <div className="flex items-center gap-2">
             <ShieldCheck className="w-5 h-5 text-[#76b900]" />

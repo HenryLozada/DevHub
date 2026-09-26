@@ -32,7 +32,7 @@ export function ChoreCard({ chore, onEdit, onDelete, onToggle }: ChoreCardProps)
         "group flex items-start gap-4 p-4 rounded-lg border transition-all relative overflow-hidden",
         isDone
           ? "bg-zinc-50 dark:bg-zinc-900/30 border-zinc-200 dark:border-zinc-800 opacity-60"
-          : "bg-white dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800 hover:border-[#76b900]/30 shadow-xs"
+          : "bg-white dark:bg-zinc-950/70 dark:backdrop-blur-xl border-zinc-200 dark:border-zinc-800 hover:border-[#76b900]/30 shadow-xs"
       )}
     >
       <button onClick={onToggle} className="mt-0.5 shrink-0 transition-all active:scale-90">

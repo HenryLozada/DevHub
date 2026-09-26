@@ -73,17 +73,17 @@ export function Dashboard({ expenses, onRefresh }: DashboardProps) {
 
       {/* Stats */}
       <div className="grid grid-cols-3 gap-2 md:gap-4 mb-4 md:mb-8 stagger">
-        <div className="bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 p-3 md:p-5 rounded-xl shadow-xs relative overflow-hidden lift">
+        <div className="bg-white dark:bg-zinc-950/70 dark:backdrop-blur-xl border border-zinc-200 dark:border-zinc-800 p-3 md:p-5 rounded-xl shadow-xs relative overflow-hidden lift">
           <div className="corner-square" />
           <p className="font-mono text-[8px] md:text-[9px] uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-1 truncate">Total</p>
           <p className="text-base md:text-2xl font-mono font-bold text-[#76b900] truncate"><CountUp value={total} format={money} /></p>
         </div>
-        <div className="bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 p-3 md:p-5 rounded-xl shadow-xs relative overflow-hidden lift">
+        <div className="bg-white dark:bg-zinc-950/70 dark:backdrop-blur-xl border border-zinc-200 dark:border-zinc-800 p-3 md:p-5 rounded-xl shadow-xs relative overflow-hidden lift">
           <div className="corner-square" />
           <p className="font-mono text-[8px] md:text-[9px] uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-1 truncate">Pagado</p>
           <p className="text-base md:text-2xl font-mono font-bold text-emerald-500 truncate"><CountUp value={total - unpaidTotal} format={money} /></p>
         </div>
-        <div className="bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 p-3 md:p-5 rounded-xl shadow-xs relative overflow-hidden lift">
+        <div className="bg-white dark:bg-zinc-950/70 dark:backdrop-blur-xl border border-zinc-200 dark:border-zinc-800 p-3 md:p-5 rounded-xl shadow-xs relative overflow-hidden lift">
           <div className="corner-square" />
           <p className="font-mono text-[8px] md:text-[9px] uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-1 truncate">Pendiente</p>
           <p className="text-base md:text-2xl font-mono font-bold text-amber-500 truncate"><CountUp value={unpaidTotal} format={money} /></p>
@@ -95,7 +95,7 @@ export function Dashboard({ expenses, onRefresh }: DashboardProps) {
         {(["all", "unpaid", "paid"] as const).map(f => (
           <button key={f} onClick={() => setFilter(f)}
             className={cn("px-3 py-1.5 rounded-lg text-[9px] font-mono font-bold uppercase tracking-wider transition-all border",
-              filter === f ? "bg-[#76b900] text-black border-[#76b900]" : "bg-white dark:bg-zinc-950 text-zinc-500 dark:text-zinc-400 border-zinc-200 dark:border-zinc-800 hover:text-zinc-800 dark:hover:text-zinc-200")}>
+              filter === f ? "bg-[#76b900] text-black border-[#76b900]" : "bg-white dark:bg-zinc-950/70 dark:backdrop-blur-xl text-zinc-500 dark:text-zinc-400 border-zinc-200 dark:border-zinc-800 hover:text-zinc-800 dark:hover:text-zinc-200")}>
             {f === "all" ? "Todos" : f === "unpaid" ? "Pendientes" : "Pagados"}
           </button>
         ))}
@@ -103,14 +103,14 @@ export function Dashboard({ expenses, onRefresh }: DashboardProps) {
 
       {/* Expense list */}
       {filtered.length === 0 ? (
-        <div className="text-center py-16 bg-white dark:bg-zinc-950 rounded-lg border border-zinc-200 dark:border-zinc-800 relative overflow-hidden">
+        <div className="text-center py-16 bg-white dark:bg-zinc-950/70 dark:backdrop-blur-xl rounded-lg border border-zinc-200 dark:border-zinc-800 relative overflow-hidden">
           <div className="corner-square" />
           <Receipt className="w-12 h-12 text-[#76b900] mx-auto mb-3 animate-bounce [animation-duration:2.4s]" />
           <p className="text-zinc-500 dark:text-zinc-400 text-sm font-semibold">Sin gastos por aquí 💸</p>
           <p className="text-zinc-400 dark:text-zinc-500 text-xs mt-1">Registra el primero con el botón de arriba.</p>
         </div>
       ) : (
-        <div className="bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg overflow-hidden shadow-xs divide-y divide-zinc-200 dark:divide-zinc-800 relative">
+        <div className="bg-white dark:bg-zinc-950/70 dark:backdrop-blur-xl border border-zinc-200 dark:border-zinc-800 rounded-lg overflow-hidden shadow-xs divide-y divide-zinc-200 dark:divide-zinc-800 relative">
           <div className="corner-square" />
           <AnimatePresence mode="popLayout">
             {filtered.map(exp => {
@@ -163,7 +163,7 @@ export function Dashboard({ expenses, onRefresh }: DashboardProps) {
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               className="absolute inset-0 bg-black/40 backdrop-blur-xs" onClick={() => setConfirmDelete(null)} />
             <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}
-              className="relative w-full max-w-sm bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg p-4 sm:p-8 text-center shadow-xs overflow-hidden">
+              className="relative w-full max-w-sm bg-white dark:bg-zinc-950/70 dark:backdrop-blur-xl border border-zinc-200 dark:border-zinc-800 rounded-lg p-4 sm:p-8 text-center shadow-xs overflow-hidden">
               <div className="corner-square" />
               <div className="w-12 h-12 sm:w-14 sm:h-14 bg-red-500/10 border border-red-500/20 rounded-lg flex items-center justify-center mx-auto mb-4 sm:mb-5 text-red-600"><TrendingDown className="w-6 h-6 sm:w-7 sm:h-7" /></div>
               <h3 className="text-sm sm:text-md font-bold text-zinc-900 dark:text-white font-mono uppercase tracking-wider mb-2">¿Eliminar gasto?</h3>

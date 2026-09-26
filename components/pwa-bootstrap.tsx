@@ -86,7 +86,7 @@ export function PwaBootstrap() {
   if (!showInstall) return null
 
   return (
-    <div className="fixed bottom-4 left-3 right-3 md:left-auto md:right-6 md:w-96 z-[80] border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-950 shadow-2xl p-4">
+    <div className="fixed bottom-4 left-3 right-3 md:left-auto md:right-6 md:w-96 z-[80] border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-950/70 dark:backdrop-blur-xl shadow-2xl p-4">
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="font-mono text-xs font-bold uppercase tracking-wider text-zinc-900 dark:text-white">

@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react"
-import { LogOut, Download, Upload, Trash2, CloudUpload, Bell, BellOff, Smartphone } from "lucide-react"
+import { LogOut, Download, Upload, Trash2, CloudUpload, Bell, BellOff, Smartphone, Sparkles } from "lucide-react"
 import { useAuth } from "@/lib/auth-store"
+import { getSpaceFx, setSpaceFx } from "@/lib/space-fx"
 import { downloadBackup, importBackup, resetAllData, uploadAllToCloud } from "@/lib/local-store"
 import {
   enableNotifications,
@@ -15,6 +16,7 @@ import { sileo } from "sileo"
 
 export function UserMenu() {
   const { user, signOut } = useAuth()
+  const [spaceFx, setSpaceFxState] = useState(getSpaceFx)
   const [open, setOpen] = useState(false)
   const [confirmReset, setConfirmReset] = useState(false)
   const [busy, setBusy] = useState(false)
@@ -167,6 +169,13 @@ export function UserMenu() {
                 </button>
               )}
 
+              <button
+                onClick={() => { setSpaceFx(!spaceFx); setSpaceFxState(!spaceFx) }}
+                className="w-full flex items-center gap-2.5 px-3 py-2 text-[10px] font-mono text-zinc-600 dark:text-zinc-400 hover:text-[#76b900] hover:bg-[#76b900]/5 transition-colors cursor-pointer"
+                title="Fondo espacial animado (modo oscuro)"
+              >
+                <Sparkles className="w-3.5 h-3.5" /> Efectos espaciales: {spaceFx ? "ON" : "OFF"}
+              </button>
               <button
                 onClick={handleDownload}
                 disabled={busy}
