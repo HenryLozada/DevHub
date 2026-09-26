@@ -111,10 +111,10 @@ export function MonthGrid({
                 </span>
                 <div className="flex items-center gap-0.5 sm:gap-1">
                   {hasIngreso && (
-                    <span className="neon-dot size-1.5 rounded-full" style={{ "--neon": "#34d399" } as React.CSSProperties} aria-label="Ingreso" />
+                    <span className="neon-dot size-1.5 rounded-full sm:hidden" style={{ "--neon": "#34d399" } as React.CSSProperties} aria-label="Ingreso" />
                   )}
                   {hasEgreso && (
-                    <span className="neon-dot size-1.5 rounded-full" style={{ "--neon": "#fb7185" } as React.CSSProperties} aria-label="Egreso" />
+                    <span className="neon-dot size-1.5 rounded-full sm:hidden" style={{ "--neon": "#fb7185" } as React.CSSProperties} aria-label="Egreso" />
                   )}
                 </div>
               </div>
