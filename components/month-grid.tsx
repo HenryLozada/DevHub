@@ -126,7 +126,7 @@ export function MonthGrid({
                       <div
                         key={item.key}
                         className={cn(
-                          "reveal reveal-tint neon-chip flex items-center gap-1 truncate rounded-md px-1.5 py-0.5 text-[8px] sm:text-[10px] leading-tight font-medium transition-transform duration-200 group-hover:translate-x-0.5",
+                          "reveal reveal-tint cal-chip flex items-center gap-1 truncate rounded-r-sm pl-1.5 pr-1 py-0.5 text-[8px] sm:text-[10px] leading-tight font-medium transition-transform duration-200 group-hover:translate-x-0.5",
                                                   )}
                         style={{ "--neon": item.tipo === "ingreso" ? "#34d399" : "#fb7185" } as React.CSSProperties}
                       >
@@ -139,7 +139,7 @@ export function MonthGrid({
                       <div
                         key={item.key}
                         style={{ "--neon": meta.neon } as React.CSSProperties}
-                        className="reveal reveal-tint neon-chip flex items-center gap-1 truncate rounded-md px-1.5 py-0.5 text-[8px] sm:text-[10px] leading-tight font-medium transition-transform duration-200 group-hover:translate-x-0.5"
+                        className="reveal reveal-tint cal-chip flex items-center gap-1 truncate rounded-r-sm pl-1.5 pr-1 py-0.5 text-[8px] sm:text-[10px] leading-tight font-medium transition-transform duration-200 group-hover:translate-x-0.5"
                       >
                         <span className="truncate">{item.label}</span>
                       </div>

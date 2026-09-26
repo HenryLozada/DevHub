@@ -357,3 +357,11 @@ body::after {
   background: radial-gradient(60px circle at var(--rx) var(--ry), color-mix(in srgb, var(--neon, #76b900) 22%, transparent), transparent 70%);
 }
 .group:hover .reveal-tint::after { opacity: 1; }
+
+/* Eventos del calendario: solo una barra fina con el color de la categoría */
+.cal-chip {
+  border-left: 2px solid var(--neon, #76b900);
+  color: rgb(63 63 70);
+}
+.dark .cal-chip { color: rgb(212 212 216); }
+.cal-chip.reveal-tint::before, .cal-chip.reveal-tint::after { inset: 0 0 0 -2px; }
