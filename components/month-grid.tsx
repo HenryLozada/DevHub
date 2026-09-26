@@ -154,7 +154,7 @@ export function MonthGrid({
                 )}
               </div>
 
-              <div className="mt-auto flex flex-wrap items-center gap-1 pt-1">
+              <div className="mt-auto flex flex-wrap items-center gap-1 pt-1 sm:hidden">
                 {Array.from(new Set(dayEvents.map(e => e.event.categoria))).map(cat => (
                   <span key={cat} className="neon-dot size-1.5 rounded-full" style={{ "--neon": getCategoryMeta(cat).neon } as React.CSSProperties} />
                 ))}
