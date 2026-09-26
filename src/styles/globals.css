@@ -347,3 +347,13 @@ body::after {
 }
 .reveal:hover::after { opacity: 1; }
 @media (hover: none) { .reveal::before, .reveal::after { display: none; } }
+
+/* La luz toma el color del objeto que toca: los chips reflejan su propio tono */
+.reveal-tint::before, .reveal-tint::after { inset: -1px; }
+.reveal-tint::before {
+  background: radial-gradient(90px circle at var(--rx) var(--ry), color-mix(in srgb, var(--neon, #76b900) 90%, white), transparent 70%);
+}
+.reveal-tint::after {
+  background: radial-gradient(60px circle at var(--rx) var(--ry), color-mix(in srgb, var(--neon, #76b900) 22%, transparent), transparent 70%);
+}
+.group:hover .reveal-tint::after { opacity: 1; }

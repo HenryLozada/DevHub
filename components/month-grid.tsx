@@ -7,6 +7,26 @@ import {
 } from "@/lib/cashflow"
 import { type EventOccurrence, getCategoryMeta } from "@/lib/events"
 import { cn } from "@/lib/utils"
+import { useRef } from "react"
+
+/** Onda de luz: al elegir un día, los bordes de las celdas se encienden en anillos desde él. */
+function lightWave(grid: HTMLElement | null, origin: number) {
+  if (!grid || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return
+  const ox = origin % 7, oy = Math.floor(origin / 7)
+  Array.from(grid.children).forEach((cell, i) => {
+    const d = Math.hypot((i % 7) - ox, Math.floor(i / 7) - oy)
+    if (d === 0 || d > 4.5) return
+    const a = 0.55 * (1 - d / 5)
+    ;(cell as HTMLElement).animate(
+      [
+        { boxShadow: "inset 0 0 0 1px rgba(118,185,0,0)" },
+        { boxShadow: `inset 0 0 0 1px rgba(155,224,28,${a}), inset 0 0 18px -6px rgba(118,185,0,${a})` },
+        { boxShadow: "inset 0 0 0 1px rgba(118,185,0,0)" },
+      ],
+      { duration: 700, delay: d * 55, easing: "cubic-bezier(.2,.7,.3,1)" }
+    )
+  })
+}
 
 interface MonthGridProps {
   year: number
@@ -27,6 +47,7 @@ export function MonthGrid({
 }: MonthGridProps) {
   const days = getMonthGrid(year, month)
   const today = new Date()
+  const gridRef = useRef<HTMLDivElement>(null)
 
   return (
     <div className="glass flex flex-col overflow-hidden rounded-2xl">
@@ -41,8 +62,8 @@ export function MonthGrid({
         ))}
       </div>
 
-      <div className="grid grid-cols-7 auto-rows-[minmax(40px,auto)] sm:auto-rows-[minmax(80px,auto)]">
-        {days.map((date) => {
+      <div ref={gridRef} className="grid grid-cols-7 auto-rows-[minmax(40px,auto)] sm:auto-rows-[minmax(80px,auto)]">
+        {days.map((date, index) => {
           const key = toDateKey(date)
           const inMonth = date.getMonth() === month
           const isToday = isSameDay(date, today)
@@ -66,7 +87,7 @@ export function MonthGrid({
             <button
               key={key}
               type="button"
-              onClick={() => onSelectDate(date)}
+              onClick={() => { onSelectDate(date); lightWave(gridRef.current, index) }}
               aria-pressed={isSelected}
               className={cn(
                 "reveal group flex min-h-[40px] sm:min-h-[80px] lg:min-h-[100px] flex-col gap-0.5 sm:gap-1 border-b border-r border-black/5 dark:border-white/[0.05] p-1 sm:p-1.5 text-left transition-[background-color,box-shadow] duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#76b900] focus-visible:ring-inset [&:nth-child(7n)]:border-r-0",
@@ -105,7 +126,7 @@ export function MonthGrid({
                       <div
                         key={item.key}
                         className={cn(
-                          "neon-chip flex items-center gap-1 truncate rounded-md px-1.5 py-0.5 text-[8px] sm:text-[10px] leading-tight font-medium transition-transform duration-200 group-hover:translate-x-0.5",
+                          "reveal reveal-tint neon-chip flex items-center gap-1 truncate rounded-md px-1.5 py-0.5 text-[8px] sm:text-[10px] leading-tight font-medium transition-transform duration-200 group-hover:translate-x-0.5",
                                                   )}
                         style={{ "--neon": item.tipo === "ingreso" ? "#34d399" : "#fb7185" } as React.CSSProperties}
                       >
@@ -118,7 +139,7 @@ export function MonthGrid({
                       <div
                         key={item.key}
                         style={{ "--neon": meta.neon } as React.CSSProperties}
-                        className="neon-chip flex items-center gap-1 truncate rounded-md px-1.5 py-0.5 text-[8px] sm:text-[10px] leading-tight font-medium transition-transform duration-200 group-hover:translate-x-0.5"
+                        className="reveal reveal-tint neon-chip flex items-center gap-1 truncate rounded-md px-1.5 py-0.5 text-[8px] sm:text-[10px] leading-tight font-medium transition-transform duration-200 group-hover:translate-x-0.5"
                       >
                         <span className="truncate">{item.label}</span>
                       </div>
