@@ -29,12 +29,12 @@ export function MonthGrid({
   const today = new Date()
 
   return (
-    <div className="flex flex-col overflow-hidden rounded-lg backdrop-blur-2xl bg-white/40 dark:bg-zinc-950/40 border border-white/30 dark:border-white/10 shadow-lg shadow-black/10">
-      <div className="grid grid-cols-7 border-b border-white/30 dark:border-white/10">
+    <div className="glass flex flex-col overflow-hidden rounded-2xl">
+      <div className="grid grid-cols-7 border-b border-black/5 dark:border-white/[0.06]">
         {WEEKDAYS.map((day) => (
           <div
             key={day}
-            className="py-1.5 sm:py-2 text-center text-[8px] sm:text-[10px] font-mono font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 select-none"
+            className="py-1.5 sm:py-2 text-center text-[8px] sm:text-[10px] font-mono font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400/80 select-none"
           >
             {day}
           </div>
@@ -69,17 +69,18 @@ export function MonthGrid({
               onClick={() => onSelectDate(date)}
               aria-pressed={isSelected}
               className={cn(
-                "group relative flex min-h-[40px] sm:min-h-[80px] lg:min-h-[100px] flex-col gap-0.5 sm:gap-1 border-b border-r border-white/30 dark:border-white/10 p-1 sm:p-1.5 text-left transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#76b900] focus-visible:ring-inset last:border-r-0",
-                "hover:bg-white/95 dark:hover:bg-zinc-900/60 hover:shadow-[0_0_30px_-4px_rgba(118,185,0,0.3)] dark:hover:shadow-[0_0_35px_-4px_rgba(118,185,0,0.35)]",
-                !inMonth && "bg-zinc-50/30 dark:bg-zinc-900/10 text-zinc-300 dark:text-zinc-700",
+                "group relative flex min-h-[40px] sm:min-h-[80px] lg:min-h-[100px] flex-col gap-0.5 sm:gap-1 border-b border-r border-black/5 dark:border-white/[0.05] p-1 sm:p-1.5 text-left transition-[background-color,box-shadow] duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#76b900] focus-visible:ring-inset [&:nth-child(7n)]:border-r-0",
+                "hover:bg-white/60 dark:hover:bg-white/[0.035]",
+                !inMonth && "text-zinc-300 dark:text-zinc-700 [&>*]:opacity-50",
                 inMonth && "text-zinc-900 dark:text-zinc-100",
-                isSelected && "bg-[#76b900]/10 ring-1 ring-[#76b900] z-10",
+                isToday && "bg-[#76b900]/[0.06] shadow-[inset_0_0_24px_-8px_rgba(118,185,0,0.55)]",
+                isSelected && "z-10 bg-[#76b900]/[0.08] shadow-[inset_0_0_0_1px_rgba(155,224,28,0.7),inset_0_0_28px_-6px_rgba(118,185,0,0.45),0_0_24px_-6px_rgba(118,185,0,0.5)]",
               )}
             >
               <div className="flex items-center justify-between w-full">
                 <span
                   className={cn(
-                    "flex size-5 sm:size-7 items-center justify-center rounded-sm text-[10px] sm:text-[13px] font-bold",
+                    "flex size-5 sm:size-7 items-center justify-center rounded-md text-[10px] sm:text-[13px] font-semibold tabular-nums",
                     isToday && "bg-gradient-to-br from-[#76b900] to-[#b6f03a] text-black rounded-md pulse-ring shadow-[0_0_14px_rgba(118,185,0,0.5)]",
                     !isToday && !inMonth && "text-zinc-400 dark:text-zinc-600",
                     !isToday && inMonth && "text-zinc-900 dark:text-zinc-100",
@@ -89,10 +90,10 @@ export function MonthGrid({
                 </span>
                 <div className="flex items-center gap-0.5 sm:gap-1">
                   {hasIngreso && (
-                    <span className="size-1.5 sm:size-2 rounded-full bg-emerald-500" aria-label="Ingreso" />
+                    <span className="neon-dot size-1.5 rounded-full" style={{ "--neon": "#34d399" } as React.CSSProperties} aria-label="Ingreso" />
                   )}
                   {hasEgreso && (
-                    <span className="size-1.5 sm:size-2 rounded-full bg-red-500" aria-label="Egreso" />
+                    <span className="neon-dot size-1.5 rounded-full" style={{ "--neon": "#fb7185" } as React.CSSProperties} aria-label="Egreso" />
                   )}
                 </div>
               </div>
@@ -104,11 +105,9 @@ export function MonthGrid({
                       <div
                         key={item.key}
                         className={cn(
-                          "flex items-center gap-1 truncate rounded-sm px-1 sm:px-1.5 py-0.5 text-[8px] sm:text-[10px] leading-tight font-mono font-bold",
-                          item.tipo === "ingreso"
-                            ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/20 dark:text-emerald-400"
-                            : "bg-red-50 text-red-600 dark:bg-red-950/20 dark:text-red-400",
-                        )}
+                          "neon-chip flex items-center gap-1 truncate rounded-md px-1.5 py-0.5 text-[8px] sm:text-[10px] leading-tight font-medium transition-transform duration-200 group-hover:translate-x-0.5",
+                                                  )}
+                        style={{ "--neon": item.tipo === "ingreso" ? "#34d399" : "#fb7185" } as React.CSSProperties}
                       >
                         <span className="truncate">{item.label}</span>
                       </div>
@@ -118,12 +117,8 @@ export function MonthGrid({
                     return (
                       <div
                         key={item.key}
-                        className={cn(
-                          "flex items-center gap-1 truncate rounded-sm px-1 sm:px-1.5 py-0.5 text-[8px] sm:text-[10px] leading-tight font-mono font-bold",
-                          meta.bgLight,
-                          meta.textColor,
-                          "dark:bg-zinc-800 dark:text-zinc-200"
-                        )}
+                        style={{ "--neon": meta.neon } as React.CSSProperties}
+                        className="neon-chip flex items-center gap-1 truncate rounded-md px-1.5 py-0.5 text-[8px] sm:text-[10px] leading-tight font-medium transition-transform duration-200 group-hover:translate-x-0.5"
                       >
                         <span className="truncate">{item.label}</span>
                       </div>
@@ -140,7 +135,7 @@ export function MonthGrid({
 
               <div className="mt-auto flex flex-wrap items-center gap-1 pt-1">
                 {Array.from(new Set(dayEvents.map(e => e.event.categoria))).map(cat => (
-                  <span key={cat} className={cn("size-1.5 rounded-full", getCategoryMeta(cat).color)} />
+                  <span key={cat} className="neon-dot size-1.5 rounded-full" style={{ "--neon": getCategoryMeta(cat).neon } as React.CSSProperties} />
                 ))}
               </div>
             </button>

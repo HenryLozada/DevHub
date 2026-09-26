@@ -116,7 +116,7 @@ export function Dashboard() {
       {/* Stats Widgets */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 stagger">
         {/* Total Items */}
-        <div className="relative border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-3 md:p-5 rounded-lg overflow-hidden select-none">
+        <div className="relative border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950/70 dark:backdrop-blur-xl p-3 md:p-5 rounded-lg overflow-hidden select-none">
           <div className="corner-square" />
           <div className="flex justify-between items-start">
             <div className="min-w-0">
@@ -132,7 +132,7 @@ export function Dashboard() {
         </div>
 
         {/* Tools */}
-        <div className="relative border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-3 md:p-5 rounded-lg overflow-hidden select-none">
+        <div className="relative border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950/70 dark:backdrop-blur-xl p-3 md:p-5 rounded-lg overflow-hidden select-none">
           <div className="corner-square" />
           <div className="flex justify-between items-start">
             <div className="min-w-0">
@@ -148,7 +148,7 @@ export function Dashboard() {
         </div>
 
         {/* Repositories */}
-        <div className="relative border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-3 md:p-5 rounded-lg overflow-hidden select-none">
+        <div className="relative border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950/70 dark:backdrop-blur-xl p-3 md:p-5 rounded-lg overflow-hidden select-none">
           <div className="corner-square" />
           <div className="flex justify-between items-start">
             <div className="min-w-0">
@@ -164,7 +164,7 @@ export function Dashboard() {
         </div>
 
         {/* Credentials / API Keys */}
-        <div className="relative border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-3 md:p-5 rounded-lg overflow-hidden select-none">
+        <div className="relative border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950/70 dark:backdrop-blur-xl p-3 md:p-5 rounded-lg overflow-hidden select-none">
           <div className="corner-square" />
           <div className="flex justify-between items-start">
             <div className="min-w-0">
@@ -206,7 +206,7 @@ export function Dashboard() {
                 className={`px-3.5 py-1.5 font-mono text-[11px] font-bold uppercase tracking-wider transition-colors cursor-pointer border ${
                   isActive
                     ? "bg-[#76b900] text-black border-[#76b900]"
-                    : "bg-white dark:bg-zinc-950 text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-900"
+                    : "bg-white dark:bg-zinc-950/70 dark:backdrop-blur-xl text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-900"
                 }`}
               >
                 {tab.label}
@@ -223,7 +223,7 @@ export function Dashboard() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Buscar por título, descripción, categoría..."
-            className="w-full pl-9 pr-4 py-2 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:border-[#76b900] font-sans text-xs transition-colors"
+            className="w-full pl-9 pr-4 py-2 bg-white dark:bg-zinc-950/70 dark:backdrop-blur-xl border border-zinc-200 dark:border-zinc-800 rounded-lg text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:border-[#76b900] font-sans text-xs transition-colors"
           />
         </div>
       </div>

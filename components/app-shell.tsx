@@ -7,12 +7,14 @@ import { AuthScreen } from "@/components/auth/AuthScreen"
 import { UserMenu } from "@/components/auth/UserMenu"
 import { PwaBootstrap } from "@/components/pwa-bootstrap"
 import { Toaster } from "sileo"
+import { getSpaceFx, SPACE_FX_EVENT } from "@/lib/space-fx"
 
 const CashflowCalendar = lazy(() => import("@/components/cashflow-calendar").then(m => ({ default: m.CashflowCalendar })))
 const BudgetedApp = lazy(() => import("@/components/budgeted/index").then(m => ({ default: m.BudgetedApp })))
 const ChoresApp = lazy(() => import("@/components/chores/index").then(m => ({ default: m.ChoresApp })))
 const DevHubApp = lazy(() => import("@/components/devhub/index").then(m => ({ default: m.DevHubApp })))
 const PlaygroundPanel = lazy(() => import("@/components/playground/PlaygroundPanel").then(m => ({ default: m.PlaygroundPanel })))
+const SpaceBackground = lazy(() => import("@/components/space-background").then(m => ({ default: m.SpaceBackground })))
 const DevBot = lazy(() => import("@/components/devbot").then(m => ({ default: m.DevBot })))
 
 function ModuleLoader() {
@@ -47,6 +49,14 @@ function AppInner() {
     window.scrollTo({ top: 0 })
   }
   const [theme, setTheme] = useState<"light" | "dark">("light")
+  const [spaceFx, setSpaceFxState] = useState(true)
+
+  useEffect(() => {
+    const sync = () => setSpaceFxState(getSpaceFx())
+    sync()
+    window.addEventListener(SPACE_FX_EVENT, sync)
+    return () => window.removeEventListener(SPACE_FX_EVENT, sync)
+  }, [])
 
   useEffect(() => {
     const isDark = document.documentElement.classList.contains("dark")
@@ -64,9 +74,16 @@ function AppInner() {
     }
   }
 
+  const backdrop = theme === "dark" && spaceFx ? (
+    <Suspense fallback={null}>
+      <SpaceBackground />
+    </Suspense>
+  ) : null
+
   if (loading) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-4">
+        {backdrop}
         <motion.div
           animate={{ rotate: [0, 90, 180, 270, 360], borderRadius: ["30%", "50%", "30%", "50%", "30%"] }}
           transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
@@ -78,12 +95,18 @@ function AppInner() {
   }
 
   if (!user) {
-    return <AuthScreen />
+    return (
+      <>
+        {backdrop}
+        <AuthScreen />
+      </>
+    )
   }
 
   return (
     <ErrorBoundary>
     <div className="min-h-screen flex flex-col text-zinc-900 dark:text-zinc-100 transition-colors duration-300">
+      {backdrop}
       <GlobalNav activeTab={activeTab} onTabChange={setActiveTab} theme={theme} onToggleTheme={toggleTheme} rightSlot={<UserMenu />} />
 
       <main className="flex-1 overflow-x-clip pb-20 md:pb-0">

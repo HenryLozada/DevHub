@@ -61,7 +61,7 @@ export function CalendarView({ chores, onToggle }: CalendarViewProps) {
           const inMonth = day.getMonth() === current.getMonth()
           const today = isToday(day)
           return (
-            <div key={i} className={cn("bg-white dark:bg-zinc-950 p-2 min-h-[80px]", !inMonth && "opacity-40")}>
+            <div key={i} className={cn("bg-white dark:bg-zinc-950/70 dark:backdrop-blur-xl p-2 min-h-[80px]", !inMonth && "opacity-40")}>
               <p className={cn("text-xs font-mono font-bold mb-1 w-6 h-6 flex items-center justify-center rounded-lg select-none",
                 today ? "bg-[#76b900] text-black" : "text-zinc-500 dark:text-zinc-400")}>
                 {format(day, "d")}
