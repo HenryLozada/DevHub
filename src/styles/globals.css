@@ -6,6 +6,29 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
+  /* ── Sistema: espaciado Fibonacci (px) → p-f8, gap-f13, rounded-f13… ── */
+  --spacing-f3: 3px;
+  --spacing-f5: 5px;
+  --spacing-f8: 8px;
+  --spacing-f13: 13px;
+  --spacing-f21: 21px;
+  --spacing-f34: 34px;
+  --spacing-f55: 55px;
+  --spacing-f89: 89px;
+  --radius-f5: 5px;
+  --radius-f8: 8px;
+  --radius-f13: 13px;
+  --radius-f21: 21px;
+  /* ── Paleta armónica: misma luminosidad y saturación, repartida en el círculo ── */
+  --color-brand: #76b900;
+  --color-brand-hi: #9be01c;
+  --color-brand-lo: #5a8f00;
+  --color-pos: #3ecf9a;
+  --color-neg: #f07a6a;
+  --color-warn: #e9b44c;
+  --color-info: #6a9ef0;
+  --color-cyan: #3cc4d8;
+  --color-violet: #a58af0;
   --font-poppins: 'Inter', 'SF Pro Display', system-ui, -apple-system, sans-serif;
   --font-heading: 'Inter', 'SF Pro Display', system-ui, -apple-system, sans-serif;
   --font-body: 'Inter', 'SF Pro Text', system-ui, -apple-system, sans-serif;
@@ -365,3 +388,23 @@ body::after {
 }
 .dark .cal-chip { color: rgb(212 212 216); }
 .cal-chip.reveal-tint::before, .cal-chip.reveal-tint::after { inset: 0 0 0 -2px; }
+
+/* ── Sistema visual compartido (calendario → todos los hubs) ── */
+.panel {
+  position: relative;
+  overflow: hidden;
+  border-radius: 21px;
+  border: 1px solid rgb(0 0 0 / 0.05);
+  background: rgb(255 255 255 / 0.6);
+  backdrop-filter: blur(21px);
+}
+.dark .panel { border-color: rgb(255 255 255 / 0.06); background: rgb(9 9 11 / 0.6); }
+.eyebrow {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.25em;
+  color: rgb(113 113 122);
+}
+.hairline { height: 1px; background: linear-gradient(90deg, transparent, rgb(0 0 0 / 0.1), transparent); }
+.dark .hairline { background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.1), transparent); }

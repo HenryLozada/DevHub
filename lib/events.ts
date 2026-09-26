@@ -97,13 +97,13 @@ export function formatEventTime(event: PersonalEvent): string {
 export function getCategoryMeta(categoria: EventCategory | string) {
   switch (categoria) {
     case "cumpleaños":
-      return { label: "Cumpleaños", neon: "#a78bfa", color: "bg-violet-500", textColor: "text-violet-600", bgLight: "bg-violet-500/10", border: "border-violet-500/40" }
+      return { label: "Cumpleaños", neon: "#a58af0", color: "bg-violet-500", textColor: "text-violet-600", bgLight: "bg-violet-500/10", border: "border-violet-500/40" }
     case "concierto":
-      return { label: "Eventos/Conciertos", neon: "#fbbf24", color: "bg-amber-500", textColor: "text-amber-600", bgLight: "bg-amber-500/10", border: "border-amber-500/40" }
+      return { label: "Eventos/Conciertos", neon: "#e9b44c", color: "bg-amber-500", textColor: "text-amber-600", bgLight: "bg-amber-500/10", border: "border-amber-500/40" }
     case "laboral":
-      return { label: "Laboral", neon: "#60a5fa", color: "bg-blue-500", textColor: "text-blue-600", bgLight: "bg-blue-500/10", border: "border-blue-500/40" }
+      return { label: "Laboral", neon: "#6a9ef0", color: "bg-blue-500", textColor: "text-blue-600", bgLight: "bg-blue-500/10", border: "border-blue-500/40" }
     case "rutina":
-      return { label: "Rutinas", neon: "#22d3ee", color: "bg-cyan-500", textColor: "text-cyan-600", bgLight: "bg-cyan-500/10", border: "border-cyan-500/40" }
+      return { label: "Rutinas", neon: "#3cc4d8", color: "bg-cyan-500", textColor: "text-cyan-600", bgLight: "bg-cyan-500/10", border: "border-cyan-500/40" }
     default:
       return { label: "Otros", neon: "#a1a1aa", color: "bg-zinc-500", textColor: "text-zinc-600", bgLight: "bg-zinc-500/10", border: "border-zinc-500/40" }
   }
