@@ -1,5 +1,7 @@
 import { Calendar as IoCalendarOutline, Wallet, CheckCircle2, Terminal, Puzzle, Sun, Moon } from "lucide-react"
 import { motion } from "motion/react"
+import { useState } from "react"
+import { SlimeNav } from "@/components/slime-nav"
 import { cn } from "@/lib/utils"
 
 export type TabId = "calendar" | "budgeted" | "chores" | "devhub" | "playground"
@@ -23,6 +25,7 @@ export const TABS = [
 const SPRING = { type: "spring", stiffness: 500, damping: 38 } as const
 
 export function GlobalNav({ activeTab, onTabChange, theme, onToggleTheme, rightSlot }: GlobalNavProps) {
+  const [activeEl, setActiveEl] = useState<HTMLButtonElement | null>(null)
   return (
     <>
       <nav className="sticky top-0 z-50 border-b border-white/10 bg-black/95 backdrop-blur-xl">
@@ -43,25 +46,20 @@ export function GlobalNav({ activeTab, onTabChange, theme, onToggleTheme, rightS
             </div>
 
             {/* Tabs (desktop / tablet) */}
-            <div className="hidden h-full items-center gap-1 md:flex">
+            <div className="relative hidden h-full items-center gap-1 md:flex">
+              <SlimeNav target={activeEl} />
               {TABS.map(({ id, label, icon: Icon }) => {
                 const active = activeTab === id
                 return (
                   <button
                     key={id}
+                    ref={active ? setActiveEl : undefined}
                     onClick={() => onTabChange(id)}
                     className={cn(
                       "relative flex h-9 shrink-0 cursor-pointer select-none items-center gap-1.5 rounded-lg px-3.5 font-mono text-xs font-bold uppercase tracking-wider transition-colors",
                       active ? "text-black" : "text-zinc-400 hover:text-white"
                     )}
                   >
-                    {active && (
-                      <motion.span
-                        layoutId="nav-pill"
-                        transition={SPRING}
-                        className="absolute inset-0 rounded-lg bg-gradient-to-r from-[#76b900] to-[#9be01c] shadow-[0_0_20px_rgba(118,185,0,0.45)]"
-                      />
-                    )}
                     <Icon className="relative size-3.5" />
                     <span className="relative">{label}</span>
                   </button>

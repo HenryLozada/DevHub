@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button"
-import { Plus as IoAdd, Download as IoDownload, Pencil as IoPencil } from "lucide-react"
+import { Plus as IoAdd, Download as IoDownload, ChevronRight, Check } from "lucide-react"
 import {
   type PersonalEvent,
   type EventOccurrence,
@@ -7,7 +7,7 @@ import {
   getCategoryMeta,
   formatEventTime,
 } from "@/lib/events"
-import { formatFullDate, toDateKey } from "@/lib/cashflow"
+import { toDateKey } from "@/lib/cashflow"
 import { cn } from "@/lib/utils"
 
 interface EventsPanelProps {
@@ -20,6 +20,24 @@ interface EventsPanelProps {
   completed: Record<string, boolean>
 }
 
+const CATEGORY_ORDER = ["rutina", "laboral", "concierto", "cumpleaños"]
+
+const RECURRENCE_LABEL: Record<string, string> = {
+  diario: "Diario",
+  dias_laborales: "Lun–Vie",
+  semanal: "Semanal",
+  mensual: "Mensual",
+  anual: "Anual",
+  unico: "Único",
+}
+
+const recurrenceLabel = (r: string) => RECURRENCE_LABEL[r] ?? r.replace(/_/g, " ")
+
+const panel =
+  "relative overflow-hidden rounded-2xl border border-black/5 dark:border-white/[0.06] bg-white/60 dark:bg-[linear-gradient(160deg,rgba(24,24,27,0.75),rgba(9,9,11,0.9))] backdrop-blur-xl shadow-[0_1px_0_0_rgba(255,255,255,0.06)_inset,0_20px_40px_-24px_rgba(0,0,0,0.6)]"
+
+const eyebrow = "font-mono text-[10px] uppercase tracking-[0.25em] text-zinc-500 dark:text-zinc-500"
+
 export function EventsPanel({
   selectedDate,
   dayOccurrences,
@@ -29,7 +47,6 @@ export function EventsPanel({
   onToggleComplete,
   completed,
 }: EventsPanelProps) {
-
   const handleExport = () => {
     exportEventsToJSON(events)
   }
@@ -40,112 +57,176 @@ export function EventsPanel({
     return acc
   }, {} as Record<string, PersonalEvent[]>)
 
-  const card = "relative border border-white/30 dark:border-white/10 backdrop-blur-lg bg-white/40 dark:bg-zinc-950/40 rounded-sm"
-  const chip = "flex items-center justify-between gap-2 rounded-sm border border-white/30 dark:border-white/10 backdrop-blur-md bg-white/30 dark:bg-zinc-900/40 p-2.5"
+  const dateKey = toDateKey(selectedDate)
+  const doneCount = dayOccurrences.filter((o) => completed[`${o.event.id}-${dateKey}`]).length
+  const progress = dayOccurrences.length ? Math.round((doneCount / dayOccurrences.length) * 100) : 0
+
+  const weekday = selectedDate.toLocaleDateString("es-ES", { weekday: "long" })
+  const monthYear = selectedDate.toLocaleDateString("es-ES", { month: "long", year: "numeric" })
 
   return (
     <aside className="flex w-full flex-col gap-4 lg:w-80">
-      <div className={cn(card, "p-3 sm:p-5")}>
-        <div className="corner-square" />
-        <div className="flex items-center justify-between mb-2">
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
-            Agenda del día
-          </p>
+      {/* ── Agenda del día ── */}
+      <section className={cn(panel, "p-5")}>
+        <div className="pointer-events-none absolute -right-16 -top-16 size-48 rounded-full bg-[#76b900]/15 blur-3xl" />
+
+        <div className="relative flex items-end justify-between gap-3">
+          <div className="flex items-end gap-3">
+            <span className="bg-gradient-to-b from-zinc-900 to-zinc-500 dark:from-white dark:to-zinc-500 bg-clip-text font-mono text-5xl font-light leading-none tracking-tighter text-transparent tabular-nums">
+              {String(selectedDate.getDate()).padStart(2, "0")}
+            </span>
+            <div className="pb-0.5">
+              <p className={eyebrow}>Agenda</p>
+              <p className="text-sm font-medium capitalize leading-tight text-zinc-900 dark:text-zinc-100">{weekday}</p>
+              <p className="text-xs capitalize text-zinc-500">{monthYear}</p>
+            </div>
+          </div>
+
+          <div className="text-right">
+            <p className="font-mono text-lg leading-none tabular-nums text-zinc-900 dark:text-zinc-100">
+              {doneCount}
+              <span className="text-zinc-500">/{dayOccurrences.length}</span>
+            </p>
+            <p className={cn(eyebrow, "mt-1 tracking-[0.2em]")}>Hecho</p>
+          </div>
         </div>
-        <h2 className="mt-0.5 text-[17px] font-semibold leading-tight text-zinc-900 dark:text-zinc-100">
-          {formatFullDate(selectedDate)}
-        </h2>
+
+        <div className="relative mt-4 h-[3px] overflow-hidden rounded-full bg-zinc-900/10 dark:bg-white/[0.06]">
+          <div
+            className="h-full rounded-full bg-gradient-to-r from-[#76b900] to-[#b6ff3b] shadow-[0_0_12px_rgba(118,185,0,0.8)] transition-[width] duration-700 ease-out"
+            style={{ width: `${progress}%` }}
+          />
+        </div>
 
         {dayOccurrences.length === 0 ? (
-          <p className="mt-3 text-sm text-zinc-500 dark:text-zinc-400">☕ Día libre: sin eventos programados.</p>
+          <div className="mt-5 rounded-xl border border-dashed border-zinc-300 dark:border-white/10 px-4 py-6 text-center">
+            <p className={eyebrow}>Sin señales</p>
+            <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">Día libre: sin eventos programados.</p>
+          </div>
         ) : (
-          <ul className="mt-3 flex flex-col gap-1.5 stagger">
+          <ol className="relative mt-5 flex flex-col stagger">
+            <span className="absolute bottom-3 left-[58px] top-3 w-px bg-gradient-to-b from-[#76b900]/60 via-zinc-300 to-transparent dark:via-white/10" />
             {dayOccurrences.map((o) => {
               const meta = getCategoryMeta(o.event.categoria)
-              const taskKey = `${o.event.id}-${toDateKey(o.date)}`
-              const isCompleted = !!completed[taskKey]
+              const isCompleted = !!completed[`${o.event.id}-${toDateKey(o.date)}`]
               return (
-                <li
-                  key={o.event.id}
-                  onClick={() => onToggleComplete(o)}
-                  className={cn(
-                    chip,
-                    "cursor-pointer transition-all duration-200 hover:bg-white/90 dark:hover:bg-zinc-900/80 hover:shadow-[0_0_20px_-4px_rgba(118,185,0,0.25)]",
-                    isCompleted && "opacity-50 line-through"
-                  )}
-                >
-                  <div className="flex min-w-0 items-center gap-2">
-                    <span className={cn("size-2 shrink-0 rounded-sm", isCompleted ? "bg-zinc-400" : meta.color)} />
-                    <div className="flex flex-col">
-                      <span className={cn("truncate text-sm font-medium", isCompleted ? "text-zinc-500 dark:text-zinc-500" : "text-zinc-900 dark:text-zinc-100")}>
+                <li key={o.event.id}>
+                  <button
+                    type="button"
+                    onClick={() => onToggleComplete(o)}
+                    aria-pressed={isCompleted}
+                    className="group relative flex w-full items-center gap-3 rounded-xl py-2 pr-2 text-left transition-colors hover:bg-zinc-900/[0.04] dark:hover:bg-white/[0.03] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#76b900]/60"
+                  >
+                    <span className="w-11 shrink-0 text-right font-mono text-xs tabular-nums text-zinc-500">
+                      {o.event.horaInicio ?? "—"}
+                    </span>
+                    <span
+                      className={cn(
+                        "relative z-10 grid size-[18px] shrink-0 place-items-center rounded-full border transition-all duration-300",
+                        isCompleted
+                          ? "border-[#76b900] bg-[#76b900] shadow-[0_0_14px_rgba(118,185,0,0.7)]"
+                          : "border-zinc-300 bg-white dark:border-white/20 dark:bg-zinc-950 group-hover:border-[#76b900]"
+                      )}
+                    >
+                      {isCompleted ? (
+                        <Check className="size-3 text-black" strokeWidth={3} />
+                      ) : (
+                        <span className={cn("size-1.5 rounded-full", meta.color)} />
+                      )}
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span
+                        className={cn(
+                          "block truncate text-sm font-medium transition-colors",
+                          isCompleted ? "text-zinc-400 line-through decoration-[#76b900]/70 dark:text-zinc-600" : "text-zinc-900 dark:text-zinc-100"
+                        )}
+                      >
                         {o.event.nombre}
                       </span>
-                      <span className="text-xs text-zinc-500 dark:text-zinc-400">{formatEventTime(o.event)}</span>
-                    </div>
-                  </div>
+                      <span className="block truncate font-mono text-[11px] text-zinc-500">
+                        {formatEventTime(o.event)} · {meta.label}
+                      </span>
+                    </span>
+                  </button>
                 </li>
               )
             })}
-          </ul>
+          </ol>
         )}
-      </div>
+      </section>
 
-      <div className={cn(card, "flex flex-col")}>
-        <div className="corner-square" />
-        <div className="flex items-center justify-between gap-2 border-b border-hairline dark:border-zinc-800 p-4">
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
-            Todos los Eventos
-          </p>
-          <div className="flex gap-1.5">
-            <Button size="icon" variant="secondary" onClick={handleExport} title="Exportar Agenda" className="h-8 w-8">
+      {/* ── Todos los eventos ── */}
+      <section className={cn(panel, "flex flex-col")}>
+        <header className="flex items-center justify-between gap-2 px-5 pb-3 pt-5">
+          <div>
+            <p className={eyebrow}>Registro</p>
+            <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
+              Todos los eventos <span className="font-mono text-zinc-500">[{events.length}]</span>
+            </p>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <Button
+              size="icon"
+              variant="ghost"
+              onClick={handleExport}
+              title="Exportar Agenda"
+              className="size-9 rounded-full border border-zinc-200 dark:border-white/10 text-zinc-500 hover:text-zinc-900 dark:hover:text-white"
+            >
               <IoDownload className="size-4" />
             </Button>
-            <Button size="sm" onClick={onAddEvent}>
+            <Button
+              size="sm"
+              onClick={onAddEvent}
+              className="h-9 rounded-full px-4 shadow-[0_0_24px_-6px_rgba(118,185,0,0.9)]"
+            >
               <IoAdd className="size-4" />
               Nuevo
             </Button>
           </div>
-        </div>
+        </header>
+
+        <div className="h-px bg-gradient-to-r from-transparent via-zinc-300 to-transparent dark:via-white/10" />
 
         <div className="flex-1 overflow-y-auto p-3">
           {events.length === 0 ? (
-            <p className="py-6 text-center text-sm text-zinc-500 dark:text-zinc-400">
+            <p className="py-8 text-center text-sm text-zinc-500 dark:text-zinc-400">
               Aún no hay eventos. Agrega tu primer evento a la agenda.
             </p>
           ) : (
             <div className="flex flex-col gap-4">
               {[
-                ...["rutina", "laboral", "concierto", "cumpleaños"],
-                ...Object.keys(groupedEvents).filter(
-                  (c) => !["rutina", "laboral", "concierto", "cumpleaños"].includes(c)
-                ),
+                ...CATEGORY_ORDER,
+                ...Object.keys(groupedEvents).filter((c) => !CATEGORY_ORDER.includes(c)),
               ].map((cat) => {
                 const catEvents = groupedEvents[cat]
                 if (!catEvents || catEvents.length === 0) return null
                 const meta = getCategoryMeta(cat)
                 return (
-                  <div key={cat} className="flex flex-col gap-2">
-                    <h3 className="text-[11px] font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">{meta.label}</h3>
-                    <ul className="flex flex-col gap-1.5 stagger">
+                  <div key={cat}>
+                    <div className="mb-1.5 flex items-center gap-2 px-2">
+                      <span className={cn("h-3 w-[3px] rounded-full", meta.color)} />
+                      <h3 className={cn(eyebrow, "text-zinc-600 dark:text-zinc-400")}>{meta.label}</h3>
+                      <span className="h-px flex-1 bg-zinc-200 dark:bg-white/[0.05]" />
+                      <span className="font-mono text-[10px] text-zinc-500">{String(catEvents.length).padStart(2, "0")}</span>
+                    </div>
+                    <ul className="flex flex-col stagger">
                       {catEvents.map((event) => (
                         <li key={event.id}>
                           <button
                             type="button"
                             onClick={() => onEditEvent(event)}
-                            className="group flex w-full items-center justify-between gap-2 rounded-sm border border-white/30 dark:border-white/10 backdrop-blur-md bg-white/30 dark:bg-zinc-900/40 p-3 text-left transition-all duration-200 hover:bg-white/90 dark:hover:bg-zinc-900/80 hover:shadow-[0_0_20px_-4px_rgba(118,185,0,0.25)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#76b900]"
+                            className="group flex w-full items-center gap-3 rounded-xl px-2 py-2.5 text-left transition-all duration-200 hover:bg-zinc-900/[0.04] dark:hover:bg-white/[0.04] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#76b900]/60"
                           >
-                            <div className="min-w-0">
-                              <div className="flex items-center gap-2">
-                                <span className={cn("size-2 shrink-0 rounded-sm", meta.color)} />
-                                <span className="truncate text-sm font-medium text-zinc-900 dark:text-zinc-100">{event.nombre}</span>
-                              </div>
-                              <p className="mt-0.5 truncate text-xs text-zinc-500 dark:text-zinc-400">
-                                {formatEventTime(event)} · {event.recurrencia}
-                              </p>
-                            </div>
-                            <div className="flex shrink-0 items-center gap-2">
-                              <IoPencil className="size-3.5 text-zinc-400 dark:text-zinc-500 opacity-0 transition-opacity group-hover:opacity-100" />
-                            </div>
+                            <span className="min-w-0 flex-1">
+                              <span className="block truncate text-sm text-zinc-900 dark:text-zinc-100">{event.nombre}</span>
+                              <span className="mt-0.5 flex items-center gap-2">
+                                <span className="font-mono text-[11px] tabular-nums text-zinc-500">{formatEventTime(event)}</span>
+                                <span className="rounded-full border border-zinc-200 dark:border-white/10 px-1.5 py-px font-mono text-[9px] uppercase tracking-wider text-zinc-500">
+                                  {recurrenceLabel(event.recurrencia)}
+                                </span>
+                              </span>
+                            </span>
+                            <ChevronRight className="size-4 shrink-0 text-zinc-400 transition-all duration-200 group-hover:translate-x-0.5 group-hover:text-[#76b900] dark:text-zinc-600" />
                           </button>
                         </li>
                       ))}
@@ -156,7 +237,7 @@ export function EventsPanel({
             </div>
           )}
         </div>
-      </div>
+      </section>
     </aside>
   )
 }
