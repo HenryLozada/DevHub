@@ -91,19 +91,19 @@ export function ItemCard({ item, onEdit, onDelete }: ItemCardProps) {
   const getTypeMeta = () => {
     switch (item.type) {
       case "tool":
-        return { icon: <Terminal className="w-4 h-4 text-brand" />, label: "Tool" };
+        return { icon: <Terminal className="w-4 h-4 text-brand" />, label: "Tool", color: "var(--color-brand)" };
       case "repo":
-        return { icon: <FaGithub className="w-4 h-4 text-zinc-900 dark:text-white" />, label: "Repo" };
+        return { icon: <FaGithub className="w-4 h-4 text-violet" />, label: "Repo", color: "var(--color-violet)" };
       case "youtube":
-        return { icon: <FaYoutube className="w-4 h-4 text-neg" />, label: "YouTube" };
+        return { icon: <FaYoutube className="w-4 h-4 text-neg" />, label: "YouTube", color: "var(--color-neg)" };
       case "note":
-        return { icon: <FileText className="w-4 h-4 text-info" />, label: "Nota" };
+        return { icon: <FileText className="w-4 h-4 text-info" />, label: "Nota", color: "var(--color-info)" };
       case "api":
-        return { icon: <Key className="w-4 h-4 text-warn" />, label: "API Key" };
+        return { icon: <Key className="w-4 h-4 text-warn" />, label: "API Key", color: "var(--color-warn)" };
       case "credential":
-        return { icon: <Lock className="w-4 h-4 text-info" />, label: "Login" };
+        return { icon: <Lock className="w-4 h-4 text-cyan" />, label: "Login", color: "var(--color-cyan)" };
       default:
-        return { icon: <Terminal className="w-4 h-4 text-brand" />, label: "Otro" };
+        return { icon: <Terminal className="w-4 h-4 text-brand" />, label: "Otro", color: "var(--color-brand)" };
     }
   };
 
@@ -111,28 +111,28 @@ export function ItemCard({ item, onEdit, onDelete }: ItemCardProps) {
   const ytVideoId = item.type === "youtube" && item.url ? getYouTubeId(item.url) : null;
 
   return (
-    <div className="relative flex flex-col justify-between border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950/70 dark:backdrop-blur-xl p-5 rounded-xl shadow-sm min-h-[220px] group overflow-hidden lift">
+    <div className="panel reveal group flex min-h-[233px] flex-col justify-between p-f21 transition-colors">
       {/* Signature NVIDIA green corner square */}
 
       {/* Top Metadata Header */}
       <div>
         <div className="flex items-center justify-between">
-          <span className="text-[9px] font-mono font-bold tracking-wider uppercase bg-zinc-100 dark:bg-zinc-900 text-zinc-500 dark:text-zinc-400 px-2 py-0.5 border border-zinc-200 dark:border-zinc-800 select-none">
+          <span className="cal-chip select-none pl-f8 font-mono text-[10px] uppercase tracking-wider" style={{ "--neon": meta.color } as React.CSSProperties}>
             {item.category}
           </span>
-          <div className="flex items-center gap-1 text-xs font-mono font-semibold text-zinc-400">
+          <div className="flex items-center gap-f5 text-zinc-500">
             {meta.icon}
-            <span className="text-[10px] uppercase select-none">{meta.label}</span>
+            <span className="eyebrow select-none tracking-[0.2em]">{meta.label}</span>
      </div>
      {dialog}
      </div>
 
         {/* Title & Description */}
-        <h4 className="text-base font-bold font-sans text-zinc-900 dark:text-white mt-3 group-hover:text-brand transition-colors line-clamp-1">
+        <h4 className="mt-f13 line-clamp-1 text-base font-medium text-zinc-900 transition-colors dark:text-zinc-100">
           {item.title}
         </h4>
         {item.description && (
-          <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1 line-clamp-2 leading-relaxed">
+          <p className="mt-f5 line-clamp-2 text-xs leading-relaxed text-zinc-500 dark:text-zinc-400">
             {item.description}
           </p>
         )}
@@ -140,7 +140,7 @@ export function ItemCard({ item, onEdit, onDelete }: ItemCardProps) {
 
       {/* YouTube Thumbnail Preview */}
       {ytVideoId && (
-        <div className="mt-3 relative aspect-[16/9] w-full overflow-hidden border border-zinc-200 dark:border-zinc-800 select-none">
+        <div className="relative mt-f13 aspect-video w-full select-none overflow-hidden rounded-f13">
           <img
             src={`https://img.youtube.com/vi/${ytVideoId}/mqdefault.jpg`}
             alt={item.title}
@@ -158,7 +158,7 @@ export function ItemCard({ item, onEdit, onDelete }: ItemCardProps) {
       )}
 
       {/* Type Specific Content rendering */}
-      <div className="mt-4 flex-1 flex flex-col justify-end">
+      <div className="mt-f13 flex flex-1 flex-col justify-end">
         {/* Tool type URL */}
         {item.type === "tool" && item.url && (
           <a
@@ -189,7 +189,7 @@ export function ItemCard({ item, onEdit, onDelete }: ItemCardProps) {
             href={item.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-1.5 text-xs text-neg dark:text-neg hover:text-neg dark:hover:text-neg font-bold hover:underline font-mono"
+            className="flex items-center gap-1.5 text-xs text-neg hover:brightness-110 font-bold hover:underline font-mono"
           >
             <FaYoutube className="w-3.5 h-3.5" /> Ver en YouTube
           </a>
@@ -197,10 +197,10 @@ export function ItemCard({ item, onEdit, onDelete }: ItemCardProps) {
 
         {/* Note snippet */}
         {item.type === "note" && item.content && (
-          <div className="relative bg-zinc-50 dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 p-2 font-mono text-[10px] max-h-20 overflow-y-auto text-zinc-700 dark:text-zinc-300 whitespace-pre-wrap select-all">
+          <div className="relative rounded-f8 bg-zinc-900/[0.03] dark:bg-white/[0.03] border border-zinc-900/5 dark:border-white/[0.06] p-2 font-mono text-[10px] max-h-20 overflow-y-auto text-zinc-700 dark:text-zinc-300 whitespace-pre-wrap select-all">
             <button
               onClick={() => handleCopy(item.content || "", "Nota")}
-              className="absolute top-1 right-1 p-1 bg-white dark:bg-zinc-950/70 dark:backdrop-blur-xl border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 transition-colors shadow-xs"
+              className="absolute top-1 right-1 p-1 rounded-f5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 transition-colors shadow-xs"
               title="Copiar nota"
             >
               <Copy className="w-3 h-3" />
@@ -212,19 +212,19 @@ export function ItemCard({ item, onEdit, onDelete }: ItemCardProps) {
         {/* API Key */}
         {item.type === "api" && hasApiKey && (
           <div className="flex items-center gap-2">
-            <div className="flex-1 bg-zinc-50 dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 px-2 py-1 font-mono text-[11px] text-zinc-700 dark:text-zinc-300 overflow-hidden truncate">
+            <div className="flex-1 rounded-f8 bg-zinc-900/[0.03] dark:bg-white/[0.03] border border-zinc-900/5 dark:border-white/[0.06] px-2 py-1 font-mono text-[11px] text-zinc-700 dark:text-zinc-300 overflow-hidden truncate">
               {revealed ? secrets?.apiKey : "••••••••••••••••"}
             </div>
             <button
               onClick={revealPassword}
-              className="p-1.5 border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-900 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 transition-colors"
+              className="p-f5 rounded-f8 border border-zinc-200 dark:border-white/10 hover:bg-zinc-900/5 dark:hover:bg-white/5 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 transition-colors"
               title={revealed ? "Ocultar" : "Revelar"}
             >
               {revealed ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
             </button>
             <button
               onClick={() => void copySecret("apiKey", "API Key")}
-              className="p-1.5 border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-900 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 transition-colors"
+              className="p-f5 rounded-f8 border border-zinc-200 dark:border-white/10 hover:bg-zinc-900/5 dark:hover:bg-white/5 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 transition-colors"
               title="Copiar"
             >
               <Copy className="w-3.5 h-3.5" />
@@ -234,7 +234,7 @@ export function ItemCard({ item, onEdit, onDelete }: ItemCardProps) {
 
         {/* Credentials */}
         {item.type === "credential" && (
-          <div className="space-y-1.5 bg-zinc-50 dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 p-2 text-zinc-700 dark:text-zinc-300 font-mono text-xs">
+          <div className="space-y-1.5 rounded-f8 bg-zinc-900/[0.03] dark:bg-white/[0.03] border border-zinc-900/5 dark:border-white/[0.06] p-2 text-zinc-700 dark:text-zinc-300 font-mono text-xs">
             {item.username && (
               <div className="flex items-center gap-1.5 overflow-hidden">
                 <span className="font-bold text-zinc-400">U:</span>
@@ -272,8 +272,8 @@ export function ItemCard({ item, onEdit, onDelete }: ItemCardProps) {
       </div>
 
       {/* Footer controls: Edit/Delete */}
-      <div className="mt-4 pt-3 border-t border-zinc-100 dark:border-zinc-900/60 flex items-center justify-between gap-2 text-zinc-400">
-        <span className="text-[9px] font-mono text-zinc-300 dark:text-zinc-700 select-none">
+      <div className="mt-f13 flex items-center justify-between gap-f8 border-t border-zinc-900/5 pt-f13 text-zinc-400 dark:border-white/[0.06]">
+        <span className="select-none font-mono text-[10px] text-zinc-400 dark:text-zinc-600">
           {item.createdAt ? new Date(item.createdAt).toLocaleDateString("es-MX", { day: "numeric", month: "short", year: "numeric" }) : ""}
         </span>
          <div className="flex items-center gap-2">
