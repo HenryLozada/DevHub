@@ -21,7 +21,7 @@ export function BudgetedApp() {
   return (
     <div className="min-h-screen">
       <ModuleNav
-        icon={<Wallet className="w-4 h-4 text-[#76b900]" />}
+        icon={<Wallet className="w-4 h-4 text-brand" />}
         title="Gastos"
       />
       <Dashboard expenses={expenses} onRefresh={reload} />

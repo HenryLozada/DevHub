@@ -23,12 +23,12 @@
   --color-brand: #76b900;
   --color-brand-hi: #9be01c;
   --color-brand-lo: #5a8f00;
-  --color-pos: #3ecf9a;
-  --color-neg: #f07a6a;
-  --color-warn: #e9b44c;
-  --color-info: #6a9ef0;
-  --color-cyan: #3cc4d8;
-  --color-violet: #a58af0;
+  --color-pos: var(--c-pos);
+  --color-neg: var(--c-neg);
+  --color-warn: var(--c-warn);
+  --color-info: var(--c-info);
+  --color-cyan: var(--c-cyan);
+  --color-violet: var(--c-violet);
   --font-poppins: 'Inter', 'SF Pro Display', system-ui, -apple-system, sans-serif;
   --font-heading: 'Inter', 'SF Pro Display', system-ui, -apple-system, sans-serif;
   --font-body: 'Inter', 'SF Pro Text', system-ui, -apple-system, sans-serif;
@@ -408,3 +408,7 @@ body::after {
 }
 .hairline { height: 1px; background: linear-gradient(90deg, transparent, rgb(0 0 0 / 0.1), transparent); }
 .dark .hairline { background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.1), transparent); }
+
+/* Paleta armónica: tonos más profundos en claro para mantener contraste */
+:root { --c-pos: #1f9e70; --c-neg: #d4533f; --c-warn: #b7811d; --c-info: #3f72c9; --c-cyan: #1f96ab; --c-violet: #7a5bd6; }
+.dark { --c-pos: #3ecf9a; --c-neg: #f07a6a; --c-warn: #e9b44c; --c-info: #6a9ef0; --c-cyan: #3cc4d8; --c-violet: #a58af0; }

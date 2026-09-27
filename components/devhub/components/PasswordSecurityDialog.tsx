@@ -167,7 +167,7 @@ export function PasswordSecurityDialog({
               : "Confirma tu PIN actual para continuar."
 
   const actionClass =
-    "w-full border border-zinc-300 dark:border-zinc-700 px-4 py-2.5 text-left font-mono text-xs font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300 hover:border-[#76b900] hover:text-[#76b900] cursor-pointer"
+    "w-full border border-zinc-300 dark:border-zinc-700 px-4 py-2.5 text-left font-mono text-xs font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300 hover:border-brand hover:text-brand cursor-pointer"
 
   return (
     <div className="fixed inset-0 z-[70] flex items-center justify-center p-4">
@@ -175,7 +175,7 @@ export function PasswordSecurityDialog({
       <div className="relative w-full max-w-sm border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-950/70 dark:backdrop-blur-xl p-5 shadow-2xl">
         <div className="flex items-start justify-between border-b border-zinc-200 dark:border-zinc-800 pb-3 mb-5">
           <div className="flex items-center gap-2">
-            <ShieldCheck className="w-5 h-5 text-[#76b900]" />
+            <ShieldCheck className="w-5 h-5 text-brand" />
             <div>
               <h2 className="font-mono font-bold text-sm uppercase tracking-wider text-zinc-900 dark:text-white">{title}</h2>
               <p className="text-[11px] text-zinc-500 mt-1">{description}</p>
@@ -215,7 +215,7 @@ export function PasswordSecurityDialog({
                     setStep("current")
                     setValue("")
                   }}
-                  className={`${actionClass} text-red-500`}
+                  className={`${actionClass} text-neg`}
                 >
                   Desactivar protección
                 </button>
@@ -236,7 +236,7 @@ export function PasswordSecurityDialog({
 
         {step === "recoveryView" ? (
           <div className="space-y-4">
-            <div className="flex items-center gap-2 border border-[#76b900]/50 bg-[#76b900]/10 p-4">
+            <div className="flex items-center gap-2 border border-brand/50 bg-brand/10 p-4">
               <code className="flex-1 select-all text-center font-mono text-lg font-bold tracking-widest text-zinc-900 dark:text-white">
                 {plainRecovery}
               </code>
@@ -246,10 +246,10 @@ export function PasswordSecurityDialog({
                   setCopied(true)
                   setTimeout(() => setCopied(false), 1500)
                 }}
-                className="shrink-0 border border-zinc-300 dark:border-zinc-700 p-2 text-zinc-500 hover:text-[#76b900] cursor-pointer"
+                className="shrink-0 border border-zinc-300 dark:border-zinc-700 p-2 text-zinc-500 hover:text-brand cursor-pointer"
                 title="Copiar código"
               >
-                {copied ? <Check className="w-4 h-4 text-[#76b900]" /> : <Copy className="w-4 h-4" />}
+                {copied ? <Check className="w-4 h-4 text-brand" /> : <Copy className="w-4 h-4" />}
               </button>
             </div>
             <p className="text-[10px] text-zinc-500 font-mono">
@@ -257,7 +257,7 @@ export function PasswordSecurityDialog({
             </p>
             <button
               onClick={onClose}
-              className="w-full bg-[#76b900] px-4 py-2.5 font-mono text-xs font-bold uppercase tracking-wider text-black cursor-pointer hover:bg-[#86cb10]"
+              className="w-full bg-brand px-4 py-2.5 font-mono text-xs font-bold uppercase tracking-wider text-black cursor-pointer hover:bg-brand-hi"
             >
               Entendido
             </button>
@@ -284,12 +284,12 @@ export function PasswordSecurityDialog({
                 )
               }
               placeholder={step === "recovery" ? "CÓDIGO" : "••••"}
-              className="w-full border border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900 px-3 py-3 text-center font-mono tracking-[0.4em] text-zinc-900 dark:text-white focus:outline-none focus:border-[#76b900]"
+              className="w-full border border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900 px-3 py-3 text-center font-mono tracking-[0.4em] text-zinc-900 dark:text-white focus:outline-none focus:border-brand"
             />
             <button
               type="submit"
               disabled={busy}
-              className="w-full bg-[#76b900] px-4 py-2.5 font-mono text-xs font-bold uppercase tracking-wider text-black cursor-pointer hover:bg-[#86cb10] disabled:opacity-50"
+              className="w-full bg-brand px-4 py-2.5 font-mono text-xs font-bold uppercase tracking-wider text-black cursor-pointer hover:bg-brand-hi disabled:opacity-50"
             >
               Continuar
             </button>
@@ -310,12 +310,12 @@ export function PasswordSecurityDialog({
               value={newPin}
               onChange={(e) => setNewPin(e.target.value.replace(/\D/g, "").slice(0, 8))}
               placeholder="PIN de 4 a 8 dígitos"
-              className="w-full border border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900 px-3 py-3 text-center font-mono tracking-[0.4em] text-zinc-900 dark:text-white focus:outline-none focus:border-[#76b900]"
+              className="w-full border border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900 px-3 py-3 text-center font-mono tracking-[0.4em] text-zinc-900 dark:text-white focus:outline-none focus:border-brand"
             />
             <button
               type="submit"
               disabled={busy}
-              className="w-full bg-[#76b900] px-4 py-2.5 font-mono text-xs font-bold uppercase tracking-wider text-black cursor-pointer hover:bg-[#86cb10] disabled:opacity-50"
+              className="w-full bg-brand px-4 py-2.5 font-mono text-xs font-bold uppercase tracking-wider text-black cursor-pointer hover:bg-brand-hi disabled:opacity-50"
             >
               Guardar PIN
             </button>

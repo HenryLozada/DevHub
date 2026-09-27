@@ -92,7 +92,7 @@ function RuleForm({
             className={cn(
               "flex items-center justify-center gap-2 rounded-sm border p-2.5 text-sm font-medium transition-colors",
               tipo === "ingreso"
-                ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                ? "border-pos/40 bg-pos/10 text-pos dark:text-pos"
                 : "border-hairline dark:border-zinc-700 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800",
             )}
           >
@@ -106,7 +106,7 @@ function RuleForm({
             className={cn(
               "flex items-center justify-center gap-2 rounded-sm border p-2.5 text-sm font-medium transition-colors",
               tipo === "egreso"
-                ? "border-red-500/40 bg-red-500/10 text-red-600 dark:text-red-400"
+                ? "border-neg/40 bg-neg/10 text-neg dark:text-neg"
                 : "border-hairline dark:border-zinc-700 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800",
             )}
           >
@@ -195,7 +195,7 @@ function RuleForm({
           <Button
             type="button"
             variant="ghost"
-            className="text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
+            className="text-neg hover:text-neg dark:text-neg dark:hover:text-neg"
             onClick={() => onDelete(rule!.id)}
           >
             <Trash2 className="size-4" />

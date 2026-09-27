@@ -1,13 +1,14 @@
 import { useState, useMemo } from "react"
 import { confetti } from "@/lib/confetti"
 import { AnimatePresence, motion } from "motion/react"
-import { CheckCircle2, Circle, Plus, Pencil, Trash2, ChevronRight, Sparkles } from "lucide-react"
+import { Check, Plus, Pencil, Trash2, ChevronRight } from "lucide-react"
+import { CountUp } from "@/components/ui/count-up"
 import { isBefore, startOfDay, endOfWeek, isSameDay } from "date-fns"
 import { cn } from "@/lib/utils"
 import { RippleButton } from "@/components/ui/ripple-button"
 import { InjectionSlot } from "@/components/playground/InjectionSlot"
 import { toggleChore, deleteChore } from "../store"
-import { Chore } from "../types"
+import { Chore, CHORE_COLOR } from "../types"
 import { ChoreModal } from "./ChoreModal"
 
 interface DashboardProps {
@@ -15,40 +16,13 @@ interface DashboardProps {
   onRefresh: () => void
 }
 
-const URGENCY_COLORS = {
-  urgent: {
-    label: "Vence hoy",
-    dot: "bg-red-500",
-    ring: "ring-red-500/20",
-    glass: "border-red-500/20",
-    text: "text-red-600 dark:text-red-400",
-    badge: "bg-red-500",
-    glow: "shadow-red-500/10",
-  },
-  soon: {
-    label: "Esta semana",
-    dot: "bg-amber-500",
-    ring: "ring-amber-500/20",
-    glass: "border-amber-500/20",
-    text: "text-amber-600 dark:text-amber-400",
-    badge: "bg-amber-500",
-    glow: "shadow-amber-500/10",
-  },
-  later: {
-    label: "Después",
-    dot: "bg-emerald-500",
-    ring: "ring-emerald-500/20",
-    glass: "border-emerald-500/20",
-    text: "text-emerald-600 dark:text-emerald-400",
-    badge: "bg-emerald-500",
-    glow: "shadow-emerald-500/10",
-  },
+const URGENCY = {
+  urgent: { label: "Vence hoy", color: "var(--color-neg)", empty: "Nada urgente" },
+  soon: { label: "Esta semana", color: "var(--color-warn)", empty: "Semana tranquila" },
+  later: { label: "Después", color: "var(--color-pos)", empty: "Sin pendientes" },
 }
 
-type Urgency = keyof typeof URGENCY_COLORS
-
-const GLASS = "backdrop-blur-xl bg-white/40 dark:bg-zinc-950/40 border border-white/30 dark:border-white/10 shadow-sm shadow-black/5"
-const GLASS_CARD = "backdrop-blur-md bg-white/60 dark:bg-zinc-950/60 border border-white/40 dark:border-white/[0.08] shadow-sm shadow-black/5"
+type Urgency = keyof typeof URGENCY
 
 function KanbanCard({
   c,
@@ -62,26 +36,26 @@ function KanbanCard({
   onDelete: (c: Chore) => void
 }) {
   return (
-    <motion.div
+    <motion.li
+      layout
       initial={{ opacity: 0, y: 4 }}
       animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, scale: 0.95 }}
-      className={cn("group flex items-center gap-2.5 p-2.5", GLASS_CARD, "hover:border-white/70 dark:hover:border-white/20 hover:shadow-md transition-all duration-200")}
+      exit={{ opacity: 0, scale: 0.97 }}
+      className="reveal group flex items-center gap-f13 rounded-f13 px-f8 py-f8 transition-colors hover:bg-zinc-900/[0.03] dark:hover:bg-white/[0.03]"
     >
-      <button onClick={() => onToggle(c)} className="shrink-0 transition-all active:scale-90 cursor-pointer group/toggle">
-        <Circle className="w-[15px] h-[15px] text-zinc-300 dark:text-zinc-600 group-hover/toggle:text-[#76b900] transition-colors" />
+      <button onClick={() => onToggle(c)} aria-label="Completar"
+        className="grid size-[21px] shrink-0 place-items-center rounded-full border border-zinc-300 bg-white transition-all hover:border-brand active:scale-90 dark:border-white/20 dark:bg-zinc-950">
+        <Check className="size-3 text-brand opacity-0 transition-opacity group-hover:opacity-40" strokeWidth={3} />
       </button>
-      <div className="flex-1 min-w-0">
-        <p className="text-xs font-semibold text-zinc-800 dark:text-zinc-200 truncate leading-tight">{c.title}</p>
-        {c.dueDate && (
-          <p className="text-[9px] font-mono text-zinc-400 dark:text-zinc-500 truncate mt-0.5">{c.dueDate}</p>
-        )}
+      <button onClick={() => onEdit(c)} className="min-w-0 flex-1 text-left">
+        <span className="cal-chip block truncate pl-f8 text-sm" style={{ "--neon": CHORE_COLOR[c.color ?? ""] ?? "var(--color-brand)" } as React.CSSProperties}>{c.title}</span>
+        {c.dueDate && <span className="mt-f3 block pl-f8 font-mono text-[10px] tabular-nums text-zinc-500">{c.dueDate}</span>}
+      </button>
+      <div className="flex shrink-0 gap-f3 transition-opacity md:opacity-0 md:group-hover:opacity-100">
+        <button onClick={() => onEdit(c)} title="Editar" className="rounded-f8 p-f5 text-zinc-400 transition-colors hover:text-brand"><Pencil className="size-3.5" /></button>
+        <button onClick={() => onDelete(c)} title="Eliminar" className="rounded-f8 p-f5 text-zinc-400 transition-colors hover:text-neg"><Trash2 className="size-3.5" /></button>
       </div>
-      <div className="flex gap-0.5 opacity-0 group-hover:opacity-100 transition-all duration-200 shrink-0">
-        <button onClick={() => onEdit(c)} className="p-1 hover:bg-white/80 dark:hover:bg-zinc-800/60 text-zinc-400 hover:text-[#76b900] rounded-sm transition-colors cursor-pointer"><Pencil className="w-3 h-3" /></button>
-        <button onClick={() => onDelete(c)} className="p-1 hover:bg-red-500/10 text-zinc-400 hover:text-red-500 rounded-sm transition-colors cursor-pointer"><Trash2 className="w-3 h-3" /></button>
-      </div>
-    </motion.div>
+    </motion.li>
   )
 }
 
@@ -159,64 +133,55 @@ export function Dashboard({ chores, onRefresh }: DashboardProps) {
   ]
 
   return (
-    <div className="h-[calc(100vh-7.5rem)] flex flex-col px-4 py-4 max-w-6xl mx-auto relative">
+    <div className="mx-auto flex max-w-6xl flex-col gap-f21 px-f13 py-f21 md:px-f34 md:py-f34 relative">
       <InjectionSlot moduleId="chores" className="absolute inset-0 pointer-events-none" />
-      {/* Subtle background decoration */}
-      <div className="absolute -top-20 right-10 w-72 h-72 bg-[#76b900]/5 dark:bg-[#76b900]/[0.03] blur-3xl rounded-full pointer-events-none" />
-      <div className="absolute -bottom-20 left-10 w-56 h-56 bg-violet-500/5 dark:bg-violet-500/[0.02] blur-3xl rounded-full pointer-events-none" />
 
-      {/* Header */}
-      <div className="flex items-center justify-between mb-4 shrink-0 relative z-10">
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 bg-[#76b900]/10 border border-[#76b900]/20 flex items-center justify-center backdrop-blur-sm">
-              <Sparkles className="w-3.5 h-3.5 text-[#76b900]" />
-            </div>
-            <h2 className="text-base font-bold text-zinc-900 dark:text-white font-sans tracking-tight">Mis Tareas</h2>
+      {/* Resumen */}
+      <section className="panel relative z-10 flex flex-wrap items-end justify-between gap-f21 p-f21">
+        <div className="flex items-end gap-f13">
+          <span className="font-mono text-5xl font-light leading-none tracking-tighter tabular-nums text-zinc-900 dark:text-zinc-100">
+            <CountUp value={total - doneCount} />
+          </span>
+          <div className="pb-f3">
+            <p className="eyebrow">Pendientes</p>
+            <p className="text-sm text-zinc-500">{grouped.urgent.length > 0 ? `${grouped.urgent.length} vencen hoy` : "Nada vence hoy"}</p>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="w-28 h-1 bg-white/60 dark:bg-zinc-800/60 backdrop-blur-sm rounded-full overflow-hidden border border-white/30 dark:border-white/10">
-              <div className="h-full bg-gradient-to-r from-[#76b900] to-[#86cb00] transition-all duration-700 rounded-full" style={{ width: `${pct}%` }} />
-            </div>
-            <span className="text-[10px] font-mono font-bold text-zinc-400 dark:text-zinc-500 tabular-nums">{doneCount}/{total}</span>
+        </div>
+        <div className="flex min-w-[233px] flex-1 items-center gap-f13 md:max-w-[377px]">
+          <div className="h-[3px] flex-1 overflow-hidden rounded-full bg-zinc-900/10 dark:bg-white/[0.06]">
+            <div className="h-full rounded-full bg-brand transition-[width] duration-700 ease-out" style={{ width: `${pct}%` }} />
           </div>
+          <span className="font-mono text-xs tabular-nums text-zinc-500">{doneCount}/{total}</span>
         </div>
         <RippleButton onClick={() => { setEditingChore(null); setShowChoreModal(true) }}
           rippleColor="#000000" duration="600ms"
-          className="flex items-center gap-1.5 px-3 py-1.5 bg-[#76b900] text-black rounded-sm text-[10px] font-mono font-bold uppercase tracking-wider hover:bg-[#86cb00] transition-all duration-200 border border-[#76b900] cursor-pointer shadow-sm shadow-[#76b900]/20 overflow-hidden">
-          <Plus className="w-3.5 h-3.5" /> Tarea
+          className="flex h-9 shrink-0 items-center gap-f5 overflow-hidden rounded-full bg-brand px-f13 text-xs font-semibold text-black transition-colors hover:bg-brand-hi">
+          <Plus className="size-4" /> Tarea
         </RippleButton>
-      </div>
+      </section>
 
-      {/* Kanban columns */}
-      <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-3 min-h-0 relative z-10">
+      {/* Columnas por urgencia */}
+      <div className="relative z-10 grid grid-cols-1 gap-f21 md:grid-cols-3">
         {columns.map(col => {
-          const meta = URGENCY_COLORS[col.key]
+          const meta = URGENCY[col.key]
           const isCollapsed = collapsed[col.key]
+          const shown = isCollapsed ? col.chores.slice(0, 3) : col.chores
           return (
-            <div key={col.key} className={cn("flex flex-col min-h-0 rounded-sm p-3", GLASS, meta.glass, meta.glow)}>
-              {/* Column header */}
-              <div className="flex items-center justify-between mb-2 shrink-0">
-                <div className="flex items-center gap-2">
-                  <div className={cn("w-2 h-2 rounded-full ring-2", meta.dot, meta.ring)} />
-                  <span className={cn("text-[10px] font-mono font-bold uppercase tracking-wider", meta.text)}>
-                    {meta.label}
-                  </span>
-                  <span className={cn("text-[9px] font-mono font-bold px-1.5 py-0.5 text-white rounded-sm shadow-sm", meta.badge)}>
-                    {col.chores.length}
-                  </span>
-                </div>
+            <section key={col.key} className="panel flex flex-col">
+              <header className="flex items-center gap-f8 px-f21 pb-f13 pt-f21">
+                <span className="h-f13 w-[3px] rounded-full" style={{ background: meta.color }} />
+                <h3 className="eyebrow !text-zinc-600 dark:!text-zinc-400">{meta.label}</h3>
+                <span className="hairline flex-1" />
+                <span className="font-mono text-[10px] text-zinc-500">{String(col.chores.length).padStart(2, "0")}</span>
                 {col.chores.length > 3 && (
-                  <button onClick={() => toggleCollapse(col.key)} className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors cursor-pointer p-0.5">
-                    <ChevronRight className={cn("w-3.5 h-3.5 transition-transform duration-200", !isCollapsed && "rotate-90")} />
+                  <button onClick={() => toggleCollapse(col.key)} className="p-f3 text-zinc-400 transition-colors hover:text-zinc-700 dark:hover:text-zinc-200">
+                    <ChevronRight className={cn("size-3.5 transition-transform duration-200", !isCollapsed && "rotate-90")} />
                   </button>
                 )}
-              </div>
-
-              {/* Cards */}
-              <div className="flex-1 overflow-y-auto min-h-0 space-y-1.5 pr-0.5 scrollbar-thin">
+              </header>
+              <ul className="flex flex-col px-f8 pb-f8">
                 <AnimatePresence mode="popLayout">
-                  {(isCollapsed ? col.chores.slice(0, 3) : col.chores).map(c => (
+                  {shown.map(c => (
                     <KanbanCard
                       key={c.id}
                       c={c}
@@ -225,43 +190,35 @@ export function Dashboard({ chores, onRefresh }: DashboardProps) {
                       onDelete={(item) => setConfirmDelete(item)}
                     />
                   ))}
-                  {isCollapsed && col.chores.length > 3 && (
-                    <button onClick={() => toggleCollapse(col.key)}
-                      className="w-full py-1.5 text-[9px] font-mono font-bold text-zinc-400 hover:text-[#76b900] uppercase tracking-wider border border-dashed border-white/40 dark:border-white/[0.08] hover:border-[#76b900]/40 transition-colors cursor-pointer backdrop-blur-sm bg-white/20 dark:bg-zinc-950/20 rounded-sm">
-                      +{col.chores.length - 3} más
-                    </button>
-                  )}
                 </AnimatePresence>
-                {col.chores.length === 0 && (
-                  <div className="flex flex-col items-center justify-center gap-1 h-24 text-[11px] text-zinc-400 dark:text-zinc-500 border border-dashed border-zinc-300/60 dark:border-white/10 bg-white/10 dark:bg-zinc-950/10 rounded-xl">
-                    <span className="text-xl animate-bounce [animation-duration:2.4s]">{col.key === "urgent" ? "🎉" : col.key === "soon" ? "🌤️" : "🧘"}</span>
-                    {col.key === "urgent" ? "Nada urgente, ¡bien!" : "Todo tranquilo por aquí"}
-                  </div>
+                {isCollapsed && col.chores.length > 3 && (
+                  <button onClick={() => toggleCollapse(col.key)} className="mx-f8 my-f5 rounded-full py-f5 font-mono text-[10px] uppercase tracking-wider text-zinc-500 transition-colors hover:text-brand">
+                    +{col.chores.length - 3} más
+                  </button>
                 )}
-              </div>
-            </div>
+                {col.chores.length === 0 && (
+                  <li className="m-f8 rounded-f13 border border-dashed border-zinc-300 px-f13 py-f21 text-center dark:border-white/10">
+                    <p className="eyebrow">{meta.empty}</p>
+                  </li>
+                )}
+              </ul>
+            </section>
           )
         })}
       </div>
 
-      {/* Recently done strip */}
+      {/* Hechas recientemente */}
       {grouped.done.length > 0 && (
-        <div className="shrink-0 mt-3 pt-3 border-t border-white/30 dark:border-white/10 relative z-10">
-          <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
-            <span className="text-[9px] font-mono font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 shrink-0 flex items-center gap-1">
-              <CheckCircle2 className="w-3 h-3 text-[#76b900]" /> Hechas
-            </span>
-            {grouped.done.map(c => (
-              <div key={c.id}
-                className="flex items-center gap-1.5 px-2 py-1 backdrop-blur-md bg-white/30 dark:bg-zinc-950/30 border border-white/40 dark:border-white/10 rounded-sm shrink-0 opacity-50 group cursor-pointer hover:opacity-100 hover:bg-white/50 dark:hover:bg-zinc-950/50 transition-all duration-200 active:scale-95"
-                onClick={() => handleToggle(c)}
-              >
-                <CheckCircle2 className="w-3 h-3 text-[#76b900]" />
-                <span className="text-[10px] font-mono text-zinc-500 dark:text-zinc-400 truncate max-w-24">{c.title}</span>
-              </div>
-            ))}
-          </div>
-        </div>
+        <section className="relative z-10 flex items-center gap-f13 overflow-x-auto no-scrollbar">
+          <span className="eyebrow shrink-0">Hechas</span>
+          {grouped.done.map(c => (
+            <button key={c.id} onClick={() => handleToggle(c)} title="Deshacer"
+              className="flex shrink-0 items-center gap-f5 rounded-full border border-zinc-200 px-f13 py-f5 text-xs text-zinc-500 transition-colors hover:text-zinc-900 dark:border-white/10 dark:hover:text-zinc-200">
+              <Check className="size-3 text-brand" strokeWidth={3} />
+              <span className="max-w-[144px] truncate line-through decoration-brand/60">{c.title}</span>
+            </button>
+          ))}
+        </section>
       )}
 
       {/* Modals */}
@@ -274,13 +231,13 @@ export function Dashboard({ chores, onRefresh }: DashboardProps) {
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setConfirmDelete(null)} />
             <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}
-              className={cn("relative w-full max-w-sm rounded-sm p-4 sm:p-8 text-center overflow-hidden", GLASS)}>
-              <div className="w-12 h-12 sm:w-14 sm:h-14 bg-red-500/10 border border-red-500/20 rounded-sm flex items-center justify-center mx-auto mb-4 sm:mb-5 text-red-500 backdrop-blur-sm"><Trash2 className="w-6 h-6 sm:w-7 sm:h-7" /></div>
-              <h3 className="text-sm sm:text-md font-bold text-zinc-900 dark:text-white font-mono uppercase tracking-wider mb-2">¿Eliminar tarea?</h3>
-              <p className="text-zinc-400 dark:text-zinc-500 text-xs font-mono uppercase tracking-wider mb-6">Esta acción no se puede deshacer.</p>
+              className="panel relative w-full max-w-sm p-f34 text-center">
+              <div className="size-[55px] bg-neg/10 rounded-full flex items-center justify-center mx-auto mb-f21 text-neg"><Trash2 className="size-6" /></div>
+              <h3 className="text-base font-medium text-zinc-900 dark:text-white mb-f8">¿Eliminar tarea?</h3>
+              <p className="text-zinc-500 text-sm mb-f21">Esta acción no se puede deshacer.</p>
               <div className="flex gap-3">
-                <button onClick={() => setConfirmDelete(null)} className="flex-1 py-2.5 bg-zinc-100/80 dark:bg-zinc-900/80 backdrop-blur-sm text-zinc-900 dark:text-white border border-zinc-200/50 dark:border-zinc-800/50 rounded-sm font-mono text-xs uppercase tracking-wider font-bold hover:bg-zinc-200/80 dark:hover:bg-zinc-800/80 transition-colors cursor-pointer">Cancelar</button>
-                <RippleButton onClick={() => handleDelete(confirmDelete)} rippleColor="#ffffff" duration="600ms" className="flex-1 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-sm font-mono text-xs uppercase tracking-wider font-bold transition-colors border border-red-600 cursor-pointer shadow-sm shadow-red-600/20 overflow-hidden">Eliminar</RippleButton>
+                <button onClick={() => setConfirmDelete(null)} className="flex-1 py-f13 rounded-full border border-zinc-200 dark:border-white/10 text-zinc-700 dark:text-zinc-300 text-xs font-semibold hover:bg-zinc-100 dark:hover:bg-white/5 transition-colors">Cancelar</button>
+                <RippleButton onClick={() => handleDelete(confirmDelete)} rippleColor="#ffffff" duration="600ms" className="flex-1 py-f13 rounded-full bg-neg hover:brightness-110 text-black text-xs font-semibold transition overflow-hidden">Eliminar</RippleButton>
               </div>
             </motion.div>
           </div>

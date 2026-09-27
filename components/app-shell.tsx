@@ -21,7 +21,7 @@ const DevBot = lazy(() => import("@/components/devbot").then(m => ({ default: m.
 function ModuleLoader() {
   return (
     <div className="flex items-center justify-center p-12">
-      <div className="w-6 h-6 border-2 border-[#76b900] border-t-transparent rounded-full animate-spin" />
+      <div className="w-6 h-6 border-2 border-brand border-t-transparent rounded-full animate-spin" />
     </div>
   )
 }
@@ -120,7 +120,7 @@ function AppInner() {
         maxOpacity={0.18}
         flickerChance={0.08}
       />
-      <div className="absolute left-1/2 top-1/3 size-[36rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#76b900]/10 blur-3xl" />
+      <div className="absolute left-1/2 top-1/3 size-[36rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-brand/10 blur-3xl" />
     </div>
   )
 
@@ -131,7 +131,7 @@ function AppInner() {
         <motion.div
           animate={{ rotate: [0, 90, 180, 270, 360], borderRadius: ["30%", "50%", "30%", "50%", "30%"] }}
           transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
-          className="size-10 bg-gradient-to-br from-[#76b900] to-[#b6f03a] shadow-[0_0_30px_rgba(118,185,0,0.5)]"
+          className="size-10 bg-gradient-to-br from-brand to-brand-hi shadow-[0_0_30px_rgba(118,185,0,0.5)]"
         />
         <p className="font-mono text-[11px] uppercase tracking-[0.3em] text-zinc-500">Cargando</p>
       </div>

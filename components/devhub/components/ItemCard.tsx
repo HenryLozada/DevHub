@@ -91,19 +91,19 @@ export function ItemCard({ item, onEdit, onDelete }: ItemCardProps) {
   const getTypeMeta = () => {
     switch (item.type) {
       case "tool":
-        return { icon: <Terminal className="w-4 h-4 text-[#76b900]" />, label: "Tool" };
+        return { icon: <Terminal className="w-4 h-4 text-brand" />, label: "Tool" };
       case "repo":
         return { icon: <FaGithub className="w-4 h-4 text-zinc-900 dark:text-white" />, label: "Repo" };
       case "youtube":
-        return { icon: <FaYoutube className="w-4 h-4 text-red-600" />, label: "YouTube" };
+        return { icon: <FaYoutube className="w-4 h-4 text-neg" />, label: "YouTube" };
       case "note":
-        return { icon: <FileText className="w-4 h-4 text-blue-500" />, label: "Nota" };
+        return { icon: <FileText className="w-4 h-4 text-info" />, label: "Nota" };
       case "api":
-        return { icon: <Key className="w-4 h-4 text-amber-500" />, label: "API Key" };
+        return { icon: <Key className="w-4 h-4 text-warn" />, label: "API Key" };
       case "credential":
-        return { icon: <Lock className="w-4 h-4 text-indigo-500" />, label: "Login" };
+        return { icon: <Lock className="w-4 h-4 text-info" />, label: "Login" };
       default:
-        return { icon: <Terminal className="w-4 h-4 text-[#76b900]" />, label: "Otro" };
+        return { icon: <Terminal className="w-4 h-4 text-brand" />, label: "Otro" };
     }
   };
 
@@ -113,7 +113,6 @@ export function ItemCard({ item, onEdit, onDelete }: ItemCardProps) {
   return (
     <div className="relative flex flex-col justify-between border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950/70 dark:backdrop-blur-xl p-5 rounded-xl shadow-sm min-h-[220px] group overflow-hidden lift">
       {/* Signature NVIDIA green corner square */}
-      <div className="corner-square" />
 
       {/* Top Metadata Header */}
       <div>
@@ -129,7 +128,7 @@ export function ItemCard({ item, onEdit, onDelete }: ItemCardProps) {
      </div>
 
         {/* Title & Description */}
-        <h4 className="text-base font-bold font-sans text-zinc-900 dark:text-white mt-3 group-hover:text-[#76b900] transition-colors line-clamp-1">
+        <h4 className="text-base font-bold font-sans text-zinc-900 dark:text-white mt-3 group-hover:text-brand transition-colors line-clamp-1">
           {item.title}
         </h4>
         {item.description && (
@@ -151,7 +150,7 @@ export function ItemCard({ item, onEdit, onDelete }: ItemCardProps) {
             }}
           />
           <div className="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-colors flex items-center justify-center">
-            <div className="w-8 h-8 rounded-full bg-red-600/90 text-white flex items-center justify-center shadow-md scale-95 group-hover:scale-100 transition-transform">
+            <div className="w-8 h-8 rounded-full bg-neg/90 text-white flex items-center justify-center shadow-md scale-95 group-hover:scale-100 transition-transform">
               <FaYoutube className="w-4 h-4 ml-0.5" />
             </div>
           </div>
@@ -166,7 +165,7 @@ export function ItemCard({ item, onEdit, onDelete }: ItemCardProps) {
             href={item.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-1.5 text-xs text-[#76b900] hover:text-[#86cb10] font-bold hover:underline font-mono"
+            className="flex items-center gap-1.5 text-xs text-brand hover:text-brand-hi font-bold hover:underline font-mono"
           >
             <ExternalLink className="w-3.5 h-3.5" /> Abrir Herramienta
           </a>
@@ -190,7 +189,7 @@ export function ItemCard({ item, onEdit, onDelete }: ItemCardProps) {
             href={item.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-1.5 text-xs text-red-600 dark:text-red-500 hover:text-red-700 dark:hover:text-red-400 font-bold hover:underline font-mono"
+            className="flex items-center gap-1.5 text-xs text-neg dark:text-neg hover:text-neg dark:hover:text-neg font-bold hover:underline font-mono"
           >
             <FaYoutube className="w-3.5 h-3.5" /> Ver en YouTube
           </a>
@@ -287,7 +286,7 @@ export function ItemCard({ item, onEdit, onDelete }: ItemCardProps) {
         </button>
         <button
           onClick={handleDelete}
-          className="p-1 hover:bg-zinc-50 dark:hover:bg-zinc-900 hover:text-red-600 transition-colors cursor-pointer"
+          className="p-1 hover:bg-zinc-50 dark:hover:bg-zinc-900 hover:text-neg transition-colors cursor-pointer"
           title="Eliminar"
         >
           <Trash2 className="w-3.5 h-3.5" />

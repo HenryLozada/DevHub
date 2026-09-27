@@ -92,7 +92,7 @@ export function EventsPanel({
 
         <div className="relative mt-4 h-[3px] overflow-hidden rounded-full bg-zinc-900/10 dark:bg-white/[0.06]">
           <div
-            className="h-full rounded-full bg-[#76b900] transition-[width] duration-700 ease-out"
+            className="h-full rounded-full bg-brand transition-[width] duration-700 ease-out"
             style={{ width: `${progress}%` }}
           />
         </div>
@@ -114,7 +114,7 @@ export function EventsPanel({
                     type="button"
                     onClick={() => onToggleComplete(o)}
                     aria-pressed={isCompleted}
-                    className="reveal group flex w-full items-center gap-3 rounded-xl py-2 pr-2 text-left transition-colors hover:bg-zinc-900/[0.04] dark:hover:bg-white/[0.03] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#76b900]/60"
+                    className="reveal group flex w-full items-center gap-3 rounded-xl py-2 pr-2 text-left transition-colors hover:bg-zinc-900/[0.04] dark:hover:bg-white/[0.03] focus:outline-none focus-visible:ring-2 focus-visible:ring-brand/60"
                   >
                     <span className="w-11 shrink-0 text-right font-mono text-xs tabular-nums text-zinc-500">
                       {o.event.horaInicio ?? "—"}
@@ -123,8 +123,8 @@ export function EventsPanel({
                       className={cn(
                         "relative z-10 grid size-[18px] shrink-0 place-items-center rounded-full border transition-all duration-300",
                         isCompleted
-                          ? "border-[#76b900] bg-[#76b900]"
-                          : "border-zinc-300 bg-white dark:border-white/20 dark:bg-zinc-950 group-hover:border-[#76b900]"
+                          ? "border-brand bg-brand"
+                          : "border-zinc-300 bg-white dark:border-white/20 dark:bg-zinc-950 group-hover:border-brand"
                       )}
                     >
                       {isCompleted ? (
@@ -137,7 +137,7 @@ export function EventsPanel({
                       <span
                         className={cn(
                           "block truncate text-sm font-medium transition-colors",
-                          isCompleted ? "text-zinc-400 line-through decoration-[#76b900]/70 dark:text-zinc-600" : "text-zinc-900 dark:text-zinc-100"
+                          isCompleted ? "text-zinc-400 line-through decoration-brand/70 dark:text-zinc-600" : "text-zinc-900 dark:text-zinc-100"
                         )}
                       >
                         {o.event.nombre}
@@ -214,7 +214,7 @@ export function EventsPanel({
                           <button
                             type="button"
                             onClick={() => onEditEvent(event)}
-                            className="reveal group flex w-full items-center gap-3 rounded-xl px-2 py-2.5 text-left transition-all duration-200 hover:bg-zinc-900/[0.04] dark:hover:bg-white/[0.04] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#76b900]/60"
+                            className="reveal group flex w-full items-center gap-3 rounded-xl px-2 py-2.5 text-left transition-all duration-200 hover:bg-zinc-900/[0.04] dark:hover:bg-white/[0.04] focus:outline-none focus-visible:ring-2 focus-visible:ring-brand/60"
                           >
                             <span className="min-w-0 flex-1">
                               <span className="block truncate text-sm text-zinc-900 dark:text-zinc-100">{event.nombre}</span>
@@ -225,7 +225,7 @@ export function EventsPanel({
                                 </span>
                               </span>
                             </span>
-                            <ChevronRight className="size-4 shrink-0 text-zinc-400 transition-all duration-200 group-hover:translate-x-0.5 group-hover:text-[#76b900] dark:text-zinc-600" />
+                            <ChevronRight className="size-4 shrink-0 text-zinc-400 transition-all duration-200 group-hover:translate-x-0.5 group-hover:text-brand dark:text-zinc-600" />
                           </button>
                         </li>
                       ))}

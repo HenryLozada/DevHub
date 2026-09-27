@@ -129,7 +129,7 @@ export function UserMenu() {
     <div className="relative">
       <button
         onClick={() => { setOpen(!open); setConfirmReset(false) }}
-        className="w-7 h-7 rounded-sm bg-[#76b900]/10 border border-[#76b900]/20 flex items-center justify-center text-[10px] font-bold font-mono text-[#76b900] cursor-pointer hover:bg-[#76b900]/20 transition-colors"
+        className="w-7 h-7 rounded-sm bg-brand/10 border border-brand/20 flex items-center justify-center text-[10px] font-bold font-mono text-brand cursor-pointer hover:bg-brand/20 transition-colors"
         title={user.email || ""}
       >
         {initial}
@@ -152,7 +152,7 @@ export function UserMenu() {
                 <button
                   onClick={handleInstall}
                   disabled={busy}
-                  className="w-full flex items-center gap-2.5 px-3 py-2 text-[10px] font-mono text-zinc-600 dark:text-zinc-400 hover:text-[#76b900] hover:bg-[#76b900]/5 transition-colors cursor-pointer disabled:opacity-40"
+                  className="w-full flex items-center gap-2.5 px-3 py-2 text-[10px] font-mono text-zinc-600 dark:text-zinc-400 hover:text-brand hover:bg-brand/5 transition-colors cursor-pointer disabled:opacity-40"
                 >
                   <Smartphone className="w-3.5 h-3.5" /> {canInstallPWA() ? "Instalar app" : "Cómo instalar app"}
                 </button>
@@ -162,7 +162,7 @@ export function UserMenu() {
                 <button
                   onClick={handleToggleNotifs}
                   disabled={busy}
-                  className="w-full flex items-center gap-2.5 px-3 py-2 text-[10px] font-mono text-zinc-600 dark:text-zinc-400 hover:text-[#76b900] hover:bg-[#76b900]/5 transition-colors cursor-pointer disabled:opacity-40"
+                  className="w-full flex items-center gap-2.5 px-3 py-2 text-[10px] font-mono text-zinc-600 dark:text-zinc-400 hover:text-brand hover:bg-brand/5 transition-colors cursor-pointer disabled:opacity-40"
                 >
                   {notifsOn ? <BellOff className="w-3.5 h-3.5" /> : <Bell className="w-3.5 h-3.5" />}
                   {notifsOn ? "Desactivar notificaciones" : "Activar notificaciones"}
@@ -171,7 +171,7 @@ export function UserMenu() {
 
               <button
                 onClick={() => { setSpaceFx(!spaceFx); setSpaceFxState(!spaceFx) }}
-                className="w-full flex items-center gap-2.5 px-3 py-2 text-[10px] font-mono text-zinc-600 dark:text-zinc-400 hover:text-[#76b900] hover:bg-[#76b900]/5 transition-colors cursor-pointer"
+                className="w-full flex items-center gap-2.5 px-3 py-2 text-[10px] font-mono text-zinc-600 dark:text-zinc-400 hover:text-brand hover:bg-brand/5 transition-colors cursor-pointer"
                 title="Fondo espacial animado (modo oscuro)"
               >
                 <Sparkles className="w-3.5 h-3.5" /> Efectos espaciales: {spaceFx ? "ON" : "OFF"}
@@ -179,7 +179,7 @@ export function UserMenu() {
               <button
                 onClick={handleDownload}
                 disabled={busy}
-                className="w-full flex items-center gap-2.5 px-3 py-2 text-[10px] font-mono text-zinc-600 dark:text-zinc-400 hover:text-[#76b900] hover:bg-[#76b900]/5 transition-colors cursor-pointer disabled:opacity-40"
+                className="w-full flex items-center gap-2.5 px-3 py-2 text-[10px] font-mono text-zinc-600 dark:text-zinc-400 hover:text-brand hover:bg-brand/5 transition-colors cursor-pointer disabled:opacity-40"
               >
                 <Download className="w-3.5 h-3.5" /> Descargar backup
               </button>
@@ -187,7 +187,7 @@ export function UserMenu() {
               <button
                 onClick={handleUploadClick}
                 disabled={busy}
-                className="w-full flex items-center gap-2.5 px-3 py-2 text-[10px] font-mono text-zinc-600 dark:text-zinc-400 hover:text-[#76b900] hover:bg-[#76b900]/5 transition-colors cursor-pointer disabled:opacity-40"
+                className="w-full flex items-center gap-2.5 px-3 py-2 text-[10px] font-mono text-zinc-600 dark:text-zinc-400 hover:text-brand hover:bg-brand/5 transition-colors cursor-pointer disabled:opacity-40"
               >
                 <Upload className="w-3.5 h-3.5" /> Restaurar backup
               </button>
@@ -195,7 +195,7 @@ export function UserMenu() {
               <button
                 onClick={handleSyncUp}
                 disabled={busy}
-                className="w-full flex items-center gap-2.5 px-3 py-2 text-[10px] font-mono text-zinc-600 dark:text-zinc-400 hover:text-[#76b900] hover:bg-[#76b900]/5 transition-colors cursor-pointer disabled:opacity-40"
+                className="w-full flex items-center gap-2.5 px-3 py-2 text-[10px] font-mono text-zinc-600 dark:text-zinc-400 hover:text-brand hover:bg-brand/5 transition-colors cursor-pointer disabled:opacity-40"
               >
                 <CloudUpload className="w-3.5 h-3.5" /> Subir todo a la nube
               </button>
@@ -207,13 +207,13 @@ export function UserMenu() {
                 <button
                   onClick={() => setConfirmReset(true)}
                   disabled={busy}
-                  className="w-full flex items-center gap-2.5 px-3 py-2 text-[10px] font-mono text-zinc-500 hover:text-red-500 hover:bg-red-500/5 transition-colors cursor-pointer disabled:opacity-40"
+                  className="w-full flex items-center gap-2.5 px-3 py-2 text-[10px] font-mono text-zinc-500 hover:text-neg hover:bg-neg/5 transition-colors cursor-pointer disabled:opacity-40"
                 >
                   <Trash2 className="w-3.5 h-3.5" /> Resetear cuenta
                 </button>
               ) : (
                 <div className="px-3 py-2 space-y-2">
-                  <p className="text-[9px] font-mono font-bold text-red-500 uppercase tracking-wider">
+                  <p className="text-[9px] font-mono font-bold text-neg uppercase tracking-wider">
                     Esto borra TODO (local + nube)
                   </p>
                   <div className="flex gap-2">
@@ -226,7 +226,7 @@ export function UserMenu() {
                     <button
                       onClick={handleReset}
                       disabled={busy}
-                      className="flex-1 py-1.5 text-[9px] font-mono font-bold bg-red-600 text-white border border-red-600 cursor-pointer hover:bg-red-700 transition-colors disabled:opacity-40"
+                      className="flex-1 py-1.5 text-[9px] font-mono font-bold bg-neg text-white border border-neg cursor-pointer hover:bg-neg transition-colors disabled:opacity-40"
                     >
                       Confirmar
                     </button>
@@ -236,7 +236,7 @@ export function UserMenu() {
 
               <button
                 onClick={() => { signOut(); setOpen(false) }}
-                className="w-full flex items-center gap-2.5 px-3 py-2 text-[10px] font-mono text-zinc-500 hover:text-red-500 hover:bg-red-500/5 transition-colors cursor-pointer"
+                className="w-full flex items-center gap-2.5 px-3 py-2 text-[10px] font-mono text-zinc-500 hover:text-neg hover:bg-neg/5 transition-colors cursor-pointer"
               >
                 <LogOut className="w-3.5 h-3.5" /> Cerrar sesión
               </button>

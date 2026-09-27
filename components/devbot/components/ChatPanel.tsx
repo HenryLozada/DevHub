@@ -210,7 +210,7 @@ ACCIONES (solo si el usuario pide crear/guardar/eliminar/completar):
         key={i}
         onClick={function() { if (!loading) handleSend(s.text) }}
         disabled={loading}
-        className={cn(GLASS_INNER, "w-full px-3 py-2 rounded-sm text-left cursor-pointer hover:bg-white/80 dark:hover:bg-zinc-950/80 hover:border-[#76b900]/30 transition-all duration-200 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed")}
+        className={cn(GLASS_INNER, "w-full px-3 py-2 rounded-sm text-left cursor-pointer hover:bg-white/80 dark:hover:bg-zinc-950/80 hover:border-brand/30 transition-all duration-200 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed")}
       >
         {s.icon + " " + s.text}
       </button>
@@ -234,9 +234,9 @@ ACCIONES (solo si el usuario pide crear/guardar/eliminar/completar):
         >
           <div className="flex items-center justify-between px-4 py-3 border-b border-white/30 dark:border-white/10 shrink-0">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-sm bg-[#76b900]/10 border border-[#76b900]/20 flex items-center justify-center relative">
-                <Bot className="w-4 h-4 text-[#76b900]" />
-                <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-[#76b900] rounded-full" />
+              <div className="w-8 h-8 rounded-sm bg-brand/10 border border-brand/20 flex items-center justify-center relative">
+                <Bot className="w-4 h-4 text-brand" />
+                <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-brand rounded-full" />
               </div>
               <div>
                 <h3 className="text-xs font-bold text-zinc-800 dark:text-zinc-200 font-mono uppercase tracking-wider">DevBot</h3>
@@ -244,11 +244,11 @@ ACCIONES (solo si el usuario pide crear/guardar/eliminar/completar):
               </div>
             </div>
             <div className="flex items-center gap-1">
-              <button onClick={function() { fileInputRef.current?.click() }} className="p-1 rounded-sm border border-white/30 dark:border-white/10 hover:border-[#76b900]/40 transition-colors cursor-pointer group relative" title="Cambiar foto de perfil">
+              <button onClick={function() { fileInputRef.current?.click() }} className="p-1 rounded-sm border border-white/30 dark:border-white/10 hover:border-brand/40 transition-colors cursor-pointer group relative" title="Cambiar foto de perfil">
                 {avatar ? (
                   <img src={avatar} alt="Tu foto" className="w-6 h-6 rounded-sm object-cover" />
                 ) : (
-                  <Camera className="w-3.5 h-3.5 text-zinc-400 group-hover:text-[#76b900]" />
+                  <Camera className="w-3.5 h-3.5 text-zinc-400 group-hover:text-brand" />
                 )}
               </button>
               <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleAvatarUpload} />
@@ -264,8 +264,8 @@ ACCIONES (solo si el usuario pide crear/guardar/eliminar/completar):
           <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin" ref={scrollRef}>
             {messages.length === 0 ? (
               <div className="h-full flex flex-col items-center justify-center text-center px-6">
-                <div className="w-14 h-14 rounded-sm bg-[#76b900]/5 border border-[#76b900]/10 flex items-center justify-center mb-4 backdrop-blur-sm">
-                  <Bot className="w-7 h-7 text-[#76b900]" />
+                <div className="w-14 h-14 rounded-sm bg-brand/5 border border-brand/10 flex items-center justify-center mb-4 backdrop-blur-sm">
+                  <Bot className="w-7 h-7 text-brand" />
                 </div>
                 <p className="text-sm font-bold text-zinc-500 dark:text-zinc-400 font-mono uppercase tracking-wider mb-3">Que necesitas?</p>
                 <div className="space-y-1.5 text-[10px] font-mono text-zinc-400 dark:text-zinc-500 w-full">
@@ -279,9 +279,9 @@ ACCIONES (solo si el usuario pide crear/guardar/eliminar/completar):
               <div className="flex justify-start">
                 <div className={cn("flex items-center gap-2.5 px-4 py-3", GLASS_INNER, "rounded-sm")}>
                   <div className="flex gap-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#76b900] animate-bounce" style={{ animationDelay: "0ms" }} />
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#76b900] animate-bounce" style={{ animationDelay: "150ms" }} />
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#76b900] animate-bounce" style={{ animationDelay: "300ms" }} />
+                    <span className="w-1.5 h-1.5 rounded-full bg-brand animate-bounce" style={{ animationDelay: "0ms" }} />
+                    <span className="w-1.5 h-1.5 rounded-full bg-brand animate-bounce" style={{ animationDelay: "150ms" }} />
+                    <span className="w-1.5 h-1.5 rounded-full bg-brand animate-bounce" style={{ animationDelay: "300ms" }} />
                   </div>
                 </div>
               </div>
@@ -289,13 +289,13 @@ ACCIONES (solo si el usuario pide crear/guardar/eliminar/completar):
           </div>
 
           {pending.length > 0 && (
-            <div className="border-t border-red-500/20 bg-red-500/5 px-4 py-3 shrink-0 space-y-2">
-              <p className="text-[10px] font-mono font-bold uppercase tracking-wider text-red-500">Confirmar eliminación</p>
+            <div className="border-t border-neg/20 bg-neg/5 px-4 py-3 shrink-0 space-y-2">
+              <p className="text-[10px] font-mono font-bold uppercase tracking-wider text-neg">Confirmar eliminación</p>
               <ul className="text-xs text-zinc-600 dark:text-zinc-300 space-y-0.5">
                 {pending.map((a, i) => <li key={i}>• {a.label}</li>)}
               </ul>
               <div className="flex gap-2">
-                <button onClick={() => resolvePending(true)} className="px-3 py-1 text-xs font-mono rounded-sm bg-red-500 text-white hover:bg-red-600 cursor-pointer">Eliminar</button>
+                <button onClick={() => resolvePending(true)} className="px-3 py-1 text-xs font-mono rounded-sm bg-neg text-white hover:bg-neg cursor-pointer">Eliminar</button>
                 <button onClick={() => resolvePending(false)} className="px-3 py-1 text-xs font-mono rounded-sm border border-zinc-300 dark:border-zinc-700 text-zinc-600 dark:text-zinc-300 cursor-pointer">Cancelar</button>
               </div>
             </div>

@@ -9,12 +9,12 @@ import { cn } from "@/lib/utils"
 import { Chore } from "../types"
 
 const COLOR_BG: Record<string, string> = {
-  violet: "bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-300 border-violet-200 dark:border-violet-800",
-  emerald: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800",
-  sky: "bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-300 border-sky-200 dark:border-sky-800",
-  amber: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300 border-amber-200 dark:border-amber-800",
-  rose: "bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-300 border-rose-200 dark:border-rose-800",
-  teal: "bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-300 border-teal-200 dark:border-teal-800",
+  violet: "bg-violet/10 text-violet dark:bg-violet/30 dark:text-violet border-violet/30 dark:border-violet/30",
+  emerald: "bg-pos/10 text-pos dark:bg-pos/30 dark:text-pos border-pos/30 dark:border-pos/30",
+  sky: "bg-info/10 text-info dark:bg-info/30 dark:text-info border-info/30 dark:border-info/30",
+  amber: "bg-warn/10 text-warn dark:bg-warn/30 dark:text-warn border-warn/30 dark:border-warn/30",
+  rose: "bg-neg/10 text-neg dark:bg-neg/30 dark:text-neg border-neg/30 dark:border-neg/30",
+  teal: "bg-cyan/10 text-cyan dark:bg-cyan/30 dark:text-cyan border-cyan/30 dark:border-cyan/30",
 }
 
 interface CalendarViewProps {
@@ -63,7 +63,7 @@ export function CalendarView({ chores, onToggle }: CalendarViewProps) {
           return (
             <div key={i} className={cn("bg-white dark:bg-zinc-950/70 dark:backdrop-blur-xl p-2 min-h-[80px]", !inMonth && "opacity-40")}>
               <p className={cn("text-xs font-mono font-bold mb-1 w-6 h-6 flex items-center justify-center rounded-lg select-none",
-                today ? "bg-[#76b900] text-black" : "text-zinc-500 dark:text-zinc-400")}>
+                today ? "bg-brand text-black" : "text-zinc-500 dark:text-zinc-400")}>
                 {format(day, "d")}
               </p>
               <div className="space-y-0.5">

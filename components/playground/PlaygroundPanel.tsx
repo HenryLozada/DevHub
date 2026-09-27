@@ -36,7 +36,7 @@ export function PlaygroundPanel() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-zinc-200 dark:border-zinc-800 pb-5">
         <div>
           <h1 className="text-lg md:text-2xl font-mono font-bold tracking-tight text-zinc-900 dark:text-white flex items-center gap-2">
-            <span className="text-[#76b900] font-bold">◆</span> PLAYGROUND
+            <span className="text-brand font-bold">◆</span> PLAYGROUND
           </h1>
           <p className="text-xs font-mono text-zinc-500 dark:text-zinc-400 mt-1 uppercase tracking-wider">
             Magic UI Component Customizer
@@ -58,7 +58,7 @@ export function PlaygroundPanel() {
                   onClick={() => handleSelect(c.id)}
                   className={`px-3.5 py-1.5 font-mono text-[11px] font-bold uppercase tracking-wider transition-colors cursor-pointer border ${
                     selectedId === c.id
-                      ? "bg-[#76b900] text-black border-[#76b900]"
+                      ? "bg-brand text-black border-brand"
                       : "bg-white dark:bg-zinc-950 text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-900"
                   }`}
                 >
@@ -108,7 +108,7 @@ export function PlaygroundPanel() {
                 onClick={() => setDestination("")}
                 className={`px-3.5 py-1.5 font-mono text-[11px] font-bold uppercase tracking-wider transition-colors cursor-pointer border ${
                   !destination
-                    ? "bg-[#76b900] text-black border-[#76b900]"
+                    ? "bg-brand text-black border-brand"
                     : "bg-white dark:bg-zinc-950 text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-900"
                 }`}
               >
@@ -120,7 +120,7 @@ export function PlaygroundPanel() {
                   onClick={() => setDestination(mod.id)}
                   className={`px-3.5 py-1.5 font-mono text-[11px] font-bold uppercase tracking-wider transition-colors cursor-pointer border ${
                     destination === mod.id
-                      ? "bg-[#76b900] text-black border-[#76b900]"
+                      ? "bg-brand text-black border-brand"
                       : "bg-white dark:bg-zinc-950 text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-900"
                   }`}
                 >
@@ -150,7 +150,7 @@ export function PlaygroundPanel() {
                     props: filtered,
                   })
                 }}
-                className="px-5 py-2.5 bg-[#76b900] text-black font-mono text-xs font-bold uppercase tracking-wider border border-[#76b900] hover:bg-[#86cb00] transition-colors cursor-pointer"
+                className="px-5 py-2.5 bg-brand text-black font-mono text-xs font-bold uppercase tracking-wider border border-brand hover:bg-brand-hi transition-colors cursor-pointer"
               >
                 Aplicar a {MODULES.find((m) => m.id === destination)?.label}
               </button>

@@ -34,33 +34,32 @@ export function FinancePanel({
   return (
     <aside className="flex w-full flex-col gap-4 lg:w-80">
       <div className={card}>
-        <div className="corner-square" />
         <p className="text-[11px] font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
           Balance proyectado del mes
         </p>
         <p className={cn(
           "mt-1.5 text-2xl sm:text-[34px] font-semibold leading-none tracking-tight tabular-nums truncate",
-          summary.balance >= 0 ? "text-emerald-600 dark:text-emerald-400" : "text-red-600 dark:text-red-400",
+          summary.balance >= 0 ? "text-pos dark:text-pos" : "text-neg dark:text-neg",
         )}>
           <CountUp value={summary.balance} format={formatCurrency} />
         </p>
 
         <div className="mt-3 md:mt-4 grid grid-cols-2 gap-2">
-          <div className="rounded-sm border border-emerald-200 dark:border-emerald-900 bg-emerald-50 dark:bg-emerald-950/40 p-2 sm:p-3">
-            <div className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400">
+          <div className="rounded-sm border border-pos/30 dark:border-pos/30 bg-pos/10 dark:bg-pos/40 p-2 sm:p-3">
+            <div className="flex items-center gap-1.5 text-pos dark:text-pos">
               <IoTrendingUp className="size-3 sm:size-3.5 shrink-0" />
               <span className="text-[10px] sm:text-xs font-semibold truncate">Ingresos</span>
             </div>
-            <p className="mt-1 text-xs sm:text-sm font-semibold tabular-nums text-emerald-600 dark:text-emerald-400 truncate">
+            <p className="mt-1 text-xs sm:text-sm font-semibold tabular-nums text-pos dark:text-pos truncate">
               <CountUp value={summary.ingresos} format={formatCurrency} />
             </p>
           </div>
-          <div className="rounded-sm border border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-950/40 p-2 sm:p-3">
-            <div className="flex items-center gap-1.5 text-red-600 dark:text-red-400">
+          <div className="rounded-sm border border-neg/30 dark:border-neg/30 bg-neg/10 dark:bg-neg/40 p-2 sm:p-3">
+            <div className="flex items-center gap-1.5 text-neg dark:text-neg">
               <IoTrendingDown className="size-3 sm:size-3.5 shrink-0" />
               <span className="text-[10px] sm:text-xs font-semibold truncate">Egresos</span>
             </div>
-            <p className="mt-1 text-xs sm:text-sm font-semibold tabular-nums text-red-600 dark:text-red-400 truncate">
+            <p className="mt-1 text-xs sm:text-sm font-semibold tabular-nums text-neg dark:text-neg truncate">
               <CountUp value={summary.egresos} format={formatCurrency} />
             </p>
           </div>
@@ -68,7 +67,6 @@ export function FinancePanel({
       </div>
 
       <div className={card}>
-        <div className="corner-square" />
         <p className="text-[11px] font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
           Movimientos del día
         </p>
@@ -85,13 +83,13 @@ export function FinancePanel({
                 <div className="flex min-w-0 items-center gap-2">
                   <span className={cn(
                     "size-2 shrink-0 rounded-sm",
-                    o.rule.tipo === "ingreso" ? "bg-emerald-500" : "bg-red-500",
+                    o.rule.tipo === "ingreso" ? "bg-pos" : "bg-neg",
                   )} />
                   <span className="truncate text-sm font-medium text-zinc-900 dark:text-zinc-100">{o.rule.concepto}</span>
                 </div>
                 <span className={cn(
                   "shrink-0 text-sm font-semibold tabular-nums",
-                  o.rule.tipo === "ingreso" ? "text-emerald-600 dark:text-emerald-400" : "text-red-600 dark:text-red-400",
+                  o.rule.tipo === "ingreso" ? "text-pos dark:text-pos" : "text-neg dark:text-neg",
                 )}>
                   {o.rule.tipo === "ingreso" ? "+" : "-"}
                   {formatCurrency(o.rule.monto)}
@@ -103,7 +101,6 @@ export function FinancePanel({
       </div>
 
       <div className={cn(card, "flex flex-col")}>
-        <div className="corner-square" />
         <div className="flex items-center justify-between gap-2 border-b border-hairline dark:border-zinc-800 pb-4 mb-3">
           <p className="text-[11px] font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
             Reglas recurrentes
@@ -126,13 +123,13 @@ export function FinancePanel({
                   <button
                     type="button"
                     onClick={() => onEditRule(rule)}
-                    className={cn(chip, "w-full text-left transition-all duration-200 hover:bg-white/90 dark:hover:bg-zinc-900/80 hover:shadow-[0_0_20px_-4px_rgba(118,185,0,0.25)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#76b900]")}
+                    className={cn(chip, "w-full text-left transition-all duration-200 hover:bg-white/90 dark:hover:bg-zinc-900/80 hover:shadow-[0_0_20px_-4px_rgba(118,185,0,0.25)] focus:outline-none focus-visible:ring-2 focus-visible:ring-brand")}
                   >
                     <div className="min-w-0">
                       <div className="flex items-center gap-2">
                         <span className={cn(
                           "size-2 shrink-0 rounded-sm",
-                          rule.tipo === "ingreso" ? "bg-emerald-500" : "bg-red-500",
+                          rule.tipo === "ingreso" ? "bg-pos" : "bg-neg",
                         )} />
                         <span className="truncate text-sm font-medium text-zinc-900 dark:text-zinc-100">{rule.concepto}</span>
                       </div>
@@ -143,7 +140,7 @@ export function FinancePanel({
                     <div className="flex shrink-0 items-center gap-2">
                       <span className={cn(
                         "text-sm font-semibold tabular-nums",
-                        rule.tipo === "ingreso" ? "text-emerald-600 dark:text-emerald-400" : "text-red-600 dark:text-red-400",
+                        rule.tipo === "ingreso" ? "text-pos dark:text-pos" : "text-neg dark:text-neg",
                       )}>
                         {rule.tipo === "ingreso" ? "+" : "-"}
                         {formatCurrency(rule.monto)}
