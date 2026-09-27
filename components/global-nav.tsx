@@ -1,7 +1,7 @@
 import { Calendar as IoCalendarOutline, Wallet, CheckCircle2, Terminal, Puzzle, Sun, Moon } from "lucide-react"
 import { motion } from "motion/react"
-import { useState } from "react"
-import { SlimeNav } from "@/components/slime-nav"
+import { useNavBadges } from "@/lib/nav-badges"
+import { CountUp } from "@/components/ui/count-up"
 import { cn } from "@/lib/utils"
 
 export type TabId = "calendar" | "budgeted" | "chores" | "devhub" | "playground"
@@ -25,7 +25,7 @@ export const TABS = [
 const SPRING = { type: "spring", stiffness: 500, damping: 38 } as const
 
 export function GlobalNav({ activeTab, onTabChange, theme, onToggleTheme, rightSlot }: GlobalNavProps) {
-  const [activeEl, setActiveEl] = useState<HTMLButtonElement | null>(null)
+  const badges = useNavBadges()
   return (
     <>
       <nav className="sticky top-0 z-50 border-b border-white/10 bg-black/95 backdrop-blur-xl">
@@ -47,21 +47,30 @@ export function GlobalNav({ activeTab, onTabChange, theme, onToggleTheme, rightS
 
             {/* Tabs (desktop / tablet) */}
             <div className="relative hidden h-full items-center gap-1 md:flex">
-              <SlimeNav target={activeEl} />
               {TABS.map(({ id, label, icon: Icon }) => {
                 const active = activeTab === id
                 return (
                   <button
                     key={id}
-                    ref={active ? setActiveEl : undefined}
                     onClick={() => onTabChange(id)}
                     className={cn(
-                      "relative flex h-9 shrink-0 cursor-pointer select-none items-center gap-1.5 rounded-lg px-3.5 font-mono text-xs font-bold uppercase tracking-wider transition-colors",
-                      active ? "text-black" : "text-zinc-400 hover:text-white"
+                      "reveal flex h-9 shrink-0 cursor-pointer select-none items-center gap-f8 rounded-full px-f13 font-mono text-xs uppercase tracking-wider transition-colors",
+                      active ? "text-white" : "text-zinc-500 hover:text-zinc-200"
                     )}
                   >
-                    <Icon className="relative size-3.5" />
+                    {/* Píldora de luz: vidrio + línea de luz que viaja al tab activo */}
+                    {active && (
+                      <motion.span
+                        layoutId="nav-pill"
+                        transition={SPRING}
+                        className="absolute inset-0 rounded-full border border-white/10 bg-white/[0.06]"
+                      >
+                        <span className="absolute inset-x-f13 -bottom-px h-px bg-gradient-to-r from-transparent via-brand-hi to-transparent" />
+                      </motion.span>
+                    )}
+                    <Icon className={cn("relative size-3.5", active && "text-brand-hi")} />
                     <span className="relative">{label}</span>
+                    <NavBadge n={badges[id]} active={active} />
                   </button>
                 )
               })}
@@ -108,11 +117,14 @@ export function GlobalNav({ activeTab, onTabChange, theme, onToggleTheme, rightS
                   <motion.span
                     layoutId="tab-glow"
                     transition={SPRING}
-                    className="absolute inset-x-3 top-0 h-0.5 rounded-full bg-brand-hi shadow-[0_0_12px_rgba(155,224,28,0.9)]"
+                    className="absolute inset-x-f13 top-0 h-px bg-gradient-to-r from-transparent via-brand-hi to-transparent"
                   />
                 )}
-                <motion.span animate={{ scale: active ? 1.15 : 1, y: active ? -1 : 0 }} transition={SPRING}>
+                <motion.span animate={{ scale: active ? 1.15 : 1, y: active ? -1 : 0 }} transition={SPRING} className="relative">
                   <Icon className="size-5" />
+                  {!!badges[id] && (
+                    <span className="absolute -right-f8 -top-f5 min-w-[15px] rounded-full bg-brand px-[3px] text-center font-mono text-[9px] leading-[15px] text-black tabular-nums">{badges[id]}</span>
+                  )}
                 </motion.span>
                 {short}
               </button>
@@ -121,5 +133,18 @@ export function GlobalNav({ activeTab, onTabChange, theme, onToggleTheme, rightS
         </div>
       </nav>
     </>
+  )
+}
+
+/** Contador de pendientes de hoy, con los números animados de la app */
+function NavBadge({ n, active }: { n?: number; active: boolean }) {
+  if (!n) return null
+  return (
+    <span className={cn(
+      "relative min-w-[18px] rounded-full px-f5 text-center font-mono text-[10px] leading-[18px] tabular-nums transition-colors",
+      active ? "bg-brand text-black" : "bg-white/[0.08] text-zinc-300"
+    )}>
+      <CountUp value={n} />
+    </span>
   )
 }
