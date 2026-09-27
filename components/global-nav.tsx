@@ -36,7 +36,7 @@ export function GlobalNav({ activeTab, onTabChange, theme, onToggleTheme, rightS
               <motion.div
                 whileHover={{ rotate: -8, scale: 1.06 }}
                 whileTap={{ scale: 0.92 }}
-                className="relative flex h-9 w-9 select-none items-center justify-center rounded-lg bg-gradient-to-br from-[#76b900] to-[#b6f03a] shadow-[0_0_18px_rgba(118,185,0,0.45)]"
+                className="relative flex h-9 w-9 select-none items-center justify-center rounded-lg bg-gradient-to-br from-brand to-brand-hi shadow-[0_0_18px_rgba(118,185,0,0.45)]"
               >
                 <span className="font-mono text-sm font-black tracking-tight text-black">P</span>
               </motion.div>
@@ -73,7 +73,7 @@ export function GlobalNav({ activeTab, onTabChange, theme, onToggleTheme, rightS
               <motion.button
                 whileTap={{ scale: 0.9, rotate: 20 }}
                 onClick={onToggleTheme}
-                className="cursor-pointer rounded-lg border border-white/10 bg-white/5 p-2 text-zinc-400 transition-colors hover:border-[#76b900]/50 hover:text-[#b6f03a]"
+                className="cursor-pointer rounded-lg border border-white/10 bg-white/5 p-2 text-zinc-400 transition-colors hover:border-brand/50 hover:text-brand-hi"
                 title="Cambiar tema"
                 aria-label="Cambiar tema"
               >
@@ -101,14 +101,14 @@ export function GlobalNav({ activeTab, onTabChange, theme, onToggleTheme, rightS
                 aria-label={short}
                 className={cn(
                   "relative flex cursor-pointer select-none flex-col items-center gap-1 py-2.5 text-[10px] font-semibold transition-colors",
-                  active ? "text-[#b6f03a]" : "text-zinc-500"
+                  active ? "text-brand-hi" : "text-zinc-500"
                 )}
               >
                 {active && (
                   <motion.span
                     layoutId="tab-glow"
                     transition={SPRING}
-                    className="absolute inset-x-3 top-0 h-0.5 rounded-full bg-[#9be01c] shadow-[0_0_12px_rgba(155,224,28,0.9)]"
+                    className="absolute inset-x-3 top-0 h-0.5 rounded-full bg-brand-hi shadow-[0_0_12px_rgba(155,224,28,0.9)]"
                   />
                 )}
                 <motion.span animate={{ scale: active ? 1.15 : 1, y: active ? -1 : 0 }} transition={SPRING}>

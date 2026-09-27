@@ -22,7 +22,7 @@ export function ChoresApp() {
   return (
     <div className="min-h-screen">
       <ModuleNav
-        icon={<CheckCircle2 className="w-4 h-4 text-[#76b900]" />}
+        icon={<CheckCircle2 className="w-4 h-4 text-brand" />}
         title="Tareas"
       />
       <AnimatePresence mode="wait">

@@ -109,14 +109,14 @@ export function PwaBootstrap() {
       <div className="mt-3 flex flex-col sm:flex-row gap-2">
         <button
           onClick={handleInstall}
-          className="flex-1 flex items-center justify-center gap-2 bg-[#76b900] text-black font-mono text-[11px] font-bold uppercase tracking-wider py-2.5 cursor-pointer hover:bg-[#86cb10]"
+          className="flex-1 flex items-center justify-center gap-2 bg-brand text-black font-mono text-[11px] font-bold uppercase tracking-wider py-2.5 cursor-pointer hover:bg-brand-hi"
         >
           <Download className="w-3.5 h-3.5" /> Instalar app
         </button>
         {isNotificationSupported() && (
           <button
             onClick={handleEnableNotifs}
-            className="flex-1 flex items-center justify-center gap-2 border border-zinc-300 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 font-mono text-[11px] font-bold uppercase tracking-wider py-2.5 cursor-pointer hover:border-[#76b900] hover:text-[#76b900]"
+            className="flex-1 flex items-center justify-center gap-2 border border-zinc-300 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 font-mono text-[11px] font-bold uppercase tracking-wider py-2.5 cursor-pointer hover:border-brand hover:text-brand"
           >
             <Bell className="w-3.5 h-3.5" /> Notificaciones
           </button>

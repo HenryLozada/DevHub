@@ -297,7 +297,7 @@ function EventForm({
           <Button
             type="button"
             variant="ghost"
-            className="text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
+            className="text-neg hover:text-neg dark:text-neg dark:hover:text-neg"
             onClick={() => onDelete(event!.id)}
           >
             <Trash2 className="size-4" />

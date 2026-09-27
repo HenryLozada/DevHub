@@ -239,7 +239,7 @@ export function CashflowCalendar() {
     <div className="mx-auto min-h-screen flex flex-col relative">
       <InjectionSlot moduleId="calendar" className="absolute inset-0 pointer-events-none" />
       <ModuleNav
-        icon={<IoCalendar className="w-4 h-4 text-[#76b900]" />}
+        icon={<IoCalendar className="w-4 h-4 text-brand" />}
         title="Flujo de Caja"
         actions={
           <RippleButton onClick={goToToday} rippleColor="#ffffff" duration="600ms"
@@ -259,14 +259,14 @@ export function CashflowCalendar() {
             <button
               onClick={() => goToMonth(-1)}
               aria-label="Mes anterior"
-              className="size-8 flex items-center justify-center rounded-lg bg-white/40 dark:bg-white/10 hover:bg-white dark:hover:bg-white/20 text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white border border-white/40 dark:border-white/10 hover:border-[#76b900]/60 dark:hover:border-[#76b900]/70 transition-all duration-200"
+              className="size-8 flex items-center justify-center rounded-lg bg-white/40 dark:bg-white/10 hover:bg-white dark:hover:bg-white/20 text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white border border-white/40 dark:border-white/10 hover:border-brand/60 dark:hover:border-brand/70 transition-all duration-200"
             >
               <IoArrowBack className="size-4" />
             </button>
             <button
               onClick={() => goToMonth(1)}
               aria-label="Mes siguiente"
-              className="size-8 flex items-center justify-center rounded-lg bg-white/40 dark:bg-white/10 hover:bg-white dark:hover:bg-white/20 text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white border border-white/40 dark:border-white/10 hover:border-[#76b900]/60 dark:hover:border-[#76b900]/70 transition-all duration-200"
+              className="size-8 flex items-center justify-center rounded-lg bg-white/40 dark:bg-white/10 hover:bg-white dark:hover:bg-white/20 text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white border border-white/40 dark:border-white/10 hover:border-brand/60 dark:hover:border-brand/70 transition-all duration-200"
             >
               <IoArrowForward className="size-4" />
             </button>
@@ -326,7 +326,7 @@ export function CashflowCalendar() {
                 <button
                   className={cn(
                     "flex flex-1 items-center justify-center gap-2 rounded-sm py-1.5 text-sm font-medium transition-all",
-                    activeTab === "eventos" ? "bg-white dark:bg-zinc-950/70 dark:backdrop-blur-xl text-zinc-900 dark:text-zinc-100 shadow-sm border border-[#76b900]" : "text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200"
+                    activeTab === "eventos" ? "bg-white dark:bg-zinc-950/70 dark:backdrop-blur-xl text-zinc-900 dark:text-zinc-100 shadow-sm border border-brand" : "text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200"
                   )}
                   onClick={() => setActiveTab("eventos")}
                 >
@@ -336,7 +336,7 @@ export function CashflowCalendar() {
                 <button
                   className={cn(
                     "flex flex-1 items-center justify-center gap-2 rounded-sm py-1.5 text-sm font-medium transition-all",
-                    activeTab === "finanzas" ? "bg-white dark:bg-zinc-950/70 dark:backdrop-blur-xl text-zinc-900 dark:text-zinc-100 shadow-sm border border-[#76b900]" : "text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200"
+                    activeTab === "finanzas" ? "bg-white dark:bg-zinc-950/70 dark:backdrop-blur-xl text-zinc-900 dark:text-zinc-100 shadow-sm border border-brand" : "text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200"
                   )}
                   onClick={() => setActiveTab("finanzas")}
                 >

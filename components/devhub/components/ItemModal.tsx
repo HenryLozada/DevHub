@@ -194,12 +194,11 @@ export function ItemModal({ item, onClose, onSaved }: ItemModalProps) {
         className="relative w-full max-w-lg bg-[#ffffff] dark:bg-[#121212] border border-zinc-200 dark:border-zinc-800 rounded-lg shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
       >
         {/* Signature NVIDIA green corner square */}
-        <div className="corner-square" />
 
         {/* Black Header */}
         <div className="bg-black text-white px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between border-b border-zinc-800 select-none">
           <h3 className="text-sm font-mono font-bold tracking-wider uppercase text-zinc-100 flex items-center gap-2">
-            <span className="text-[#76b900]">//</span> {item ? "Editar Elemento" : "Nuevo Elemento"}
+            <span className="text-brand">//</span> {item ? "Editar Elemento" : "Nuevo Elemento"}
           </h3>
           <button
             onClick={onClose}
@@ -223,7 +222,7 @@ export function ItemModal({ item, onClose, onSaved }: ItemModalProps) {
               value={title}
               onChange={(e) => { setTitle(e.target.value); userTouchedTitle.current = true }}
               placeholder="ej. GitHub Copilot, Servidor de Producción..."
-              className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-950/70 dark:backdrop-blur-xl border border-zinc-200 dark:border-zinc-800 rounded-lg text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:border-[#76b900] font-sans text-sm transition-colors"
+              className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-950/70 dark:backdrop-blur-xl border border-zinc-200 dark:border-zinc-800 rounded-lg text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:border-brand font-sans text-sm transition-colors"
             />
           </div>
 
@@ -236,7 +235,7 @@ export function ItemModal({ item, onClose, onSaved }: ItemModalProps) {
               <select
                 value={type}
                 onChange={(e) => setType(e.target.value as DevItemType)}
-                className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-950/70 dark:backdrop-blur-xl border border-zinc-200 dark:border-zinc-800 rounded-lg text-zinc-900 dark:text-white text-sm focus:outline-none focus:border-[#76b900] transition-colors"
+                className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-950/70 dark:backdrop-blur-xl border border-zinc-200 dark:border-zinc-800 rounded-lg text-zinc-900 dark:text-white text-sm focus:outline-none focus:border-brand transition-colors"
               >
                 <option value="tool">Herramienta (Tool)</option>
                 <option value="repo">Repositorio (GitHub)</option>
@@ -253,7 +252,7 @@ export function ItemModal({ item, onClose, onSaved }: ItemModalProps) {
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-950/70 dark:backdrop-blur-xl border border-zinc-200 dark:border-zinc-800 rounded-lg text-zinc-900 dark:text-white text-sm focus:outline-none focus:border-[#76b900] transition-colors"
+                className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-950/70 dark:backdrop-blur-xl border border-zinc-200 dark:border-zinc-800 rounded-lg text-zinc-900 dark:text-white text-sm focus:outline-none focus:border-brand transition-colors"
               >
                 {CATEGORIES.map((cat) => (
                   <option key={cat} value={cat}>
@@ -274,7 +273,7 @@ export function ItemModal({ item, onClose, onSaved }: ItemModalProps) {
               value={description}
               onChange={(e) => { setDescription(e.target.value); userTouchedDesc.current = true }}
               placeholder="Detalles sobre este recurso..."
-              className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-950/70 dark:backdrop-blur-xl border border-zinc-200 dark:border-zinc-800 rounded-lg text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:border-[#76b900] text-sm resize-none transition-colors"
+              className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-950/70 dark:backdrop-blur-xl border border-zinc-200 dark:border-zinc-800 rounded-lg text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:border-brand text-sm resize-none transition-colors"
             />
           </div>
 
@@ -290,7 +289,7 @@ export function ItemModal({ item, onClose, onSaved }: ItemModalProps) {
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
                 placeholder="https://..."
-                className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-950/70 dark:backdrop-blur-xl border border-zinc-200 dark:border-zinc-800 rounded-lg text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:border-[#76b900] font-sans text-sm transition-colors"
+                className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-950/70 dark:backdrop-blur-xl border border-zinc-200 dark:border-zinc-800 rounded-lg text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:border-brand font-sans text-sm transition-colors"
               />
               {metaLoading && (
                 <span className="inline-block mt-1.5 text-[10px] font-mono text-zinc-400 animate-pulse">
@@ -311,7 +310,7 @@ export function ItemModal({ item, onClose, onSaved }: ItemModalProps) {
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 placeholder="Escribe tu código, snippet o apuntes aquí..."
-                className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-950/70 dark:backdrop-blur-xl border border-zinc-200 dark:border-zinc-800 rounded-lg text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:border-[#76b900] font-mono text-xs resize-y transition-colors"
+                className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-950/70 dark:backdrop-blur-xl border border-zinc-200 dark:border-zinc-800 rounded-lg text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:border-brand font-mono text-xs resize-y transition-colors"
               />
             </div>
           )}
@@ -327,7 +326,7 @@ export function ItemModal({ item, onClose, onSaved }: ItemModalProps) {
                 value={apiKey}
                 onChange={(e) => setApiKey(e.target.value)}
                 placeholder={secretsLoaded ? "sk-proj-..." : "Cifrada · déjala vacía para no cambiarla"}
-                className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-950/70 dark:backdrop-blur-xl border border-zinc-200 dark:border-zinc-800 rounded-lg text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:border-[#76b900] font-mono text-sm transition-colors"
+                className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-950/70 dark:backdrop-blur-xl border border-zinc-200 dark:border-zinc-800 rounded-lg text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:border-brand font-mono text-sm transition-colors"
               />
             </div>
           )}
@@ -344,7 +343,7 @@ export function ItemModal({ item, onClose, onSaved }: ItemModalProps) {
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   placeholder="admin, email@host.com"
-                  className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-950/70 dark:backdrop-blur-xl border border-zinc-200 dark:border-zinc-800 rounded-lg text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:border-[#76b900] text-sm transition-colors"
+                  className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-950/70 dark:backdrop-blur-xl border border-zinc-200 dark:border-zinc-800 rounded-lg text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:border-brand text-sm transition-colors"
                 />
               </div>
               <div>
@@ -357,7 +356,7 @@ export function ItemModal({ item, onClose, onSaved }: ItemModalProps) {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder={secretsLoaded ? "••••••••" : "Cifrada · vacía = sin cambios"}
-                  className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-950/70 dark:backdrop-blur-xl border border-zinc-200 dark:border-zinc-800 rounded-lg text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:border-[#76b900] text-sm transition-colors"
+                  className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-950/70 dark:backdrop-blur-xl border border-zinc-200 dark:border-zinc-800 rounded-lg text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:border-brand text-sm transition-colors"
                 />
               </div>
               </div>
@@ -377,7 +376,7 @@ export function ItemModal({ item, onClose, onSaved }: ItemModalProps) {
               type="submit"
               rippleColor="rgba(255,255,255,0.5)"
               duration="600ms"
-              className="px-4 py-2 bg-black hover:bg-zinc-900 dark:bg-[#76b900] dark:hover:bg-[#86cb10] text-white dark:text-black font-bold font-mono text-xs uppercase tracking-wider border border-transparent dark:border-transparent transition-colors cursor-pointer overflow-hidden"
+              className="px-4 py-2 bg-black hover:bg-zinc-900 dark:bg-brand dark:hover:bg-brand-hi text-white dark:text-black font-bold font-mono text-xs uppercase tracking-wider border border-transparent dark:border-transparent transition-colors cursor-pointer overflow-hidden"
             >
               {item ? "Guardar" : "Crear"}
             </RippleButton>

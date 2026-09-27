@@ -31,11 +31,11 @@ function renderMarkdown(text: string) {
       const inlineProcessed = inlineParts.map((inlinePart, inlineIndex) => {
         const isInlineCode = inlineIndex % 2 === 1
         if (isInlineCode) {
-          return <code key={inlineIndex} className="px-1 py-0.5 bg-zinc-800/80 text-[#76b900] font-mono text-[10px] border border-white/10 rounded-sm">{inlinePart}</code>
+          return <code key={inlineIndex} className="px-1 py-0.5 bg-zinc-800/80 text-brand font-mono text-[10px] border border-white/10 rounded-sm">{inlinePart}</code>
         }
         return inlinePart
       })
-      if (isBold) return <strong key={subIndex} className="font-bold text-[#76b900]">{inlineProcessed}</strong>
+      if (isBold) return <strong key={subIndex} className="font-bold text-brand">{inlineProcessed}</strong>
       return inlineProcessed
     })
     return <span key={index}>{processedText}</span>
@@ -54,14 +54,14 @@ export function MessageBubble({ message }: { message: ChatMessage }) {
     <div className={cn("flex items-start gap-2.5", isUser ? "flex-row-reverse" : "")}>
       <div className={cn("shrink-0 w-7 h-7 rounded-sm flex items-center justify-center mt-0.5 overflow-hidden", isUser
         ? "bg-zinc-200/60 dark:bg-zinc-800/60 border border-white/30 dark:border-white/10 backdrop-blur-sm"
-        : "bg-[#76b900]/10 border border-[#76b900]/20"
+        : "bg-brand/10 border border-brand/20"
       )}>
         {isUser && avatar ? (
           <img src={avatar} alt="Tu foto" className="w-full h-full object-cover" />
         ) : isUser ? (
           <User className="w-3.5 h-3.5 text-zinc-500 dark:text-zinc-400" />
         ) : (
-          <Bot className="w-3.5 h-3.5 text-[#76b900]" />
+          <Bot className="w-3.5 h-3.5 text-brand" />
         )}
       </div>
       <div className={cn("max-w-[85%] px-3.5 py-2.5 text-xs whitespace-pre-wrap leading-relaxed", isUser ? GLASS_USER : GLASS_BOT, "rounded-sm")}>

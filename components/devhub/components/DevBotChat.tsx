@@ -35,8 +35,8 @@ function BotMessage({ msg, isFirst }: { msg: Message; isFirst: boolean }) {
       transition={{ duration: 0.25, ease: "easeOut" }}
       className="flex items-start gap-2.5 max-w-[85%]"
     >
-      <div className="shrink-0 w-7 h-7 rounded-sm bg-[#76b900]/10 border border-[#76b900]/20 flex items-center justify-center mt-0.5">
-        <Bot className="w-3.5 h-3.5 text-[#76b900]" />
+      <div className="shrink-0 w-7 h-7 rounded-sm bg-brand/10 border border-brand/20 flex items-center justify-center mt-0.5">
+        <Bot className="w-3.5 h-3.5 text-brand" />
       </div>
       <div>
         <div className={cn("px-3.5 py-2.5 text-xs leading-relaxed text-zinc-700 dark:text-zinc-300", GLASS_BOT, "rounded-sm")}>
@@ -253,18 +253,18 @@ export function DevBotChat({ onItemAdded }: DevBotChatProps) {
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-white/30 dark:border-white/10">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-sm bg-[#76b900]/10 border border-[#76b900]/20 flex items-center justify-center relative">
-            <Terminal className="w-4 h-4 text-[#76b900]" />
-            <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-[#76b900] rounded-full animate-pulse" />
+          <div className="w-8 h-8 rounded-sm bg-brand/10 border border-brand/20 flex items-center justify-center relative">
+            <Terminal className="w-4 h-4 text-brand" />
+            <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-brand rounded-full animate-pulse" />
           </div>
           <div>
             <h3 className="text-xs font-bold text-zinc-800 dark:text-zinc-200 font-mono uppercase tracking-wider">DevBot</h3>
             <p className="text-[9px] font-mono text-zinc-400 dark:text-zinc-500">Smart Parse • Online</p>
           </div>
         </div>
-        <div className="flex items-center gap-1 px-2 py-1 bg-[#76b900]/5 border border-[#76b900]/10 rounded-sm">
-          <Sparkles className="w-3 h-3 text-[#76b900]" />
-          <span className="text-[8px] font-mono font-bold text-[#76b900] uppercase tracking-wider">IA</span>
+        <div className="flex items-center gap-1 px-2 py-1 bg-brand/5 border border-brand/10 rounded-sm">
+          <Sparkles className="w-3 h-3 text-brand" />
+          <span className="text-[8px] font-mono font-bold text-brand uppercase tracking-wider">IA</span>
         </div>
       </div>
 
@@ -286,13 +286,13 @@ export function DevBotChat({ onItemAdded }: DevBotChatProps) {
             animate={{ opacity: 1, y: 0 }}
             className="flex items-start gap-2.5 max-w-[70%]"
           >
-            <div className="shrink-0 w-7 h-7 rounded-sm bg-[#76b900]/10 border border-[#76b900]/20 flex items-center justify-center">
-              <Bot className="w-3.5 h-3.5 text-[#76b900]" />
+            <div className="shrink-0 w-7 h-7 rounded-sm bg-brand/10 border border-brand/20 flex items-center justify-center">
+              <Bot className="w-3.5 h-3.5 text-brand" />
             </div>
             <div className={cn("px-3.5 py-3 flex items-center gap-1", GLASS_BOT, "rounded-sm")}>
-              <span className="w-1.5 h-1.5 rounded-full bg-[#76b900] animate-bounce" style={{ animationDelay: "0ms" }} />
-              <span className="w-1.5 h-1.5 rounded-full bg-[#76b900] animate-bounce" style={{ animationDelay: "150ms" }} />
-              <span className="w-1.5 h-1.5 rounded-full bg-[#76b900] animate-bounce" style={{ animationDelay: "300ms" }} />
+              <span className="w-1.5 h-1.5 rounded-full bg-brand animate-bounce" style={{ animationDelay: "0ms" }} />
+              <span className="w-1.5 h-1.5 rounded-full bg-brand animate-bounce" style={{ animationDelay: "150ms" }} />
+              <span className="w-1.5 h-1.5 rounded-full bg-brand animate-bounce" style={{ animationDelay: "300ms" }} />
             </div>
           </motion.div>
         )}
@@ -309,20 +309,20 @@ export function DevBotChat({ onItemAdded }: DevBotChatProps) {
             onKeyDown={handleKeyDown}
             rows={1}
             placeholder="Pega un link, creds:, api:, o escribe una nota..."
-            className="w-full bg-white/50 dark:bg-zinc-900/50 backdrop-blur-sm border border-white/40 dark:border-white/10 rounded-sm px-3 py-2.5 pr-10 text-xs font-mono text-zinc-800 dark:text-zinc-200 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:border-[#76b900] transition-colors resize-none leading-relaxed"
+            className="w-full bg-white/50 dark:bg-zinc-900/50 backdrop-blur-sm border border-white/40 dark:border-white/10 rounded-sm px-3 py-2.5 pr-10 text-xs font-mono text-zinc-800 dark:text-zinc-200 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:border-brand transition-colors resize-none leading-relaxed"
           />
           <button
             onClick={() => parseAndSave(input)}
             disabled={!input.trim() || isTyping}
-            className="absolute right-2 bottom-2 p-1.5 text-zinc-400 hover:text-[#76b900] disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer"
+            className="absolute right-2 bottom-2 p-1.5 text-zinc-400 hover:text-brand disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer"
           >
             <CornerDownLeft className="w-4 h-4" />
           </button>
         </div>
         <div className="flex gap-3 mt-2 text-[8px] font-mono text-zinc-400 dark:text-zinc-600 select-none">
-          <span><span className="text-[#76b900]">github.com/</span>user/repo</span>
-          <span><span className="text-[#76b900]">creds:</span> host - user / pass</span>
-          <span><span className="text-[#76b900]">api:</span> nombre - endpoint - key</span>
+          <span><span className="text-brand">github.com/</span>user/repo</span>
+          <span><span className="text-brand">creds:</span> host - user / pass</span>
+          <span><span className="text-brand">api:</span> nombre - endpoint - key</span>
         </div>
       </div>
     </div>

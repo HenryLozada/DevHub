@@ -49,7 +49,7 @@ export function AuthScreen() {
         aria-hidden
         animate={{ scale: [1, 1.15, 1], opacity: [0.35, 0.6, 0.35] }}
         transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute size-[28rem] rounded-full bg-[#76b900]/20 blur-3xl pointer-events-none"
+        className="absolute size-[28rem] rounded-full bg-brand/20 blur-3xl pointer-events-none"
       />
 
       <motion.div
@@ -64,7 +64,7 @@ export function AuthScreen() {
             initial={{ rotate: -20, scale: 0.6 }}
             animate={{ rotate: 0, scale: 1 }}
             transition={{ type: "spring", stiffness: 300, damping: 14, delay: 0.1 }}
-            className="w-11 h-11 rounded-xl bg-gradient-to-br from-[#76b900] to-[#b6f03a] flex items-center justify-center shadow-[0_0_24px_rgba(118,185,0,0.55)]"
+            className="w-11 h-11 rounded-xl bg-gradient-to-br from-brand to-brand-hi flex items-center justify-center shadow-[0_0_24px_rgba(118,185,0,0.55)]"
           >
             <span className="text-black font-black font-mono text-lg tracking-tight">P</span>
           </motion.div>
@@ -83,7 +83,7 @@ export function AuthScreen() {
               onChange={e => setEmail(e.target.value)}
               placeholder="Correo electrónico"
               required
-              className="w-full pl-9 pr-4 py-2.5 bg-white/50 dark:bg-zinc-900/50 border border-white/40 dark:border-white/10 rounded-sm text-xs font-mono text-zinc-800 dark:text-zinc-200 placeholder:text-zinc-400 focus:outline-none focus:border-[#76b900] transition-colors"
+              className="w-full pl-9 pr-4 py-2.5 bg-white/50 dark:bg-zinc-900/50 border border-white/40 dark:border-white/10 rounded-sm text-xs font-mono text-zinc-800 dark:text-zinc-200 placeholder:text-zinc-400 focus:outline-none focus:border-brand transition-colors"
             />
           </div>
 
@@ -96,19 +96,19 @@ export function AuthScreen() {
               placeholder="Contraseña"
               required
               minLength={6}
-              className="w-full pl-9 pr-4 py-2.5 bg-white/50 dark:bg-zinc-900/50 border border-white/40 dark:border-white/10 rounded-sm text-xs font-mono text-zinc-800 dark:text-zinc-200 placeholder:text-zinc-400 focus:outline-none focus:border-[#76b900] transition-colors"
+              className="w-full pl-9 pr-4 py-2.5 bg-white/50 dark:bg-zinc-900/50 border border-white/40 dark:border-white/10 rounded-sm text-xs font-mono text-zinc-800 dark:text-zinc-200 placeholder:text-zinc-400 focus:outline-none focus:border-brand transition-colors"
             />
           </div>
 
-          {error && <p className="text-[10px] font-mono text-red-500">{error}</p>}
-          {message && <p className="text-[10px] font-mono text-[#76b900]">{message}</p>}
+          {error && <p className="text-[10px] font-mono text-neg">{error}</p>}
+          {message && <p className="text-[10px] font-mono text-brand">{message}</p>}
 
           <RippleButton
             type="submit"
             disabled={busy}
             rippleColor="#000000"
             duration="600ms"
-            className="w-full py-2.5 bg-[#76b900] text-black rounded-sm text-[10px] font-mono font-bold uppercase tracking-wider hover:bg-[#86cb00] transition-all border border-[#76b900] cursor-pointer disabled:opacity-50 shadow-sm shadow-[#76b900]/20 overflow-hidden"
+            className="w-full py-2.5 bg-brand text-black rounded-sm text-[10px] font-mono font-bold uppercase tracking-wider hover:bg-brand-hi transition-all border border-brand cursor-pointer disabled:opacity-50 shadow-sm shadow-brand/20 overflow-hidden"
           >
             {busy ? "..." : mode === "signup" ? "Crear cuenta" : "Iniciar sesión"}
           </RippleButton>
@@ -135,7 +135,7 @@ export function AuthScreen() {
         <p className="mt-5 text-[10px] font-mono text-zinc-400 dark:text-zinc-500 text-center">
           {mode === "signup" ? "¿Ya tienes cuenta?" : "¿No tienes cuenta?"}{" "}
           <button onClick={() => { setMode(mode === "signup" ? "login" : "signup"); setError(null); setMessage(null) }}
-            className="text-[#76b900] hover:underline cursor-pointer font-bold">
+            className="text-brand hover:underline cursor-pointer font-bold">
             {mode === "signup" ? "Inicia sesión" : "Regístrate"}
           </button>
         </p>

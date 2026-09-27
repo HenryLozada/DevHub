@@ -92,21 +92,21 @@ export function Dashboard() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-zinc-200 dark:border-zinc-800 pb-5">
         <div>
           <h1 className="text-lg md:text-2xl font-mono font-bold tracking-tight text-zinc-900 dark:text-white flex items-center gap-2">
-            <span className="text-[#76b900] font-bold">#</span> DEVHUB
+            <span className="text-brand font-bold">#</span> DEVHUB
           </h1>
           <p className="text-xs font-mono text-zinc-500 dark:text-zinc-400 mt-1 uppercase tracking-wider">
             Developer Toolbox & Credentials Locker
           </p>
         </div>
          <div className="flex flex-col sm:flex-row gap-2">
-          <button onClick={() => setSecurityDialogOpen(true)} className="flex items-center justify-center gap-2 px-4 py-2.5 border border-zinc-300 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 hover:border-[#76b900] hover:text-[#76b900] font-bold font-mono text-xs uppercase tracking-wider transition-colors cursor-pointer">
+          <button onClick={() => setSecurityDialogOpen(true)} className="flex items-center justify-center gap-2 px-4 py-2.5 border border-zinc-300 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 hover:border-brand hover:text-brand font-bold font-mono text-xs uppercase tracking-wider transition-colors cursor-pointer">
             <ShieldCheck className="w-4 h-4" /> Seguridad
           </button>
           <RippleButton
            onClick={handleAddNew}
           rippleColor="rgba(255,255,255,0.5)"
           duration="600ms"
-          className="flex items-center justify-center gap-2 px-5 py-2.5 bg-black hover:bg-zinc-900 dark:bg-[#76b900] dark:hover:bg-[#86cb10] text-white dark:text-black font-bold font-mono text-xs uppercase tracking-wider transition-colors cursor-pointer border border-transparent overflow-hidden"
+          className="flex items-center justify-center gap-2 px-5 py-2.5 bg-black hover:bg-zinc-900 dark:bg-brand dark:hover:bg-brand-hi text-white dark:text-black font-bold font-mono text-xs uppercase tracking-wider transition-colors cursor-pointer border border-transparent overflow-hidden"
         >
           <Plus className="w-4 h-4" /> Añadir Recurso
           </RippleButton>
@@ -117,7 +117,6 @@ export function Dashboard() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 stagger">
         {/* Total Items */}
         <div className="relative border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950/70 dark:backdrop-blur-xl p-3 md:p-5 rounded-lg overflow-hidden select-none">
-          <div className="corner-square" />
           <div className="flex justify-between items-start">
             <div className="min-w-0">
               <p className="text-[9px] md:text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-widest truncate">
@@ -133,23 +132,21 @@ export function Dashboard() {
 
         {/* Tools */}
         <div className="relative border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950/70 dark:backdrop-blur-xl p-3 md:p-5 rounded-lg overflow-hidden select-none">
-          <div className="corner-square" />
           <div className="flex justify-between items-start">
             <div className="min-w-0">
               <p className="text-[9px] md:text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-widest truncate">
                 Herramientas
               </p>
-              <h3 className="text-xl md:text-3xl font-mono font-bold text-[#76b900] mt-1 md:mt-2 tabular-nums">
+              <h3 className="text-xl md:text-3xl font-mono font-bold text-brand mt-1 md:mt-2 tabular-nums">
                 {toolsCount}
               </h3>
             </div>
-            <Terminal className="w-4 h-4 md:w-5 md:h-5 text-[#76b900]/70 shrink-0" />
+            <Terminal className="w-4 h-4 md:w-5 md:h-5 text-brand/70 shrink-0" />
           </div>
         </div>
 
         {/* Repositories */}
         <div className="relative border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950/70 dark:backdrop-blur-xl p-3 md:p-5 rounded-lg overflow-hidden select-none">
-          <div className="corner-square" />
           <div className="flex justify-between items-start">
             <div className="min-w-0">
               <p className="text-[9px] md:text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-widest truncate">
@@ -165,7 +162,6 @@ export function Dashboard() {
 
         {/* Credentials / API Keys */}
         <div className="relative border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950/70 dark:backdrop-blur-xl p-3 md:p-5 rounded-lg overflow-hidden select-none">
-          <div className="corner-square" />
           <div className="flex justify-between items-start">
             <div className="min-w-0">
               <p className="text-[9px] md:text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-widest truncate">
@@ -205,7 +201,7 @@ export function Dashboard() {
                 onClick={() => setFilterType(tab.id)}
                 className={`px-3.5 py-1.5 font-mono text-[11px] font-bold uppercase tracking-wider transition-colors cursor-pointer border ${
                   isActive
-                    ? "bg-[#76b900] text-black border-[#76b900]"
+                    ? "bg-brand text-black border-brand"
                     : "bg-white dark:bg-zinc-950/70 dark:backdrop-blur-xl text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-900"
                 }`}
               >
@@ -223,7 +219,7 @@ export function Dashboard() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Buscar por título, descripción, categoría..."
-            className="w-full pl-9 pr-4 py-2 bg-white dark:bg-zinc-950/70 dark:backdrop-blur-xl border border-zinc-200 dark:border-zinc-800 rounded-lg text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:border-[#76b900] font-sans text-xs transition-colors"
+            className="w-full pl-9 pr-4 py-2 panel text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:border-brand font-sans text-xs transition-colors"
           />
         </div>
       </div>
@@ -242,7 +238,7 @@ export function Dashboard() {
         </div>
       ) : (
         <div className="text-center py-16 rounded-2xl border border-dashed border-zinc-300 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/10">
-          <Layers className="w-10 h-10 text-[#76b900] mx-auto mb-3 animate-bounce [animation-duration:2.4s]" />
+          <Layers className="w-10 h-10 text-brand mx-auto mb-3 animate-bounce [animation-duration:2.4s]" />
           <p className="text-sm font-mono font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
             No se encontraron elementos
           </p>

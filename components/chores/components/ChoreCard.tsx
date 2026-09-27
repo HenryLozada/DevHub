@@ -5,12 +5,12 @@ import { cn } from "@/lib/utils"
 import { Chore } from "../types"
 
 const COLOR_BORDER: Record<string, string> = {
-  violet: "border-violet-400 dark:border-violet-600",
-  emerald: "border-emerald-400 dark:border-emerald-600",
-  sky: "border-sky-400 dark:border-sky-600",
-  amber: "border-amber-400 dark:border-amber-600",
-  rose: "border-rose-400 dark:border-rose-600",
-  teal: "border-teal-400 dark:border-teal-600",
+  violet: "border-violet dark:border-violet",
+  emerald: "border-pos dark:border-pos",
+  sky: "border-info dark:border-info",
+  amber: "border-warn dark:border-warn",
+  rose: "border-neg dark:border-neg",
+  teal: "border-cyan dark:border-cyan",
 }
 
 interface ChoreCardProps {
@@ -32,14 +32,14 @@ export function ChoreCard({ chore, onEdit, onDelete, onToggle }: ChoreCardProps)
         "group flex items-start gap-4 p-4 rounded-lg border transition-all relative overflow-hidden",
         isDone
           ? "bg-zinc-50 dark:bg-zinc-900/30 border-zinc-200 dark:border-zinc-800 opacity-60"
-          : "bg-white dark:bg-zinc-950/70 dark:backdrop-blur-xl border-zinc-200 dark:border-zinc-800 hover:border-[#76b900]/30 shadow-xs"
+          : "bg-white dark:bg-zinc-950/70 dark:backdrop-blur-xl border-zinc-200 dark:border-zinc-800 hover:border-brand/30 shadow-xs"
       )}
     >
       <button onClick={onToggle} className="mt-0.5 shrink-0 transition-all active:scale-90">
         {isDone ? (
-          <CheckCircle2 className="w-5 h-5 text-[#76b900]" />
+          <CheckCircle2 className="w-5 h-5 text-brand" />
         ) : (
-          <Circle className="w-5 h-5 text-zinc-300 dark:text-zinc-600 hover:text-[#76b900] transition-colors" />
+          <Circle className="w-5 h-5 text-zinc-300 dark:text-zinc-600 hover:text-brand transition-colors" />
         )}
       </button>
       <div className="flex-1 min-w-0">
@@ -56,7 +56,7 @@ export function ChoreCard({ chore, onEdit, onDelete, onToggle }: ChoreCardProps)
               className={cn(
                 "text-[9px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded-md border",
                 isBefore((() => { const [y,m,d]=chore.dueDate!.split("-").map(Number); return new Date(y, m-1, d) })(), startOfDay(new Date())) && !isDone
-                  ? "bg-red-50 text-red-700 border-red-200 dark:bg-red-950/30 dark:text-red-400 dark:border-red-900/30"
+                  ? "bg-neg/10 text-neg border-neg/30 dark:bg-neg/30 dark:text-neg dark:border-neg/30"
                   : "bg-zinc-100 text-zinc-500 border-zinc-200 dark:bg-zinc-900 dark:text-zinc-400 dark:border-zinc-800"
               )}
             >
@@ -66,8 +66,8 @@ export function ChoreCard({ chore, onEdit, onDelete, onToggle }: ChoreCardProps)
         </div>
       </div>
       <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
-        <button onClick={onEdit} className="p-1.5 hover:bg-[#76b900]/10 text-zinc-400 hover:text-[#76b900] rounded-lg transition-colors border border-transparent hover:border-[#76b900]/20"><Pencil className="w-3.5 h-3.5" /></button>
-        <button onClick={onDelete} className="p-1.5 hover:bg-red-500/10 text-zinc-400 hover:text-red-500 rounded-lg transition-colors border border-transparent hover:border-red-500/20"><Trash2 className="w-3.5 h-3.5" /></button>
+        <button onClick={onEdit} className="p-1.5 hover:bg-brand/10 text-zinc-400 hover:text-brand rounded-lg transition-colors border border-transparent hover:border-brand/20"><Pencil className="w-3.5 h-3.5" /></button>
+        <button onClick={onDelete} className="p-1.5 hover:bg-neg/10 text-zinc-400 hover:text-neg rounded-lg transition-colors border border-transparent hover:border-neg/20"><Trash2 className="w-3.5 h-3.5" /></button>
       </div>
     </motion.div>
   )

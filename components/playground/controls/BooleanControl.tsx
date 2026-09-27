@@ -17,7 +17,7 @@ export function BooleanControl({ def, value, onChange }: Props) {
         onClick={() => onChange(!value)}
         className={`relative w-10 h-5 rounded-sm transition-colors border ${
           value
-            ? "bg-[#76b900] border-[#76b900]"
+            ? "bg-brand border-brand"
             : "bg-zinc-200 dark:bg-zinc-800 border-zinc-300 dark:border-zinc-700"
         }`}
       >
