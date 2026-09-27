@@ -37,7 +37,7 @@ export function ChatInput({ onSend, disabled }: ChatInputProps) {
         onKeyDown={handleKeyDown}
         disabled={disabled}
         placeholder="Pregúntale a DevBot..."
-        className="w-full resize-none bg-white/50 dark:bg-zinc-900/50 backdrop-blur-sm border border-white/40 dark:border-white/10 rounded-sm px-3 py-2.5 pr-10 text-xs font-mono text-zinc-800 dark:text-zinc-200 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:border-brand transition-colors min-h-[36px] max-h-[100px] leading-relaxed"
+        className="w-full resize-none bg-transparent border border-zinc-200 dark:border-white/10 rounded-f13 px-f13 py-f8 pr-10 text-xs font-mono text-zinc-800 dark:text-zinc-200 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:border-brand transition-colors min-h-[36px] max-h-[100px] leading-relaxed"
         rows={1}
       />
       <RippleButton

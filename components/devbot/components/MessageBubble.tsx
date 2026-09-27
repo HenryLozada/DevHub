@@ -4,8 +4,8 @@ import { cn } from "@/lib/utils"
 import { Bot, User } from "lucide-react"
 import { getAvatar } from "@/lib/avatar"
 
-const GLASS_BOT = "backdrop-blur-md bg-white/60 dark:bg-zinc-950/60 border border-white/40 dark:border-white/[0.08] shadow-sm shadow-black/5"
-const GLASS_USER = "bg-black/5 dark:bg-white/5 backdrop-blur-md border border-white/40 dark:border-white/[0.08] shadow-sm"
+const GLASS_BOT = "bg-zinc-900/[0.03] dark:bg-white/[0.04] border border-zinc-900/5 dark:border-white/[0.06]"
+const GLASS_USER = "bg-brand/10 border border-brand/20"
 
 function renderMarkdown(text: string) {
   if (!text) return ""
@@ -18,7 +18,7 @@ function renderMarkdown(text: string) {
       const hasLang = /^[a-zA-Z0-9_-]+$/.test(firstLine)
       const codeContent = hasLang ? lines.slice(1).join("\n") : part
       return (
-        <pre key={index} className="my-2 p-2.5 bg-zinc-900/80 dark:bg-black/60 backdrop-blur-sm border border-white/10 text-[10px] font-mono text-zinc-100 overflow-x-auto rounded-sm select-all relative">
+        <pre key={index} className="my-2 p-2.5 bg-zinc-900/80 dark:bg-black/60 backdrop-blur-sm border border-white/10 text-[10px] font-mono text-zinc-100 overflow-x-auto rounded-f8 select-all relative">
           {hasLang && <span className="absolute right-2 top-1.5 text-[8px] font-mono font-bold text-zinc-600 uppercase tracking-widest select-none">{firstLine}</span>}
           <code>{codeContent.trim()}</code>
         </pre>
@@ -31,7 +31,7 @@ function renderMarkdown(text: string) {
       const inlineProcessed = inlineParts.map((inlinePart, inlineIndex) => {
         const isInlineCode = inlineIndex % 2 === 1
         if (isInlineCode) {
-          return <code key={inlineIndex} className="px-1 py-0.5 bg-zinc-800/80 text-brand font-mono text-[10px] border border-white/10 rounded-sm">{inlinePart}</code>
+          return <code key={inlineIndex} className="px-1 py-0.5 bg-zinc-800/80 text-brand font-mono text-[10px] border border-white/10 rounded-f5">{inlinePart}</code>
         }
         return inlinePart
       })
@@ -52,7 +52,7 @@ export function MessageBubble({ message }: { message: ChatMessage }) {
 
   return (
     <div className={cn("flex items-start gap-2.5", isUser ? "flex-row-reverse" : "")}>
-      <div className={cn("shrink-0 w-7 h-7 rounded-sm flex items-center justify-center mt-0.5 overflow-hidden", isUser
+      <div className={cn("shrink-0 w-7 h-7 rounded-full flex items-center justify-center mt-0.5 overflow-hidden", isUser
         ? "bg-zinc-200/60 dark:bg-zinc-800/60 border border-white/30 dark:border-white/10 backdrop-blur-sm"
         : "bg-brand/10 border border-brand/20"
       )}>
@@ -64,7 +64,7 @@ export function MessageBubble({ message }: { message: ChatMessage }) {
           <Bot className="w-3.5 h-3.5 text-brand" />
         )}
       </div>
-      <div className={cn("max-w-[85%] px-3.5 py-2.5 text-xs whitespace-pre-wrap leading-relaxed", isUser ? GLASS_USER : GLASS_BOT, "rounded-sm")}>
+      <div className={cn("max-w-[85%] px-3.5 py-2.5 text-xs whitespace-pre-wrap leading-relaxed", isUser ? GLASS_USER : GLASS_BOT, isUser ? "rounded-f13 rounded-tr-f3" : "rounded-f13 rounded-tl-f3")}>
         <div className={cn("text-zinc-800 dark:text-zinc-200")}>
           {renderMarkdown(message.text)}
         </div>
