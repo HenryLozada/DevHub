@@ -2,7 +2,7 @@ import { Calendar as IoCalendarOutline, Wallet, CheckCircle2, Terminal, Puzzle, 
 import { motion } from "motion/react"
 import { useState } from "react"
 import { useNavBadges } from "@/lib/nav-badges"
-import { PixelEntity } from "@/components/pixel-entity"
+import { PixelOracle } from "@/components/pixel-oracle"
 import { CountUp } from "@/components/ui/count-up"
 import { cn } from "@/lib/utils"
 
@@ -50,7 +50,7 @@ export function GlobalNav({ activeTab, onTabChange, theme, onToggleTheme, rightS
 
             {/* Tabs (desktop / tablet) */}
             <div className="relative hidden h-full items-center gap-1 md:flex">
-              <PixelEntity target={activeEl} />
+              <PixelOracle target={activeEl} />
               {TABS.map(({ id, label, icon: Icon }) => {
                 const active = activeTab === id
                 return (
@@ -60,7 +60,7 @@ export function GlobalNav({ activeTab, onTabChange, theme, onToggleTheme, rightS
                     onClick={() => onTabChange(id)}
                     className={cn(
                       "relative flex h-9 shrink-0 cursor-pointer select-none items-center gap-f8 rounded-full px-f13 font-mono text-xs uppercase tracking-wider transition-colors",
-                      active ? "font-bold text-black" : "text-zinc-500 hover:text-zinc-200"
+                      active ? "font-bold text-white [text-shadow:0_0_6px_#000,0_0_2px_#000]" : "text-zinc-500 hover:text-zinc-200"
                     )}
                   >
                     <Icon className="relative size-3.5" />
@@ -137,7 +137,7 @@ function NavBadge({ n, active }: { n?: number; active: boolean }) {
   return (
     <span className={cn(
       "relative min-w-[18px] rounded-full px-f5 text-center font-mono text-[10px] leading-[18px] tabular-nums transition-colors",
-      active ? "bg-black/80 text-brand-hi" : "bg-white/[0.08] text-zinc-300"
+      active ? "bg-brand text-black" : "bg-white/[0.08] text-zinc-300"
     )}>
       <CountUp value={n} />
     </span>
