@@ -7,6 +7,7 @@ import { InjectionSlot } from "@/components/playground/InjectionSlot"
 import { togglePaidStatus, deleteExpense } from "../store"
 import { Expense, PaidStatus, fmt } from "../types"
 import { CountUp } from "@/components/ui/count-up"
+import { PixelBar } from "@/components/ui/pixel-bar"
 
 const money = (n: number) => `$${fmt(n)}`
 import { ExpenseModal } from "./ExpenseModal"
@@ -81,9 +82,7 @@ export function Dashboard({ expenses, onRefresh }: DashboardProps) {
               <p className="eyebrow mt-f5 tracking-[0.2em]">Pagado</p>
             </div>
           </div>
-          <div className="mt-f21 h-[3px] overflow-hidden rounded-full bg-zinc-900/10 dark:bg-white/[0.06]">
-            <div className="h-full rounded-full bg-brand transition-[width] duration-700 ease-out" style={{ width: `${paidPct}%` }} />
-          </div>
+          <PixelBar className="mt-f21" label={`${paidPct}% pagado`} segments={[{ value: paidPct / 100, color: "var(--color-brand)" }]} />
           <div className="mt-f13 grid grid-cols-2 gap-f13">
             <div className="cal-chip pl-f8" style={{ "--neon": "var(--color-pos)" } as React.CSSProperties}>
               <p className="eyebrow tracking-[0.2em]">Pagado</p>
@@ -100,11 +99,8 @@ export function Dashboard({ expenses, onRefresh }: DashboardProps) {
           <section className="panel p-f21">
             <p className="eyebrow">Por categoría</p>
             {/* barra apilada: de un vistazo, en qué se va el dinero */}
-            <div className="mt-f13 flex h-f8 overflow-hidden rounded-full">
-              {byCategory.map(({ c, sum }) => (
-                <div key={c} title={c} style={{ width: `${(sum / total) * 100}%`, background: catColor(categories, c) }} className="h-full first:rounded-l-full last:rounded-r-full" />
-              ))}
-            </div>
+            <PixelBar className="mt-f13" rows={3} label="Gasto por categoría"
+              segments={byCategory.map(({ c, sum }) => ({ value: total ? sum / total : 0, color: catColor(categories, c) }))} />
             <ul className="mt-f13 flex flex-col gap-f8">
               {byCategory.map(({ c, sum }) => (
                 <li key={c} className="cal-chip flex items-center justify-between gap-f8 pl-f8 text-xs" style={{ "--neon": catColor(categories, c) } as React.CSSProperties}>

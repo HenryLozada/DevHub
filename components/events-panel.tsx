@@ -9,6 +9,7 @@ import {
 } from "@/lib/events"
 import { toDateKey } from "@/lib/cashflow"
 import { cn } from "@/lib/utils"
+import { PixelBar } from "@/components/ui/pixel-bar"
 
 interface EventsPanelProps {
   selectedDate: Date
@@ -90,12 +91,7 @@ export function EventsPanel({
           </div>
         </div>
 
-        <div className="relative mt-4 h-[3px] overflow-hidden rounded-full bg-zinc-900/10 dark:bg-white/[0.06]">
-          <div
-            className="h-full rounded-full bg-brand transition-[width] duration-700 ease-out"
-            style={{ width: `${progress}%` }}
-          />
-        </div>
+        <PixelBar className="mt-4" label={`${progress}% hecho`} segments={[{ value: progress / 100, color: "var(--color-brand)" }]} />
 
         {dayOccurrences.length === 0 ? (
           <div className="mt-5 rounded-xl border border-dashed border-zinc-300 dark:border-white/10 px-4 py-6 text-center">
