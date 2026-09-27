@@ -9,7 +9,7 @@ interface Props {
 export function ColorControl({ def, value, onChange }: Props) {
   return (
     <div>
-      <label className="block text-[10px] font-mono font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-widest mb-1.5">
+      <label className="block eyebrow block mb-f8">
         {def.label}
       </label>
       <div className="flex items-center gap-2">
@@ -17,7 +17,7 @@ export function ColorControl({ def, value, onChange }: Props) {
           type="color"
           value={(value as string) ?? "#000000"}
           onChange={(e) => onChange(e.target.value)}
-          className="w-10 h-10 border border-zinc-200 dark:border-zinc-800 cursor-pointer rounded-lg bg-transparent p-0.5"
+          className="size-[34px] border border-zinc-200 dark:border-white/10 cursor-pointer rounded-f8 bg-transparent p-0.5"
         />
         <input
           type="text"

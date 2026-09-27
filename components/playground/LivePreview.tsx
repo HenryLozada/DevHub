@@ -26,7 +26,7 @@ export function LivePreview({ meta, values }: Props) {
   const isBackground = BACKGROUND_IDS.includes(meta.id)
 
   return (
-    <div className="relative flex items-center justify-center min-h-[200px] bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg p-6 overflow-hidden">
+    <div className="panel flex min-h-[377px] items-center justify-center p-f34">
       {isBackground ? (
         <div className="absolute inset-0">
           <meta.component {...(previewProps as any)} className="h-full w-full" />
