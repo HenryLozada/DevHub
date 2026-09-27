@@ -3,6 +3,7 @@ import { confetti } from "@/lib/confetti"
 import { AnimatePresence, motion } from "motion/react"
 import { Check, Plus, Pencil, Trash2, ChevronRight } from "lucide-react"
 import { CountUp } from "@/components/ui/count-up"
+import { PixelBar } from "@/components/ui/pixel-bar"
 import { isBefore, startOfDay, endOfWeek, isSameDay } from "date-fns"
 import { cn } from "@/lib/utils"
 import { RippleButton } from "@/components/ui/ripple-button"
@@ -148,9 +149,7 @@ export function Dashboard({ chores, onRefresh }: DashboardProps) {
           </div>
         </div>
         <div className="flex min-w-[233px] flex-1 items-center gap-f13 md:max-w-[377px]">
-          <div className="h-[3px] flex-1 overflow-hidden rounded-full bg-zinc-900/10 dark:bg-white/[0.06]">
-            <div className="h-full rounded-full bg-brand transition-[width] duration-700 ease-out" style={{ width: `${pct}%` }} />
-          </div>
+          <PixelBar className="flex-1" label={`${pct}% hecho`} segments={[{ value: pct / 100, color: "var(--color-brand)" }]} />
           <span className="font-mono text-xs tabular-nums text-zinc-500">{doneCount}/{total}</span>
         </div>
         <RippleButton onClick={() => { setEditingChore(null); setShowChoreModal(true) }}
