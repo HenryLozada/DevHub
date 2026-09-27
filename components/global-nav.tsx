@@ -1,6 +1,8 @@
 import { Calendar as IoCalendarOutline, Wallet, CheckCircle2, Terminal, Puzzle, Sun, Moon } from "lucide-react"
 import { motion } from "motion/react"
+import { useState } from "react"
 import { useNavBadges } from "@/lib/nav-badges"
+import { PixelEntity } from "@/components/pixel-entity"
 import { CountUp } from "@/components/ui/count-up"
 import { cn } from "@/lib/utils"
 
@@ -26,6 +28,7 @@ const SPRING = { type: "spring", stiffness: 500, damping: 38 } as const
 
 export function GlobalNav({ activeTab, onTabChange, theme, onToggleTheme, rightSlot }: GlobalNavProps) {
   const badges = useNavBadges()
+  const [activeEl, setActiveEl] = useState<HTMLButtonElement | null>(null)
   return (
     <>
       <nav className="sticky top-0 z-50 border-b border-white/10 bg-black/95 backdrop-blur-xl">
@@ -47,28 +50,20 @@ export function GlobalNav({ activeTab, onTabChange, theme, onToggleTheme, rightS
 
             {/* Tabs (desktop / tablet) */}
             <div className="relative hidden h-full items-center gap-1 md:flex">
+              <PixelEntity target={activeEl} />
               {TABS.map(({ id, label, icon: Icon }) => {
                 const active = activeTab === id
                 return (
                   <button
                     key={id}
+                    ref={active ? setActiveEl : undefined}
                     onClick={() => onTabChange(id)}
                     className={cn(
-                      "reveal flex h-9 shrink-0 cursor-pointer select-none items-center gap-f8 rounded-full px-f13 font-mono text-xs uppercase tracking-wider transition-colors",
-                      active ? "text-white" : "text-zinc-500 hover:text-zinc-200"
+                      "relative flex h-9 shrink-0 cursor-pointer select-none items-center gap-f8 rounded-full px-f13 font-mono text-xs uppercase tracking-wider transition-colors",
+                      active ? "font-bold text-black" : "text-zinc-500 hover:text-zinc-200"
                     )}
                   >
-                    {/* Píldora de luz: vidrio + línea de luz que viaja al tab activo */}
-                    {active && (
-                      <motion.span
-                        layoutId="nav-pill"
-                        transition={SPRING}
-                        className="absolute inset-0 rounded-full border border-white/10 bg-white/[0.06]"
-                      >
-                        <span className="absolute inset-x-f13 -bottom-px h-px bg-gradient-to-r from-transparent via-brand-hi to-transparent" />
-                      </motion.span>
-                    )}
-                    <Icon className={cn("relative size-3.5", active && "text-brand-hi")} />
+                    <Icon className="relative size-3.5" />
                     <span className="relative">{label}</span>
                     <NavBadge n={badges[id]} active={active} />
                   </button>
@@ -142,7 +137,7 @@ function NavBadge({ n, active }: { n?: number; active: boolean }) {
   return (
     <span className={cn(
       "relative min-w-[18px] rounded-full px-f5 text-center font-mono text-[10px] leading-[18px] tabular-nums transition-colors",
-      active ? "bg-brand text-black" : "bg-white/[0.08] text-zinc-300"
+      active ? "bg-black/80 text-brand-hi" : "bg-white/[0.08] text-zinc-300"
     )}>
       <CountUp value={n} />
     </span>
