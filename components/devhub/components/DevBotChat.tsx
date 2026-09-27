@@ -20,8 +20,7 @@ interface Message {
   type?: string
 }
 
-const GLASS = "backdrop-blur-xl bg-white/40 dark:bg-zinc-950/40 border border-white/30 dark:border-white/10 shadow-sm shadow-black/5"
-const GLASS_BOT = "backdrop-blur-md bg-white/60 dark:bg-zinc-950/60 border border-white/40 dark:border-white/[0.08] shadow-sm shadow-black/5"
+const GLASS_BOT = "bg-zinc-900/[0.03] dark:bg-white/[0.04] border border-zinc-900/5 dark:border-white/[0.06]"
 
 function formatTime(d: Date) {
   return d.toLocaleTimeString("es-MX", { hour: "2-digit", minute: "2-digit" })
@@ -35,11 +34,11 @@ function BotMessage({ msg, isFirst }: { msg: Message; isFirst: boolean }) {
       transition={{ duration: 0.25, ease: "easeOut" }}
       className="flex items-start gap-2.5 max-w-[85%]"
     >
-      <div className="shrink-0 w-7 h-7 rounded-sm bg-brand/10 border border-brand/20 flex items-center justify-center mt-0.5">
+      <div className="shrink-0 w-7 h-7 rounded-full border border-zinc-200 dark:border-white/10 flex items-center justify-center mt-0.5">
         <Bot className="w-3.5 h-3.5 text-brand" />
       </div>
       <div>
-        <div className={cn("px-3.5 py-2.5 text-xs leading-relaxed text-zinc-700 dark:text-zinc-300", GLASS_BOT, "rounded-sm")}>
+        <div className={cn("px-3.5 py-2.5 text-xs leading-relaxed text-zinc-700 dark:text-zinc-300", GLASS_BOT, "rounded-f13 rounded-tl-f3")}>
           <p>{msg.content}</p>
         </div>
         <p className="text-[9px] font-mono text-zinc-400 dark:text-zinc-600 mt-1 px-1">{formatTime(msg.timestamp)}</p>
@@ -56,11 +55,11 @@ function UserMessage({ msg }: { msg: Message }) {
       transition={{ duration: 0.2, ease: "easeOut" }}
       className="flex items-start gap-2.5 max-w-[85%] ml-auto flex-row-reverse"
     >
-      <div className="shrink-0 w-7 h-7 rounded-sm bg-zinc-200/60 dark:bg-zinc-800/60 border border-white/30 dark:border-white/10 flex items-center justify-center mt-0.5 backdrop-blur-sm">
+      <div className="shrink-0 w-7 h-7 rounded-full border border-zinc-200 dark:border-white/10 flex items-center justify-center mt-0.5">
         <User className="w-3.5 h-3.5 text-zinc-500 dark:text-zinc-400" />
       </div>
       <div>
-        <div className="px-3.5 py-2.5 text-xs leading-relaxed text-zinc-800 dark:text-zinc-200 bg-black/5 dark:bg-white/5 backdrop-blur-md border border-white/40 dark:border-white/[0.08] rounded-sm shadow-sm">
+        <div className="px-3.5 py-2.5 text-xs leading-relaxed text-zinc-800 dark:text-zinc-200 bg-brand/10 border border-brand/20 rounded-f13 rounded-tr-f3">
           <p>{msg.content}</p>
         </div>
         <p className="text-[9px] font-mono text-zinc-400 dark:text-zinc-600 mt-1 px-1 text-right">{formatTime(msg.timestamp)}</p>
@@ -248,28 +247,28 @@ export function DevBotChat({ onItemAdded }: DevBotChatProps) {
   }
 
   return (
-    <div className={cn("rounded-sm overflow-hidden flex flex-col", GLASS)}>
+    <div className="panel flex flex-col">
       {dialog}
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-white/30 dark:border-white/10">
+      <div className="flex items-center justify-between px-f21 pb-f13 pt-f21">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-sm bg-brand/10 border border-brand/20 flex items-center justify-center relative">
+          <div className="size-[34px] rounded-f13 border border-zinc-200 dark:border-white/10 flex items-center justify-center relative">
             <Terminal className="w-4 h-4 text-brand" />
             <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-brand rounded-full animate-pulse" />
           </div>
           <div>
-            <h3 className="text-xs font-bold text-zinc-800 dark:text-zinc-200 font-mono uppercase tracking-wider">DevBot</h3>
-            <p className="text-[9px] font-mono text-zinc-400 dark:text-zinc-500">Smart Parse • Online</p>
+            <h3 className="eyebrow !text-zinc-900 dark:!text-zinc-100">DevBot</h3>
+            <p className="text-xs text-zinc-500">Smart Parse • Online</p>
           </div>
         </div>
-        <div className="flex items-center gap-1 px-2 py-1 bg-brand/5 border border-brand/10 rounded-sm">
+        <div className="flex items-center gap-f5 rounded-full border border-zinc-200 px-f8 py-f3 dark:border-white/10">
           <Sparkles className="w-3 h-3 text-brand" />
           <span className="text-[8px] font-mono font-bold text-brand uppercase tracking-wider">IA</span>
         </div>
       </div>
 
       {/* Messages */}
-      <div ref={messagesRef} className="flex-1 overflow-y-auto p-4 space-y-4 min-h-[280px] max-h-[420px] scrollbar-thin">
+      <div ref={messagesRef} className="flex-1 overflow-y-auto border-y border-zinc-900/5 p-f21 space-y-f13 min-h-[233px] max-h-[377px] scrollbar-thin dark:border-white/[0.06]">
         <AnimatePresence>
           {messages.map((msg, i) =>
             msg.role === "bot" ? (
@@ -286,10 +285,10 @@ export function DevBotChat({ onItemAdded }: DevBotChatProps) {
             animate={{ opacity: 1, y: 0 }}
             className="flex items-start gap-2.5 max-w-[70%]"
           >
-            <div className="shrink-0 w-7 h-7 rounded-sm bg-brand/10 border border-brand/20 flex items-center justify-center">
+            <div className="shrink-0 w-7 h-7 rounded-full border border-zinc-200 dark:border-white/10 flex items-center justify-center">
               <Bot className="w-3.5 h-3.5 text-brand" />
             </div>
-            <div className={cn("px-3.5 py-3 flex items-center gap-1", GLASS_BOT, "rounded-sm")}>
+            <div className={cn("px-3.5 py-3 flex items-center gap-1", GLASS_BOT, "rounded-f13 rounded-tl-f3")}>
               <span className="w-1.5 h-1.5 rounded-full bg-brand animate-bounce" style={{ animationDelay: "0ms" }} />
               <span className="w-1.5 h-1.5 rounded-full bg-brand animate-bounce" style={{ animationDelay: "150ms" }} />
               <span className="w-1.5 h-1.5 rounded-full bg-brand animate-bounce" style={{ animationDelay: "300ms" }} />
@@ -300,7 +299,7 @@ export function DevBotChat({ onItemAdded }: DevBotChatProps) {
       </div>
 
       {/* Input */}
-      <div className="border-t border-white/30 dark:border-white/10 p-3">
+      <div className="p-f13">
         <div className="relative">
           <textarea
             ref={inputRef}
@@ -309,7 +308,7 @@ export function DevBotChat({ onItemAdded }: DevBotChatProps) {
             onKeyDown={handleKeyDown}
             rows={1}
             placeholder="Pega un link, creds:, api:, o escribe una nota..."
-            className="w-full bg-white/50 dark:bg-zinc-900/50 backdrop-blur-sm border border-white/40 dark:border-white/10 rounded-sm px-3 py-2.5 pr-10 text-xs font-mono text-zinc-800 dark:text-zinc-200 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:border-brand transition-colors resize-none leading-relaxed"
+            className="w-full bg-transparent border border-zinc-200 dark:border-white/10 rounded-f13 px-f13 py-f8 pr-10 text-xs font-mono text-zinc-800 dark:text-zinc-200 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:border-brand transition-colors resize-none leading-relaxed"
           />
           <button
             onClick={() => parseAndSave(input)}
@@ -319,7 +318,7 @@ export function DevBotChat({ onItemAdded }: DevBotChatProps) {
             <CornerDownLeft className="w-4 h-4" />
           </button>
         </div>
-        <div className="flex gap-3 mt-2 text-[8px] font-mono text-zinc-400 dark:text-zinc-600 select-none">
+        <div className="flex flex-wrap gap-x-f13 gap-y-f3 mt-f8 px-f5 text-[10px] font-mono text-zinc-400 dark:text-zinc-600 select-none">
           <span><span className="text-brand">github.com/</span>user/repo</span>
           <span><span className="text-brand">creds:</span> host - user / pass</span>
           <span><span className="text-brand">api:</span> nombre - endpoint - key</span>

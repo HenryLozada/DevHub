@@ -5,17 +5,14 @@ import { ItemCard } from "./ItemCard";
 import { ItemModal } from "./ItemModal";
 import { DevBotChat } from "./DevBotChat";
 import { RippleButton } from "@/components/ui/ripple-button";
+import { CountUp } from "@/components/ui/count-up";
 import { InjectionSlot } from "@/components/playground/InjectionSlot";
 import {
   Search,
   Plus,
-  Terminal,
-  Lock,
   Layers,
-  Key,
   ShieldCheck,
 } from "lucide-react";
-import { FaGithub } from "@/components/icons";
 import { sileo } from "sileo";
 import { PasswordSecurityDialog } from "./PasswordSecurityDialog";
 
@@ -85,168 +82,88 @@ export function Dashboard() {
     return matchesSearch;
   });
 
+  const stats = [
+    { label: "Total", value: totalCount, color: "var(--color-brand)" },
+    { label: "Herramientas", value: toolsCount, color: "var(--color-brand)" },
+    { label: "Repos", value: reposCount, color: "var(--color-violet)" },
+    { label: "Bóveda", value: secureCount, color: "var(--color-cyan)" },
+  ];
+
   return (
-    <div className="max-w-7xl mx-auto px-3 md:px-6 lg:px-8 py-4 md:py-8 space-y-4 md:space-y-8 animate-in fade-in duration-300 relative">
+    <div className="mx-auto flex max-w-7xl flex-col gap-f21 px-f13 py-f21 md:px-f34 md:py-f34 relative">
       <InjectionSlot moduleId="devhub" className="absolute inset-0 pointer-events-none" />
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-zinc-200 dark:border-zinc-800 pb-5">
-        <div>
-          <h1 className="text-lg md:text-2xl font-mono font-bold tracking-tight text-zinc-900 dark:text-white flex items-center gap-2">
-            <span className="text-brand font-bold">#</span> DEVHUB
-          </h1>
-          <p className="text-xs font-mono text-zinc-500 dark:text-zinc-400 mt-1 uppercase tracking-wider">
-            Developer Toolbox & Credentials Locker
-          </p>
-        </div>
-         <div className="flex flex-col sm:flex-row gap-2">
-          <button onClick={() => setSecurityDialogOpen(true)} className="flex items-center justify-center gap-2 px-4 py-2.5 border border-zinc-300 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 hover:border-brand hover:text-brand font-bold font-mono text-xs uppercase tracking-wider transition-colors cursor-pointer">
-            <ShieldCheck className="w-4 h-4" /> Seguridad
-          </button>
-          <RippleButton
-           onClick={handleAddNew}
-          rippleColor="rgba(255,255,255,0.5)"
-          duration="600ms"
-          className="flex items-center justify-center gap-2 px-5 py-2.5 bg-black hover:bg-zinc-900 dark:bg-brand dark:hover:bg-brand-hi text-white dark:text-black font-bold font-mono text-xs uppercase tracking-wider transition-colors cursor-pointer border border-transparent overflow-hidden"
-        >
-          <Plus className="w-4 h-4" /> Añadir Recurso
-          </RippleButton>
-         </div>
-      </div>
 
-      {/* Stats Widgets */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 stagger">
-        {/* Total Items */}
-        <div className="relative border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950/70 dark:backdrop-blur-xl p-3 md:p-5 rounded-lg overflow-hidden select-none">
-          <div className="flex justify-between items-start">
-            <div className="min-w-0">
-              <p className="text-[9px] md:text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-widest truncate">
-                Total Items
+      {/* Resumen */}
+      <section className="panel relative z-10 flex flex-wrap items-center justify-between gap-f21 p-f21">
+        <div className="flex flex-wrap items-end gap-f34">
+          {stats.map((st) => (
+            <div key={st.label} className="cal-chip pl-f13" style={{ "--neon": st.color } as React.CSSProperties}>
+              <p className="eyebrow tracking-[0.2em]">{st.label}</p>
+              <p className="font-mono text-3xl font-light leading-none tracking-tighter tabular-nums text-zinc-900 dark:text-zinc-100">
+                <CountUp value={st.value} />
               </p>
-              <h3 className="text-xl md:text-3xl font-mono font-bold text-zinc-900 dark:text-white mt-1 md:mt-2 tabular-nums">
-                {totalCount}
-              </h3>
             </div>
-            <Layers className="w-4 h-4 md:w-5 md:h-5 text-zinc-400 dark:text-zinc-600 shrink-0" />
-          </div>
-        </div>
-
-        {/* Tools */}
-        <div className="relative border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950/70 dark:backdrop-blur-xl p-3 md:p-5 rounded-lg overflow-hidden select-none">
-          <div className="flex justify-between items-start">
-            <div className="min-w-0">
-              <p className="text-[9px] md:text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-widest truncate">
-                Herramientas
-              </p>
-              <h3 className="text-xl md:text-3xl font-mono font-bold text-brand mt-1 md:mt-2 tabular-nums">
-                {toolsCount}
-              </h3>
-            </div>
-            <Terminal className="w-4 h-4 md:w-5 md:h-5 text-brand/70 shrink-0" />
-          </div>
-        </div>
-
-        {/* Repositories */}
-        <div className="relative border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950/70 dark:backdrop-blur-xl p-3 md:p-5 rounded-lg overflow-hidden select-none">
-          <div className="flex justify-between items-start">
-            <div className="min-w-0">
-              <p className="text-[9px] md:text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-widest truncate">
-                Repositorios
-              </p>
-              <h3 className="text-xl md:text-3xl font-mono font-bold text-zinc-900 dark:text-white mt-1 md:mt-2 tabular-nums">
-                {reposCount}
-              </h3>
-            </div>
-            <FaGithub className="w-4 h-4 md:w-5 md:h-5 text-zinc-500 dark:text-zinc-400 shrink-0" />
-          </div>
-        </div>
-
-        {/* Credentials / API Keys */}
-        <div className="relative border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950/70 dark:backdrop-blur-xl p-3 md:p-5 rounded-lg overflow-hidden select-none">
-          <div className="flex justify-between items-start">
-            <div className="min-w-0">
-              <p className="text-[9px] md:text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-widest truncate">
-                Seguridad / API
-              </p>
-              <h3 className="text-xl md:text-3xl font-mono font-bold text-zinc-900 dark:text-white mt-1 md:mt-2 tabular-nums">
-                {secureCount}
-              </h3>
-            </div>
-            <div className="flex gap-1 text-zinc-500 dark:text-zinc-400 shrink-0">
-              <Lock className="w-3.5 h-3.5 md:w-4 md:h-4" />
-              <Key className="w-3.5 h-3.5 md:w-4 md:h-4" />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* DevBot Chat */}
-      <DevBotChat onItemAdded={refreshItems} />
-
-      {/* Filter and Search Bar */}
-      <div className="flex flex-col md:flex-row gap-4 justify-between items-stretch md:items-center">
-        {/* Category/Type Pills */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-2 md:pb-0 scrollbar-none select-none">
-          {[
-            { id: "All", label: "Todos" },
-            { id: "tool", label: "Herramientas" },
-            { id: "repo", label: "Repos" },
-            { id: "youtube", label: "YouTube" },
-            { id: "note", label: "Notas" },
-            { id: "credentials_apis", label: "Credenciales/APIs" },
-          ].map((tab) => {
-            const isActive = filterType === tab.id;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setFilterType(tab.id)}
-                className={`px-3.5 py-1.5 font-mono text-[11px] font-bold uppercase tracking-wider transition-colors cursor-pointer border ${
-                  isActive
-                    ? "bg-brand text-black border-brand"
-                    : "bg-white dark:bg-zinc-950/70 dark:backdrop-blur-xl text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-900"
-                }`}
-              >
-                {tab.label}
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Search */}
-        <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Buscar por título, descripción, categoría..."
-            className="w-full pl-9 pr-4 py-2 panel text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:border-brand font-sans text-xs transition-colors"
-          />
-        </div>
-      </div>
-
-      {/* Grid Layout of Items */}
-      {filteredItems.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 stagger">
-          {filteredItems.map((item) => (
-            <ItemCard
-              key={item.id}
-              item={item}
-              onEdit={handleEdit}
-              onDelete={handleDelete}
-            />
           ))}
         </div>
-      ) : (
-        <div className="text-center py-16 rounded-2xl border border-dashed border-zinc-300 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/10">
-          <Layers className="w-10 h-10 text-brand mx-auto mb-3 animate-bounce [animation-duration:2.4s]" />
-          <p className="text-sm font-mono font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
-            No se encontraron elementos
-          </p>
-          <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-1 font-sans">
-            Comienza agregando un nuevo recurso utilizando el botón superior.
-          </p>
+        <div className="flex gap-f8">
+          <button onClick={() => setSecurityDialogOpen(true)} className="flex h-9 items-center gap-f5 rounded-full border border-zinc-200 px-f13 text-xs text-zinc-600 transition-colors hover:border-brand hover:text-brand dark:border-white/10 dark:text-zinc-300">
+            <ShieldCheck className="size-4" /> Seguridad
+          </button>
+          <RippleButton onClick={handleAddNew} rippleColor="#000000" duration="600ms"
+            className="flex h-9 items-center gap-f5 overflow-hidden rounded-full bg-brand px-f13 text-xs font-semibold text-black transition-colors hover:bg-brand-hi">
+            <Plus className="size-4" /> Recurso
+          </RippleButton>
         </div>
-      )}
+      </section>
+
+      {/* Contenido 62% · DevBot 38% */}
+      <div className="relative z-10 grid gap-f21 xl:grid-cols-[1.618fr_1fr] xl:items-start">
+        <div className="flex min-w-0 flex-col gap-f21">
+          {/* Filtros + búsqueda */}
+          <div className="flex flex-col gap-f13 md:flex-row md:items-center md:justify-between">
+            <div className="no-scrollbar inline-flex max-w-full overflow-x-auto rounded-full border border-zinc-200 p-f3 dark:border-white/10">
+              {[
+                { id: "All", label: "Todos" },
+                { id: "tool", label: "Tools" },
+                { id: "repo", label: "Repos" },
+                { id: "youtube", label: "YouTube" },
+                { id: "note", label: "Notas" },
+                { id: "credentials_apis", label: "Bóveda" },
+              ].map((tab) => (
+                <button key={tab.id} onClick={() => setFilterType(tab.id)}
+                  className={`shrink-0 rounded-full px-f13 py-f5 font-mono text-[10px] uppercase tracking-wider transition-colors ${
+                    filterType === tab.id ? "bg-zinc-900 text-white dark:bg-white/10 dark:text-zinc-100" : "text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-200"
+                  }`}>
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+            <div className="relative md:w-[233px]">
+              <Search className="absolute left-f13 top-1/2 size-3.5 -translate-y-1/2 text-zinc-400" />
+              <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Buscar…"
+                className="w-full rounded-full border border-zinc-200 bg-transparent py-f8 pl-f34 pr-f13 text-xs text-zinc-900 placeholder:text-zinc-400 transition-colors focus:border-brand focus:outline-none dark:border-white/10 dark:text-white" />
+            </div>
+          </div>
+
+          {filteredItems.length > 0 ? (
+            <div className="grid grid-cols-1 gap-f21 md:grid-cols-2 stagger">
+              {filteredItems.map((item) => (
+                <ItemCard key={item.id} item={item} onEdit={handleEdit} onDelete={handleDelete} />
+              ))}
+            </div>
+          ) : (
+            <div className="rounded-f21 border border-dashed border-zinc-300 px-f21 py-f55 text-center dark:border-white/10">
+              <Layers className="mx-auto mb-f8 size-5 text-zinc-400" />
+              <p className="eyebrow">Sin resultados</p>
+              <p className="mt-f5 text-sm text-zinc-500">Agrega un recurso o cambia el filtro.</p>
+            </div>
+          )}
+        </div>
+
+        <div className="xl:sticky xl:top-[89px]">
+          <DevBotChat onItemAdded={refreshItems} />
+        </div>
+      </div>
 
       {/* Modal Dialog */}
       {isModalOpen && (
