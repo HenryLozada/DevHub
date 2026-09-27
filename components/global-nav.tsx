@@ -1,8 +1,6 @@
 import { Calendar as IoCalendarOutline, Wallet, CheckCircle2, Terminal, Puzzle, Sun, Moon } from "lucide-react"
 import { motion } from "motion/react"
-import { useState } from "react"
 import { useNavBadges } from "@/lib/nav-badges"
-import { PixelPulse } from "@/components/pixel-pulse"
 import { CountUp } from "@/components/ui/count-up"
 import { cn } from "@/lib/utils"
 
@@ -28,7 +26,6 @@ const SPRING = { type: "spring", stiffness: 500, damping: 38 } as const
 
 export function GlobalNav({ activeTab, onTabChange, theme, onToggleTheme, rightSlot }: GlobalNavProps) {
   const badges = useNavBadges()
-  const [activeEl, setActiveEl] = useState<HTMLButtonElement | null>(null)
   return (
     <>
       <nav className="sticky top-0 z-50 border-b border-white/10 bg-black/95 backdrop-blur-xl">
@@ -50,20 +47,22 @@ export function GlobalNav({ activeTab, onTabChange, theme, onToggleTheme, rightS
 
             {/* Tabs (desktop / tablet) */}
             <div className="relative hidden h-full items-center gap-1 md:flex">
-              <PixelPulse target={activeEl} />
               {TABS.map(({ id, label, icon: Icon }) => {
                 const active = activeTab === id
                 return (
                   <button
                     key={id}
-                    ref={active ? setActiveEl : undefined}
                     onClick={() => onTabChange(id)}
                     className={cn(
                       "relative flex h-9 shrink-0 cursor-pointer select-none items-center gap-f8 rounded-full px-f13 font-mono text-xs uppercase tracking-wider transition-colors",
                       active ? "text-white" : "text-zinc-500 hover:text-zinc-200"
                     )}
                   >
-                    <Icon className="relative size-3.5" />
+                    {active && (
+                      <motion.span layoutId="nav-line" transition={SPRING}
+                        className="absolute inset-x-f13 -bottom-[14px] h-[2px] bg-brand" />
+                    )}
+                    <Icon className={cn("relative size-3.5", active && "text-brand")} />
                     <span className="relative">{label}</span>
                     <NavBadge n={badges[id]} active={active} />
                   </button>
@@ -135,10 +134,7 @@ export function GlobalNav({ activeTab, onTabChange, theme, onToggleTheme, rightS
 function NavBadge({ n, active }: { n?: number; active: boolean }) {
   if (!n) return null
   return (
-    <span className={cn(
-      "relative min-w-[18px] rounded-full px-f5 text-center font-mono text-[10px] leading-[18px] tabular-nums transition-colors",
-      active ? "bg-brand text-black" : "bg-white/[0.08] text-zinc-300"
-    )}>
+    <span className={cn("relative font-mono text-[10px] tabular-nums", active ? "text-brand" : "text-zinc-500")}>
       <CountUp value={n} />
     </span>
   )
