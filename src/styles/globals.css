@@ -337,6 +337,7 @@ body::after {
 [data-slot="dialog-overlay"][data-exiting] {
   opacity: 0;
 }
+@layer components {
 /* Reveal (Windows 10 Fluent): borde y fondo iluminados por la luz del cursor */
 .reveal {
   --rx: -9999px;
@@ -371,6 +372,8 @@ body::after {
 .reveal:hover::after { opacity: 1; }
 @media (hover: none) { .reveal::before, .reveal::after { display: none; } }
 
+}
+
 /* La luz toma el color del objeto que toca: los chips reflejan su propio tono */
 .reveal-tint::before, .reveal-tint::after { inset: -1px; }
 .reveal-tint::before {
@@ -381,6 +384,7 @@ body::after {
 }
 .group:hover .reveal-tint::after { opacity: 1; }
 
+@layer components {
 /* Eventos del calendario: solo una barra fina con el color de la categoría */
 .cal-chip {
   border-left: 2px solid var(--neon, #76b900);
@@ -388,6 +392,9 @@ body::after {
 }
 .dark .cal-chip { color: rgb(212 212 216); }
 .cal-chip.reveal-tint::before, .cal-chip.reveal-tint::after { inset: 0 0 0 -2px; }
+
+@layer components {
+}
 
 /* ── Sistema visual compartido (calendario → todos los hubs) ── */
 .panel {
@@ -408,6 +415,8 @@ body::after {
 }
 .hairline { height: 1px; background: linear-gradient(90deg, transparent, rgb(0 0 0 / 0.1), transparent); }
 .dark .hairline { background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.1), transparent); }
+
+}
 
 /* Paleta armónica: tonos más profundos en claro para mantener contraste */
 :root { --c-pos: #1f9e70; --c-neg: #d4533f; --c-warn: #b7811d; --c-info: #3f72c9; --c-cyan: #1f96ab; --c-violet: #7a5bd6; }

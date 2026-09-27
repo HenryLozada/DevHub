@@ -15,8 +15,7 @@ interface ChatPanelProps {
   onClose: () => void
 }
 
-const GLASS = "backdrop-blur-xl bg-white/40 dark:bg-zinc-950/40 border border-white/30 dark:border-white/10 shadow-sm shadow-black/5"
-const GLASS_INNER = "backdrop-blur-md bg-white/60 dark:bg-zinc-950/60 border border-white/40 dark:border-white/[0.08]"
+const GLASS_INNER = "bg-zinc-900/[0.03] dark:bg-white/[0.04] border border-zinc-900/5 dark:border-white/[0.06]"
 
 const SUGGESTIONS = [
   { icon: "\u{1F4CA}", text: "Analiza mis finanzas del mes" },
@@ -210,7 +209,7 @@ ACCIONES (solo si el usuario pide crear/guardar/eliminar/completar):
         key={i}
         onClick={function() { if (!loading) handleSend(s.text) }}
         disabled={loading}
-        className={cn(GLASS_INNER, "w-full px-3 py-2 rounded-sm text-left cursor-pointer hover:bg-white/80 dark:hover:bg-zinc-950/80 hover:border-brand/30 transition-all duration-200 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed")}
+        className={cn(GLASS_INNER, "reveal w-full px-f13 py-f8 rounded-f13 text-left cursor-pointer hover:bg-white/80 dark:hover:bg-zinc-950/80 hover:border-brand/30 transition-all duration-200 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed")}
       >
         {s.icon + " " + s.text}
       </button>
@@ -229,24 +228,24 @@ ACCIONES (solo si el usuario pide crear/guardar/eliminar/completar):
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 20, scale: 0.97 }}
           transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-          className={cn("fixed bottom-40 md:bottom-24 right-3 md:right-6 left-3 md:left-auto w-auto md:w-[26rem] flex flex-col z-50 rounded-sm overflow-hidden", GLASS)}
+          className={cn("fixed bottom-40 md:bottom-24 right-3 md:right-6 left-3 md:left-auto w-auto md:w-[377px] flex flex-col z-50 panel !bg-white/85 dark:!bg-zinc-950/85 shadow-2xl shadow-black/30")}
           style={{ height: "520px", maxHeight: "calc(100dvh - 12rem)" }}
         >
-          <div className="flex items-center justify-between px-4 py-3 border-b border-white/30 dark:border-white/10 shrink-0">
+          <div className="flex items-center justify-between px-f21 py-f13 border-b border-zinc-900/5 dark:border-white/[0.06] shrink-0">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-sm bg-brand/10 border border-brand/20 flex items-center justify-center relative">
+              <div className="size-[34px] rounded-f13 border border-zinc-200 dark:border-white/10 flex items-center justify-center relative">
                 <Bot className="w-4 h-4 text-brand" />
                 <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-brand rounded-full" />
               </div>
               <div>
-                <h3 className="text-xs font-bold text-zinc-800 dark:text-zinc-200 font-mono uppercase tracking-wider">DevBot</h3>
-                <p className="text-[9px] font-mono text-zinc-400 dark:text-zinc-500">Copiloto de PersonalHub</p>
+                <h3 className="eyebrow !text-zinc-900 dark:!text-zinc-100">DevBot</h3>
+                <p className="text-xs text-zinc-500">Copiloto de PersonalHub</p>
               </div>
             </div>
             <div className="flex items-center gap-1">
-              <button onClick={function() { fileInputRef.current?.click() }} className="p-1 rounded-sm border border-white/30 dark:border-white/10 hover:border-brand/40 transition-colors cursor-pointer group relative" title="Cambiar foto de perfil">
+              <button onClick={function() { fileInputRef.current?.click() }} className="p-1 rounded-full border border-zinc-200 dark:border-white/10 hover:border-brand/40 transition-colors cursor-pointer group relative" title="Cambiar foto de perfil">
                 {avatar ? (
-                  <img src={avatar} alt="Tu foto" className="w-6 h-6 rounded-sm object-cover" />
+                  <img src={avatar} alt="Tu foto" className="w-6 h-6 rounded-full object-cover" />
                 ) : (
                   <Camera className="w-3.5 h-3.5 text-zinc-400 group-hover:text-brand" />
                 )}
@@ -261,13 +260,13 @@ ACCIONES (solo si el usuario pide crear/guardar/eliminar/completar):
             </div>
           </div>
 
-          <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin" ref={scrollRef}>
+          <div className="flex-1 overflow-y-auto p-f21 space-y-f13 scrollbar-thin" ref={scrollRef}>
             {messages.length === 0 ? (
               <div className="h-full flex flex-col items-center justify-center text-center px-6">
-                <div className="w-14 h-14 rounded-sm bg-brand/5 border border-brand/10 flex items-center justify-center mb-4 backdrop-blur-sm">
+                <div className="size-[55px] rounded-full border border-zinc-200 dark:border-white/10 flex items-center justify-center mb-f21">
                   <Bot className="w-7 h-7 text-brand" />
                 </div>
-                <p className="text-sm font-bold text-zinc-500 dark:text-zinc-400 font-mono uppercase tracking-wider mb-3">Que necesitas?</p>
+                <p className="eyebrow mb-f13">Que necesitas?</p>
                 <div className="space-y-1.5 text-[10px] font-mono text-zinc-400 dark:text-zinc-500 w-full">
                   {suggestionBtns}
                 </div>
@@ -277,7 +276,7 @@ ACCIONES (solo si el usuario pide crear/guardar/eliminar/completar):
             )}
             {loading && (
               <div className="flex justify-start">
-                <div className={cn("flex items-center gap-2.5 px-4 py-3", GLASS_INNER, "rounded-sm")}>
+                <div className={cn("flex items-center gap-2.5 px-4 py-3", GLASS_INNER, "rounded-f13")}>
                   <div className="flex gap-1">
                     <span className="w-1.5 h-1.5 rounded-full bg-brand animate-bounce" style={{ animationDelay: "0ms" }} />
                     <span className="w-1.5 h-1.5 rounded-full bg-brand animate-bounce" style={{ animationDelay: "150ms" }} />
@@ -295,13 +294,13 @@ ACCIONES (solo si el usuario pide crear/guardar/eliminar/completar):
                 {pending.map((a, i) => <li key={i}>• {a.label}</li>)}
               </ul>
               <div className="flex gap-2">
-                <button onClick={() => resolvePending(true)} className="px-3 py-1 text-xs font-mono rounded-sm bg-neg text-white hover:bg-neg cursor-pointer">Eliminar</button>
-                <button onClick={() => resolvePending(false)} className="px-3 py-1 text-xs font-mono rounded-sm border border-zinc-300 dark:border-zinc-700 text-zinc-600 dark:text-zinc-300 cursor-pointer">Cancelar</button>
+                <button onClick={() => resolvePending(true)} className="px-3 py-1 text-xs font-mono rounded-full bg-neg text-black hover:brightness-110 cursor-pointer">Eliminar</button>
+                <button onClick={() => resolvePending(false)} className="px-3 py-1 text-xs font-mono rounded-full border border-zinc-300 dark:border-white/10 text-zinc-600 dark:text-zinc-300 cursor-pointer">Cancelar</button>
               </div>
             </div>
           )}
 
-          <div className="border-t border-white/30 dark:border-white/10 p-3 shrink-0">
+          <div className="border-t border-zinc-900/5 dark:border-white/[0.06] p-f13 shrink-0">
             <ChatInput onSend={handleSend} disabled={loading} />
           </div>
         </motion.div>
