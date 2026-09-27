@@ -13,7 +13,7 @@ interface Props {
 
 export function DynamicControls({ meta, values, onChange }: Props) {
   return (
-    <div className="space-y-4">
+    <div className="space-y-f21">
       {meta.props.map((def) => (
         <ControlRow key={def.key} def={def} value={values[def.key]} onChange={(v) => onChange(def.key, v)} />
       ))}

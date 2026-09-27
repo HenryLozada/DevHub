@@ -9,7 +9,7 @@ interface Props {
 export function SelectControl({ def, value, onChange }: Props) {
   return (
     <div>
-      <label className="block text-[10px] font-mono font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-widest mb-1.5">
+      <label className="block eyebrow block mb-f8">
         {def.label}
       </label>
       <select

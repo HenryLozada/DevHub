@@ -34,7 +34,7 @@ export function CodeExport({ meta, values, integrationSnippet }: Props) {
     <div className="relative space-y-2">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-1.5">
-          <label className="text-[10px] font-mono font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-widest">
+          <label className="eyebrow">
             Código
           </label>
           {integrationSnippet && (
@@ -44,7 +44,7 @@ export function CodeExport({ meta, values, integrationSnippet }: Props) {
                 className={`px-2 py-0.5 text-[9px] font-mono font-bold uppercase tracking-wider border transition-colors cursor-pointer ${
                   mode === "jsx"
                     ? "bg-brand text-black border-brand"
-                    : "bg-white dark:bg-zinc-950 text-zinc-500 dark:text-zinc-400 border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-900"
+                    : "bg-white dark:bg-zinc-950 text-zinc-500 dark:text-zinc-400 rounded-full border-zinc-200 dark:border-white/10 hover:bg-zinc-900/5 dark:hover:bg-white/5"
                 }`}
               >
                 JSX
@@ -54,7 +54,7 @@ export function CodeExport({ meta, values, integrationSnippet }: Props) {
                 className={`px-2 py-0.5 text-[9px] font-mono font-bold uppercase tracking-wider border transition-colors cursor-pointer ${
                   mode === "integration"
                     ? "bg-brand text-black border-brand"
-                    : "bg-white dark:bg-zinc-950 text-zinc-500 dark:text-zinc-400 border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-900"
+                    : "bg-white dark:bg-zinc-950 text-zinc-500 dark:text-zinc-400 rounded-full border-zinc-200 dark:border-white/10 hover:bg-zinc-900/5 dark:hover:bg-white/5"
                 }`}
               >
                 + Integración
@@ -64,7 +64,7 @@ export function CodeExport({ meta, values, integrationSnippet }: Props) {
         </div>
         <button
           onClick={handleCopy}
-          className="flex items-center gap-1 px-2.5 py-1.5 text-[10px] font-mono font-bold uppercase tracking-wider border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-900 text-zinc-600 dark:text-zinc-400 hover:text-brand transition-colors rounded-lg cursor-pointer"
+          className="flex items-center gap-1 px-2.5 py-1.5 text-[10px] font-mono font-bold uppercase tracking-wider border rounded-full border-zinc-200 dark:border-white/10 hover:bg-zinc-900/5 dark:hover:bg-white/5 text-zinc-600 dark:text-zinc-400 hover:text-brand transition-colors rounded-lg cursor-pointer"
         >
           {copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
           {copied ? "Copiado" : "Copiar"}

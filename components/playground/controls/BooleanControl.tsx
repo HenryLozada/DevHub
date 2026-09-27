@@ -9,21 +9,21 @@ interface Props {
 export function BooleanControl({ def, value, onChange }: Props) {
   return (
     <div className="flex items-center justify-between">
-      <label className="text-[10px] font-mono font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-widest">
+      <label className="eyebrow">
         {def.label}
       </label>
       <button
         type="button"
         onClick={() => onChange(!value)}
-        className={`relative w-10 h-5 rounded-sm transition-colors border ${
+        className={`relative w-[34px] h-[21px] rounded-full transition-colors border ${
           value
             ? "bg-brand border-brand"
             : "bg-zinc-200 dark:bg-zinc-800 border-zinc-300 dark:border-zinc-700"
         }`}
       >
         <span
-          className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-sm transition-transform ${
-            value ? "translate-x-5" : "translate-x-0"
+          className={`absolute top-[2px] left-[2px] size-[15px] bg-white rounded-full transition-transform ${
+            value ? "translate-x-[13px]" : "translate-x-0"
           }`}
         />
       </button>
